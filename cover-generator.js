@@ -25,12 +25,43 @@ const LOGO = {
   bottom: 40
 };
 
-async function fetchBuffer(url) {
-  const response = await fetch(url);
-  if (!response.ok) {
-    throw new Error(`Download immagine fallito (${response.status})`);
+const imageCache = new Map();
+const pendingDownloads = new Map();
+const IMAGE_TTL = 6 * 60 * 60 * 1000;
+const MAX_IMAGE_CACHE = 80;
+
+function getImageFromCache(url) {
+  const entry = imageCache.get(url);
+  if (!entry) return null;
+  if (entry.expiresAt <= Date.now()) { imageCache.delete(url); return null; }
+  return entry.buffer;
+}
+
+function saveImageToCache(url, buffer) {
+  imageCache.set(url, { buffer, expiresAt: Date.now() + IMAGE_TTL });
+  while (imageCache.size > MAX_IMAGE_CACHE) {
+    const firstKey = imageCache.keys().next().value;
+    if (!firstKey) break;
+    imageCache.delete(firstKey);
   }
-  return Buffer.from(await response.arrayBuffer());
+}
+
+async function fetchBuffer(url) {
+  const cached = getImageFromCache(url);
+  if (cached) return cached;
+  if (pendingDownloads.has(url)) return pendingDownloads.get(url);
+
+  const promise = (async () => {
+    const response = await fetch(url, { headers: { "User-Agent": "Nuvio-Top10-Custom-Covers/6.0" } });
+    if (!response.ok) throw new Error(`Download immagine fallito (${response.status})`);
+    const buffer = Buffer.from(await response.arrayBuffer());
+    saveImageToCache(url, buffer);
+    return buffer;
+  })();
+
+  pendingDownloads.set(url, promise);
+  try { return await promise; }
+  finally { pendingDownloads.delete(url); }
 }
 
 function numberSvg(rank) {
@@ -63,7 +94,7 @@ function numberSvg(rank) {
 async function createRoundedArtwork(buffer) {
   const resized = await sharp(buffer)
     .resize(CARD.width, CARD.height, { fit: "cover", position: "centre" })
-    .png()
+    .png({ compressionLevel: 8, adaptiveFiltering: true })
     .toBuffer();
 
   const mask = Buffer.from(`
@@ -74,7 +105,7 @@ async function createRoundedArtwork(buffer) {
 
   return sharp(resized)
     .composite([{ input: mask, blend: "dest-in" }])
-    .png()
+    .png({ compressionLevel: 8, adaptiveFiltering: true })
     .toBuffer();
 }
 
@@ -108,7 +139,7 @@ async function prepareLogo(buffer) {
 
   const logo = await sharp(buffer)
     .resize({ width, height, fit: "inside", withoutEnlargement: true })
-    .png()
+    .png({ compressionLevel: 8, adaptiveFiltering: true })
     .toBuffer();
 
   const pad = 32;
@@ -137,7 +168,7 @@ async function prepareLogo(buffer) {
     }
   })
     .composite([{ input: shadowMask, blend: "dest-in" }])
-    .png()
+    .png({ compressionLevel: 8, adaptiveFiltering: true })
     .toBuffer();
 
   return {
@@ -201,6 +232,6 @@ export async function createTopCover({ rank, artworkUrl, logoUrl = null }) {
     }
   })
     .composite(composites)
-    .png()
+    .png({ compressionLevel: 8, adaptiveFiltering: true })
     .toBuffer();
 }

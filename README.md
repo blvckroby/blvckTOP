@@ -1,4 +1,4 @@
-# Nuvio Top 10 Custom Covers v5
+# Nuvio Top 10 Custom Covers v6
 
 Addon configurabile per Nuvio/Stremio.
 
@@ -145,3 +145,17 @@ Le cover sono:
 - `posterShape: "landscape"` nel catalogo.
 
 Il generatore usa Inter quando disponibile. Il Dockerfile installa `fonts-inter`.
+
+
+## Cache e velocità (v6)
+
+- Cover PNG in RAM per 24 ore.
+- Richieste contemporanee della stessa cover condividono una sola generazione.
+- Dati TMDB `/images` in cache per 6 ore.
+- Risoluzione IMDb → TMDB in cache per 24 ore.
+- Backdrop TMDB usa `w1280` invece di `original`.
+- Backdrop/logo scaricati restano in RAM per 6 ore.
+- Manifest/cataloghi/meta sorgente in cache per 5 minuti.
+- Le cover restituiscono `Cache-Control: public, max-age=86400, immutable`.
+
+Su Render Free la cache RAM viene persa a ogni cold start/riavvio, quindi il primo caricamento dopo lo sleep può ancora essere più lento.

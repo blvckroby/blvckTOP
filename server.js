@@ -16,6 +16,29 @@ const app = express();
 const PORT = Number(process.env.PORT || 3000);
 const SOURCE_MANIFEST_URL = process.env.SOURCE_MANIFEST_URL;
 
+const jsonCache = new Map();
+const coverCache = new Map();
+const pendingCovers = new Map();
+const JSON_TTL = 5 * 60 * 1000;
+const COVER_TTL = 24 * 60 * 60 * 1000;
+const MAX_COVER_CACHE = 120;
+
+function getMemoryCache(map, key) {
+  const entry = map.get(key);
+  if (!entry) return null;
+  if (entry.expiresAt <= Date.now()) { map.delete(key); return null; }
+  return entry.value;
+}
+
+function setMemoryCache(map, key, value, ttl, maxItems = 500) {
+  map.set(key, { value, expiresAt: Date.now() + ttl });
+  while (map.size > maxItems) {
+    const firstKey = map.keys().next().value;
+    if (!firstKey) break;
+    map.delete(firstKey);
+  }
+}
+
 if (!SOURCE_MANIFEST_URL) {
   throw new Error("SOURCE_MANIFEST_URL non configurato.");
 }
@@ -41,15 +64,17 @@ function publicBase(req) {
 }
 
 async function fetchJson(url) {
+  const cached = getMemoryCache(jsonCache, url);
+  if (cached) return cached;
+
   const response = await fetch(url, {
-    headers: { "User-Agent": "Nuvio-Top10-Custom-Covers/5.0" }
+    headers: { "User-Agent": "Nuvio-Top10-Custom-Covers/6.0" }
   });
 
-  if (!response.ok) {
-    throw new Error(`Sorgente HTTP ${response.status}`);
-  }
-
-  return response.json();
+  if (!response.ok) throw new Error(`Sorgente HTTP ${response.status}`);
+  const data = await response.json();
+  setMemoryCache(jsonCache, url, data, JSON_TTL, 300);
+  return data;
 }
 
 function catalogKey(type, id) {
@@ -262,43 +287,55 @@ app.get("/c/:token/meta/:type/:id.json", async (req, res) => {
 app.get("/c/:token/top-cover", async (req, res) => {
   try {
     const config = decryptConfig(req.params.token);
-
     const rank = Math.max(1, Math.min(99, Number(req.query.rank || 1)));
     const type = String(req.query.type || "movie");
     const tmdbId = req.query.tmdbId ? String(req.query.tmdbId) : null;
-
     let artworkUrl = req.query.artwork ? String(req.query.artwork) : null;
     let logoUrl = req.query.logo ? String(req.query.logo) : null;
 
-    if (tmdbId && (!artworkUrl || !logoUrl)) {
-      const images = await getTmdbImages(
-        type,
-        tmdbId,
-        config.tmdbApiKey
-      );
+    const coverKey = [req.params.token, rank, type, tmdbId || "", artworkUrl || "", logoUrl || ""].join("|");
+    const cachedPng = getMemoryCache(coverCache, coverKey);
 
-      if (!artworkUrl) artworkUrl = chooseBackdrop(images);
-      if (!logoUrl) logoUrl = chooseLogo(images);
+    if (cachedPng) {
+      res.setHeader("Content-Type", "image/png");
+      res.setHeader("Cache-Control", "public, max-age=86400, immutable");
+      res.setHeader("X-Cover-Cache", "HIT");
+      return res.send(cachedPng);
     }
 
-    if (!artworkUrl) {
-      return res.status(400).json({ error: "Nessun backdrop disponibile." });
+    if (pendingCovers.has(coverKey)) {
+      const png = await pendingCovers.get(coverKey);
+      res.setHeader("Content-Type", "image/png");
+      res.setHeader("Cache-Control", "public, max-age=86400, immutable");
+      res.setHeader("X-Cover-Cache", "SHARED");
+      return res.send(png);
     }
 
-    const png = await createTopCover({
-      rank,
-      artworkUrl,
-      logoUrl
-    });
+    const generationPromise = (async () => {
+      if (tmdbId && (!artworkUrl || !logoUrl)) {
+        const images = await getTmdbImages(type, tmdbId, config.tmdbApiKey);
+        if (!artworkUrl) artworkUrl = chooseBackdrop(images);
+        if (!logoUrl) logoUrl = chooseLogo(images);
+      }
+      if (!artworkUrl) throw new Error("Nessun backdrop disponibile.");
+      const png = await createTopCover({ rank, artworkUrl, logoUrl });
+      setMemoryCache(coverCache, coverKey, png, COVER_TTL, MAX_COVER_CACHE);
+      return png;
+    })();
 
-    res.setHeader("Content-Type", "image/png");
-    res.setHeader("Cache-Control", "public, max-age=86400");
-    res.send(png);
+    pendingCovers.set(coverKey, generationPromise);
+    try {
+      const png = await generationPromise;
+      res.setHeader("Content-Type", "image/png");
+      res.setHeader("Cache-Control", "public, max-age=86400, immutable");
+      res.setHeader("X-Cover-Cache", "MISS");
+      res.send(png);
+    } finally {
+      pendingCovers.delete(coverKey);
+    }
   } catch (err) {
     console.error(err);
-    res.status(500).json({
-      error: err.message || "Errore generazione cover"
-    });
+    res.status(500).json({ error: err.message || "Errore generazione cover" });
   }
 });
 
