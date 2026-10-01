@@ -82,7 +82,7 @@
     .cv .poster { position: relative; z-index: 2; display: block; aspect-ratio: 16/9; border-radius: 12px; overflow: hidden;
       border: 1px solid rgba(255,255,255,.16); box-shadow: 0 18px 40px rgba(0,0,0,.55); transition: transform .3s var(--ease); }
     .cv:hover .poster { transform: translateY(-6px); }
-    .poster::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(0,0,0,.7)); }
+    .poster img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
     .poster b { position: absolute; z-index: 1; left: 11px; bottom: 9px; right: 10px; font-size: 14px; font-weight: 800; letter-spacing: -.01em; line-height: 1.15; text-shadow: 0 2px 8px rgba(0,0,0,.5); }
     .poster i { position: absolute; z-index: 1; left: 10px; top: 9px; font-style: normal; font-size: 9px; font-weight: 800; letter-spacing: .14em; padding: 3px 6px; border-radius: 5px; background: rgba(0,0,0,.35); }
 
@@ -240,7 +240,6 @@
       .cv { width: 138px; }
       .cv:nth-child(n+3) { display: none; }
       .cv .n { font-size: 104px; right: -32px; bottom: -14px; -webkit-text-stroke-width: 2.5px; }
-      .poster b { font-size: 11px; left: 8px; bottom: 7px; }
       .band { margin-bottom: 22px; padding: 12px 0; border-radius: 16px; }
       .brand { font-size: 17px; }
       .track { gap: 36px; }
@@ -420,8 +419,8 @@
     const svgUri = (w, h, body) => "data:image/svg+xml;utf8," + encodeURIComponent(
       `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}"><g fill="#fff" font-family="Arial Black, Arial, Helvetica, sans-serif" font-weight="900">${body}</g></svg>`);
     const LOGO = {
-      hbomax:  svgUri(120, 48, '<text x="60" y="38" font-size="42" text-anchor="middle" letter-spacing="-2">max</text>'),
-      rakuten: svgUri(150, 48, '<text x="75" y="35" font-size="30" text-anchor="middle" letter-spacing="-1">Rakuten TV</text>'),
+      hbomax:  "https://upload.wikimedia.org/wikipedia/commons/b/b3/HBO_Max_%282025%29.svg",
+      rakuten: "https://upload.wikimedia.org/wikipedia/commons/e/e5/Rakuten_TV_logo.svg",
       chili:   svgUri(120, 48, '<text x="60" y="36" font-size="34" text-anchor="middle" letter-spacing="1">CHILI</text>'),
       tmdb:    "https://upload.wikimedia.org/wikipedia/commons/8/89/Tmdb.new.logo.svg",
       disney:  "https://upload.wikimedia.org/wikipedia/commons/3/3e/Disney%2B_logo.svg",
@@ -695,18 +694,14 @@
       $("track").innerHTML = row + row;
     })();
 
-    /* ---------- cover casuali ---------- */
+    /* ---------- cover Top 4 (immagini reali dell'addon) ---------- */
     (function () {
-      const titles = ["Notte Eterna", "Ombre di Roma", "Oltre il Confine", "Ultimo Inverno", "Codice Rosso", "La Città Muta",
-        "Rotta Sud", "Sangue Blu", "Eclissi", "Mare Nero", "Il Sentiero", "Fuoco Lento", "Orizzonte", "Vertigine", "Lupi di Strada"];
-      const pick = [...titles].sort(() => Math.random() - .5).slice(0, 4);
-      const h0 = Math.floor(Math.random() * 360);
-      $("covers").innerHTML = pick.map((t, i) => {
-        const h = (h0 + i * 83 + Math.random() * 30) % 360;
-        const x = 20 + Math.random() * 60, y = 15 + Math.random() * 45;
-        const bg = `radial-gradient(circle at ${x}% ${y}%, hsl(${(h + 40) % 360} 90% 66%) 0, transparent 46%), linear-gradient(${120 + Math.random() * 90}deg, hsl(${h} 70% 38%), hsl(${(h + 60) % 360} 75% 16%))`;
-        return `<div class="cv"><span class="n">${i + 1}</span><span class="poster" style="background:${bg}"><i>TOP 10</i><b>${t}</b></span></div>`;
-      }).join("");
+      const base = "https://blvcktop.onrender.com/c/nmoG69qfX6e3tqJVtEaK0sLlrNOFz-tITBc8c_UFds0rhMDfnZ-4y3Voo2jyILN134ZxoR2UJGX-vRgMiRxzjHUXd89UodKEP0DDdxnmMvgKDSz8-zLo7LJDe4N8s3SPRqLqnpSKVUJ7EsFDX-pns5AQ-m87EnZfertRA1iCNCf7WWI8PYUdK2NNhNKJv340KtymzpS7ZIsBqhJ3wzX25TFm1ABaccoq2schhTtYqnHtCkrUbhXQ9UzmzZFB-Ey53JVyhROvBnG1r4rWkFRsUbZR18xymaqjAipZFx5lWWy6rKQd_nAOfwSl12l7arfrHIzvDqtALiliTrSIrsSetFYbqK_F0g8Rf6QkqgU5T2UOX_WbX5cann-Uk-ZdMrXn-RmrxaXLRb2BevMgu_9WX66lThnGFEsRE77gjZ9JGP0MJ4_iE3Nw0b6p2BxN4oSm8pwy5uBfb-YmVPBegWqUCnvzhfMNlxEAs2w5d7iWFnvWMqGQ0_HZPjfeFV0rCUZl_X1pScNTQb_uUkjfz_YsZ9C7kIHp1LNUJ1PAumE3bodIYfg5SSNVJ82tyPjIBJ9lw8YTyLN6CMeQz09UinnLpiBYXwxxhK2Adcd3sW3KMuxbjoYJygrtYCVufR7qGXdr-z4wrzvzV23krFKiv5KzZzPKeHy0DD52Nx0OFkR6TiSNf4XqLgrgQzjX08mgIb7iYE0G8iKdeJFwK144VLwrFXqWy_TvMGfSAgPE4feLv26DK3jZ2A-QL_21xOQ6BI6ZzxSOl0p6aurvM_naUa6wU4NsGqVUSEjqrvkDLZEz8iMaEVo7AuTNY-5XZ8-DglPQ3L2vcWc82Z6bmWZbpUr7enEoGyJko51JIZp9ruM2bRMMBUKstcC6EmkVVTJRs4ckIs5YRbp6tyvW3553lnUSiFMqGdVWfIeb3iPJjI0NWuhEcL7PAgAbrAsEghLgvk3z7Gt3Gd9fVxpPfIjF1qwzjoimmM87a0hhYWCsvid40PTwq3CJZbq-4XA14QrKKZzKnRwZYvnGOYe0teyJCxbSKoxpqpa3I51atLzL_z5RpM2r8nyWczxBX6GV_Jp8olbIy0Zzy45Ij56EddhEqL90YxBkXiJcmSVAtKf7sbGbJWUu72jHn2LGfhrV5Cv0ISXfrrnuAByr8nTuju9yndzcOqBxKQ_9XHFJcVYqMmI_wyvQH4uqMBlLoaMYwzV9hQLv-lbY6YyJs7nlZaXVz4G0pu_WS-uB-7EG65f9Mt9XQMJHx-4JC4Dp3SbgOsHpEiRHwninHX48lwUOzgDQlREkcW-rgH0XhAeAnjFUGYCSTaCpMHApYwXdEU0QRjsdoNNNlVWFjMc5MuPnO6nXSo1DCw46JCx8b1uBj8j4E3CZEfNUfmlhxhbxCMV1cVjgqlYzuZ4XGwpe0w-nG3t-7ROjDBp1btNMmknc6wP7YEoLSX0dcVPUyoxfOf95e1gnCFV_oNn1kD9nf-6MqN7maQk7I7lIDMI2KnZNvOCzmQ2Fbg/top-cover";
+      const ids = [1423191, 1377237, 1283515, 977942];
+      const fallback = ["#3b2a8c", "#7a1f4e", "#8a5a14", "#1f6a3d"];
+      $("covers").innerHTML = ids.map((id, i) =>
+        `<div class="cv"><span class="n">${i + 1}</span><span class="poster" style="background:${fallback[i]}"><img src="${base}?rank=${i + 1}&type=movie&tmdbId=${id}" alt="" decoding="async" referrerpolicy="no-referrer" onerror="this.remove()" /></span></div>`
+      ).join("");
     })();
 
     loadCatalogs();
