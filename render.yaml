@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: nuvio-top10-custom-covers
+    runtime: docker
+    plan: free
+    autoDeploy: true
+    envVars:
+      - key: SOURCE_MANIFEST_URL
+        sync: false
+      - key: APP_SECRET
+        generateValue: true
