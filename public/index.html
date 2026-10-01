@@ -1,0 +1,412 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="color-scheme" content="dark" />
+  <title>Top 10 Custom Covers</title>
+  <style>
+    * { box-sizing: border-box; }
+    :root {
+      --bg: #06080b;
+      --panel: rgba(255,255,255,.055);
+      --panel2: rgba(255,255,255,.035);
+      --border: rgba(255,255,255,.10);
+      --text: #f7f8fa;
+      --muted: #9299a6;
+      --accent: #fff;
+      --good: #56db7c;
+      --bad: #ff7171;
+    }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 10% 0%, rgba(36, 108, 255, .16), transparent 34rem),
+        radial-gradient(circle at 95% 90%, rgba(121, 73, 255, .12), transparent 34rem),
+        var(--bg);
+    }
+    .page {
+      width: min(900px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 64px 0 80px;
+    }
+    .hero {
+      max-width: 720px;
+      margin-bottom: 32px;
+    }
+    .badge {
+      display: inline-flex;
+      padding: 7px 11px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.05);
+      border-radius: 999px;
+      color: #cdd2db;
+      font-size: 12px;
+      margin-bottom: 18px;
+    }
+    h1 {
+      font-size: clamp(36px, 7vw, 64px);
+      line-height: .98;
+      letter-spacing: -.055em;
+      margin: 0 0 16px;
+    }
+    .hero p {
+      color: var(--muted);
+      font-size: 17px;
+      line-height: 1.65;
+      margin: 0;
+    }
+    .panel {
+      border: 1px solid var(--border);
+      background: var(--panel);
+      backdrop-filter: blur(18px);
+      border-radius: 26px;
+      padding: 26px;
+      box-shadow: 0 24px 70px rgba(0,0,0,.30);
+    }
+    .step + .step {
+      margin-top: 28px;
+      padding-top: 28px;
+      border-top: 1px solid rgba(255,255,255,.08);
+    }
+    .step-title {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      margin-bottom: 16px;
+    }
+    .num {
+      width: 30px;
+      height: 30px;
+      display: grid;
+      place-items: center;
+      border-radius: 9px;
+      background: #fff;
+      color: #06080b;
+      font-size: 13px;
+      font-weight: 900;
+    }
+    h2 {
+      margin: 0;
+      font-size: 18px;
+      letter-spacing: -.02em;
+    }
+    .catalog-actions {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 13px;
+      flex-wrap: wrap;
+    }
+    .ghost {
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.045);
+      color: #dce0e7;
+    }
+    .catalogs {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .catalog {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      padding: 14px;
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 15px;
+      background: var(--panel2);
+      cursor: pointer;
+      transition: .16s ease;
+    }
+    .catalog:hover { border-color: rgba(255,255,255,.20); }
+    .catalog:has(input:checked) {
+      border-color: rgba(255,255,255,.34);
+      background: rgba(255,255,255,.085);
+    }
+    .catalog input {
+      accent-color: white;
+      width: 18px;
+      height: 18px;
+      flex: 0 0 auto;
+    }
+    .catalog strong { display:block; font-size:14px; }
+    .catalog small { color: var(--muted); }
+    input[type=password],
+    input[type=text] {
+      width: 100%;
+      border: 1px solid rgba(255,255,255,.11);
+      background: rgba(0,0,0,.30);
+      color: #fff;
+      border-radius: 14px;
+      padding: 14px 15px;
+      outline: none;
+      font: inherit;
+    }
+    input:focus {
+      border-color: rgba(255,255,255,.36);
+      box-shadow: 0 0 0 4px rgba(255,255,255,.05);
+    }
+    .hint {
+      margin: 9px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+    button {
+      border: 0;
+      border-radius: 13px;
+      padding: 12px 15px;
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+      transition: .15s ease;
+    }
+    button:hover { transform: translateY(-1px); }
+    button:disabled { opacity: .55; cursor: wait; transform: none; }
+    .primary {
+      width: 100%;
+      margin-top: 16px;
+      padding: 15px 18px;
+      background: #fff;
+      color: #07090c;
+    }
+    .message {
+      display: none;
+      margin-top: 14px;
+      padding: 12px 13px;
+      border-radius: 13px;
+      font-size: 13px;
+    }
+    .message.ok {
+      display: block;
+      color: #aff0c1;
+      background: rgba(86,219,124,.09);
+      border: 1px solid rgba(86,219,124,.25);
+    }
+    .message.bad {
+      display: block;
+      color: #ffc0c0;
+      background: rgba(255,113,113,.09);
+      border: 1px solid rgba(255,113,113,.24);
+    }
+    .result {
+      display: none;
+      margin-top: 22px;
+      padding: 18px;
+      border-radius: 18px;
+      background: rgba(255,255,255,.05);
+      border: 1px solid var(--border);
+    }
+    .result.show { display: block; }
+    .result label {
+      display:block;
+      font-size:13px;
+      font-weight:800;
+      margin-bottom:9px;
+    }
+    .url-row {
+      display:flex;
+      gap:8px;
+    }
+    .url-row input { min-width:0; }
+    @media (max-width: 700px) {
+      .page { padding-top: 36px; }
+      .panel { padding: 18px; }
+      .catalogs { grid-template-columns: 1fr; }
+      .url-row { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="hero">
+      <span class="badge">Top 10 Custom Covers</span>
+      <h1>Crea il tuo addon.</h1>
+      <p>
+        Scegli le classifiche che vuoi vedere, inserisci la tua chiave TMDB
+        e genera un manifest personale pronto da aggiungere a Nuvio.
+      </p>
+    </header>
+
+    <section class="panel">
+      <div class="step">
+        <div class="step-title">
+          <span class="num">1</span>
+          <h2>Scegli i cataloghi Top 10</h2>
+        </div>
+
+        <div class="catalog-actions">
+          <button class="ghost" id="allBtn" type="button">Seleziona tutti</button>
+          <button class="ghost" id="noneBtn" type="button">Deseleziona</button>
+        </div>
+
+        <div id="catalogs" class="catalogs">
+          <span style="color:var(--muted)">Caricamento cataloghi…</span>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-title">
+          <span class="num">2</span>
+          <h2>Inserisci la TMDB API key</h2>
+        </div>
+
+        <input
+          id="tmdbKey"
+          type="password"
+          autocomplete="off"
+          placeholder="TMDB API Key"
+        />
+        <p class="hint">
+          La chiave viene usata per recuperare backdrop e logo dei titoli.
+          Non viene salvata in un database.
+        </p>
+      </div>
+
+      <div class="step">
+        <div class="step-title">
+          <span class="num">3</span>
+          <h2>Genera il manifest</h2>
+        </div>
+
+        <button id="generateBtn" class="primary" type="button">
+          Genera manifest personale
+        </button>
+
+        <div id="message" class="message"></div>
+
+        <div id="result" class="result">
+          <label for="manifestUrl">Il tuo manifest</label>
+          <div class="url-row">
+            <input id="manifestUrl" type="text" readonly />
+            <button id="copyBtn" type="button">Copia</button>
+          </div>
+          <p class="hint">
+            Conserva questo URL: contiene una configurazione cifrata necessaria
+            all'addon per ricordare i cataloghi selezionati.
+          </p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const catalogsEl = document.getElementById("catalogs");
+    const keyEl = document.getElementById("tmdbKey");
+    const generateBtn = document.getElementById("generateBtn");
+    const message = document.getElementById("message");
+    const result = document.getElementById("result");
+    const manifestUrl = document.getElementById("manifestUrl");
+    const copyBtn = document.getElementById("copyBtn");
+
+    function setMessage(text, type) {
+      message.textContent = text;
+      message.className = `message ${type}`;
+    }
+
+    function selectedCatalogs() {
+      return [...document.querySelectorAll(".catalog input:checked")].map(input => ({
+        id: input.dataset.id,
+        type: input.dataset.type
+      }));
+    }
+
+    async function loadCatalogs() {
+      try {
+        const res = await fetch("/api/catalogs");
+        const data = await res.json();
+
+        if (!res.ok) throw new Error(data.error || "Errore cataloghi");
+
+        catalogsEl.innerHTML = "";
+
+        data.catalogs.forEach(catalog => {
+          const label = document.createElement("label");
+          label.className = "catalog";
+
+          const input = document.createElement("input");
+          input.type = "checkbox";
+          input.dataset.id = catalog.id;
+          input.dataset.type = catalog.type;
+          input.checked = true;
+
+          const text = document.createElement("div");
+          const strong = document.createElement("strong");
+          strong.textContent = catalog.name;
+          const small = document.createElement("small");
+          small.textContent = catalog.type === "series" ? "Serie TV" : "Film";
+
+          text.append(strong, small);
+          label.append(input, text);
+          catalogsEl.append(label);
+        });
+      } catch (err) {
+        catalogsEl.innerHTML =
+          `<span style="color:#ffaaaa">${err.message}</span>`;
+      }
+    }
+
+    document.getElementById("allBtn").addEventListener("click", () => {
+      document.querySelectorAll(".catalog input").forEach(i => i.checked = true);
+    });
+
+    document.getElementById("noneBtn").addEventListener("click", () => {
+      document.querySelectorAll(".catalog input").forEach(i => i.checked = false);
+    });
+
+    generateBtn.addEventListener("click", async () => {
+      const tmdbApiKey = keyEl.value.trim();
+      const catalogs = selectedCatalogs();
+
+      result.classList.remove("show");
+
+      if (!catalogs.length) {
+        setMessage("Seleziona almeno un catalogo.", "bad");
+        return;
+      }
+
+      if (!tmdbApiKey) {
+        setMessage("Inserisci la tua TMDB API key.", "bad");
+        return;
+      }
+
+      generateBtn.disabled = true;
+      generateBtn.textContent = "Generazione…";
+
+      try {
+        const res = await fetch("/api/generate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ tmdbApiKey, catalogs })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) throw new Error(data.error || "Errore generazione");
+
+        manifestUrl.value = data.manifestUrl;
+        result.classList.add("show");
+        setMessage(
+          `Manifest generato con ${data.catalogCount} cataloghi.`,
+          "ok"
+        );
+      } catch (err) {
+        setMessage(err.message, "bad");
+      } finally {
+        generateBtn.disabled = false;
+        generateBtn.textContent = "Genera manifest personale";
+      }
+    });
+
+    copyBtn.addEventListener("click", async () => {
+      await navigator.clipboard.writeText(manifestUrl.value);
+      setMessage("URL del manifest copiato.", "ok");
+    });
+
+    loadCatalogs();
+  </script>
+</body>
+</html>
