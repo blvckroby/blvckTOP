@@ -74,37 +74,28 @@
     }
     .target img { width: 15px; height: 15px; }
 
-    /* cover decorative a ventaglio */
-    .covers { display: flex; justify-content: center; margin: 4px 0 34px; height: 190px; position: relative; }
-    .cover {
-      position: absolute; top: 14px; width: 250px; aspect-ratio: 16/9; border-radius: 16px; overflow: hidden;
-      border: 1px solid rgba(255,255,255,.16); box-shadow: 0 24px 50px rgba(0,0,0,.55);
-      transform: translateX(var(--x)) rotate(var(--r)) translateY(var(--y, 0)); transition: transform .35s var(--ease);
-    }
-    .cover:hover { transform: translateX(var(--x)) rotate(0) translateY(-10px) scale(1.04); z-index: 5; }
-    .cover:nth-child(1) { --x: -215px; --r: -7deg; --y: 14px; background: linear-gradient(135deg,#ff4b6e,#7a1fff); }
-    .cover:nth-child(2) { --x: 0px; --r: 0deg; --y: -4px; z-index: 2; background: linear-gradient(135deg,#2f8bff,#01b4e4); }
-    .cover:nth-child(3) { --x: 215px; --r: 7deg; --y: 14px; background: linear-gradient(135deg,#ffb23f,#ff4b6e); }
-    .cover em {
-      position: absolute; z-index: 2; left: 12px; bottom: -16px; font-style: normal; font-weight: 900;
-      font-size: 96px; letter-spacing: -.08em; color: rgba(255,255,255,.94); text-shadow: 0 6px 24px rgba(0,0,0,.45);
-    }
-    .cover::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(0,0,0,.5), transparent 62%); }
-    .cover span { position: absolute; z-index: 2; right: 12px; top: 11px; font-size: 10px; font-weight: 800; letter-spacing: .12em; color: #fff; opacity: .9; }
+    /* cover in stile addon: numero a destra, dietro la card */
+    .covers { display: flex; justify-content: center; gap: 62px; margin: 6px 0 36px; padding-right: 50px; }
+    .cv { position: relative; flex: 0 0 auto; width: 196px; }
+    .cv .n { position: absolute; z-index: 1; right: -50px; bottom: -20px; font-weight: 900; font-size: 150px; line-height: 1;
+      letter-spacing: -.06em; color: transparent; -webkit-text-stroke: 3px rgba(255,255,255,.34); pointer-events: none; }
+    .cv .poster { position: relative; z-index: 2; display: block; aspect-ratio: 16/9; border-radius: 12px; overflow: hidden;
+      border: 1px solid rgba(255,255,255,.16); box-shadow: 0 18px 40px rgba(0,0,0,.55); transition: transform .3s var(--ease); }
+    .cv:hover .poster { transform: translateY(-6px); }
+    .poster::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(0,0,0,.7)); }
+    .poster b { position: absolute; z-index: 1; left: 11px; bottom: 9px; right: 10px; font-size: 14px; font-weight: 800; letter-spacing: -.01em; line-height: 1.15; text-shadow: 0 2px 8px rgba(0,0,0,.5); }
+    .poster i { position: absolute; z-index: 1; left: 10px; top: 9px; font-style: normal; font-size: 9px; font-weight: 800; letter-spacing: .14em; padding: 3px 6px; border-radius: 5px; background: rgba(0,0,0,.35); }
 
     /* pannello */
     .panel {
       border: 1px solid var(--border); background: rgba(14,17,24,.82);
-      border-radius: 30px; padding: clamp(22px, 4vw, 44px); box-shadow: 0 30px 80px rgba(0,0,0,.4);
+      border-radius: 24px; padding: clamp(18px, 3.5vw, 36px); box-shadow: 0 30px 80px rgba(0,0,0,.4);
     }
-    .step + .step { margin-top: 30px; padding-top: 30px; border-top: 1px solid rgba(255,255,255,.08); }
-    .step-title { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
-    .num {
-      width: 32px; height: 32px; display: grid; place-items: center; border-radius: 10px;
-      background: var(--grad); color: #fff; font-size: 14px; font-weight: 900;
-    }
-    h2 { margin: 0; font-size: 19px; letter-spacing: -.02em; }
-    .sub { margin: 0 0 14px; color: var(--muted); font-size: 14px; }
+    .step + .step { margin-top: 34px; padding-top: 30px; border-top: 1px solid rgba(255,255,255,.07); }
+    .step-title { margin-bottom: 14px; }
+    .eyebrow { display: block; font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--tmdb); font-weight: 700; margin-bottom: 6px; }
+    h2 { margin: 0; font-size: 21px; letter-spacing: -.025em; font-weight: 700; }
+    .sub { margin: 6px 0 0; color: var(--muted); font-size: 14px; }
 
     .toolbar { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; align-items: center; }
     .search { flex: 1 1 200px; min-width: 0; }
@@ -138,7 +129,7 @@
       overflow: hidden; transition: transform .25s;
     }
     .logo img { width: 28px; height: 28px; object-fit: contain; }
-    .logo.wide img { width: 40px; height: 24px; }
+    .logo.wide img { width: 42px; height: 24px; }
     .logo.dark img { filter: brightness(0); }
     .logo:not(.dark) img { filter: brightness(0) invert(1); }
     .logo.mono { color: #fff; font-weight: 900; font-size: 20px; }
@@ -157,27 +148,21 @@
     .skeleton { height: 76px; border-radius: 18px; background: linear-gradient(90deg, rgba(255,255,255,.04), rgba(255,255,255,.09), rgba(255,255,255,.04)); background-size: 200% 100%; animation: sh 1.3s linear infinite; }
     @keyframes sh { to { background-position: -200% 0; } }
 
-    /* TMDB */
-    .tmdb-card {
-      display: flex; gap: 18px; align-items: center; padding: 18px; border-radius: 20px; margin-bottom: 16px;
-      background: linear-gradient(135deg, rgba(1,180,228,.14), rgba(144,206,161,.08));
-      border: 1px solid rgba(1,180,228,.3);
-    }
-    .tmdb-logo { width: 120px; flex: 0 0 auto; }
-    .tmdb-pill { height: 12px; width: auto !important; }
-    .tmdb-card p { margin: 0; color: #cfe8f0; font-size: 14px; line-height: 1.55; }
-    .tmdb-card p b { color: #fff; }
-    .tmdb-btn {
-      display: inline-flex; align-items: center; justify-content: center; gap: 8px; margin-top: 12px;
-      padding: 12px 18px; border-radius: 13px; text-decoration: none; font-weight: 800; font-size: 14px;
-      color: #032b36; background: linear-gradient(90deg, var(--tmdb2), var(--tmdb));
-      box-shadow: 0 10px 30px rgba(1,180,228,.28); transition: .15s;
-    }
-    .tmdb-btn:hover { transform: translateY(-2px); box-shadow: 0 14px 36px rgba(1,180,228,.4); }
-    .tmdb-btn svg { width: 16px; height: 16px; }
-    .how { margin: 14px 0 0; padding: 0; list-style: none; display: grid; gap: 7px; counter-reset: s; }
-    .how li { counter-increment: s; color: #cfe8f0; font-size: 13px; display: flex; gap: 9px; }
-    .how li::before { content: counter(s); flex: 0 0 auto; width: 20px; height: 20px; border-radius: 50%; background: rgba(1,180,228,.25); display: grid; place-items: center; font-size: 11px; font-weight: 800; }
+    /* TMDB: compatto */
+    .key-row { display: flex; align-items: center; gap: 14px; padding: 12px 14px; border-radius: 16px;
+      background: rgba(1,180,228,.07); border: 1px solid rgba(1,180,228,.22); margin-bottom: 12px; }
+    .tmdb-logo { width: 74px; height: 22px; flex: 0 0 auto; object-fit: contain; }
+    .key-row p { margin: 0; flex: 1; color: #bfdbe5; font-size: 13px; line-height: 1.45; }
+    .key-row a { flex: 0 0 auto; display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 14px; border-radius: 999px;
+      text-decoration: none; font-weight: 700; font-size: 13px; color: #032b36; background: linear-gradient(90deg, var(--tmdb2), var(--tmdb)); transition: transform .2s; }
+    .key-row a:hover { transform: translateY(-1px); }
+    .key-row a svg { width: 13px; height: 13px; }
+    details.how { margin: 12px 0 0; font-size: 13px; color: var(--muted); }
+    details.how summary { cursor: pointer; width: fit-content; list-style: none; }
+    details.how summary::-webkit-details-marker { display: none; }
+    details.how summary::before { content: "+ "; color: var(--tmdb); font-weight: 800; }
+    details.how[open] summary::before { content: "− "; }
+    details.how ol { margin: 10px 0 0; padding-left: 18px; display: grid; gap: 5px; color: #cfe8f0; }
 
     .field { position: relative; }
     input[type=password], input[type=text], input[type=search] {
@@ -251,11 +236,11 @@
       .hero { margin-bottom: 22px; }
       .badge { margin-bottom: 16px; }
       .cta a { flex: 1 1 100%; }
-      .covers { height: 128px; margin-bottom: 22px; }
-      .cover { width: 160px; border-radius: 12px; top: 8px; }
-      .cover:nth-child(1) { --x: -112px; }
-      .cover:nth-child(3) { --x: 112px; }
-      .cover em { font-size: 62px; bottom: -10px; left: 8px; }
+      .covers { gap: 40px; padding-right: 30px; margin-bottom: 22px; }
+      .cv { width: 138px; }
+      .cv:nth-child(n+3) { display: none; }
+      .cv .n { font-size: 104px; right: -32px; bottom: -14px; -webkit-text-stroke-width: 2.5px; }
+      .poster b { font-size: 11px; left: 8px; bottom: 7px; }
       .band { margin-bottom: 22px; padding: 12px 0; border-radius: 16px; }
       .brand { font-size: 17px; }
       .track { gap: 36px; }
@@ -271,8 +256,9 @@
       .counter { margin-left: 0; width: 100%; }
       .url-row { flex-direction: column; }
       .url-row button { width: 100%; }
-      .tmdb-card { flex-direction: column; align-items: flex-start; padding: 16px; }
-      .tmdb-btn { width: 100%; }
+      .key-row { flex-wrap: wrap; }
+      .key-row p { flex: 1 1 100%; order: 3; }
+      .key-row a { margin-left: auto; }
       .field input { padding-right: 104px; font-size: 16px; }
       input[type=search] { font-size: 16px; }
       .step + .step { margin-top: 24px; padding-top: 24px; }
@@ -292,12 +278,11 @@
     .track { display: flex; gap: 54px; width: max-content; animation: scroll 40s linear infinite; will-change: transform; }
     .band:hover .track { animation-play-state: paused; }
     @keyframes scroll { to { transform: translateX(-50%); } }
-    .brand { display: flex; align-items: center; gap: 12px; font-weight: 900; font-size: 22px; letter-spacing: -.03em; color: rgba(255,255,255,.88); white-space: nowrap; }
-    .brand img { height: 26px; width: 26px; filter: invert(1) brightness(2); opacity: .9; }
-    .brand.custom img { width: auto; max-width: 110px; filter: brightness(0) invert(1); opacity: .88; }
+    .brand { display: flex; align-items: center; height: 30px; }
+    .brand img { height: 28px; width: 28px; filter: invert(1) brightness(2); opacity: .9; }
+    .brand.custom img { width: auto; max-width: 120px; height: 26px; filter: brightness(0) invert(1); opacity: .88; }
 
     .panel { box-shadow: 0 30px 80px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.1); }
-    .num { box-shadow: 0 6px 20px rgba(76,110,255,.45); }
     .logo { transition: transform .25s; }
     .catalog:hover .logo { transform: scale(1.06); }
     @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
@@ -317,7 +302,6 @@
       </p>
       <div class="cta">
         <a class="solid" href="#start">Inizia ora</a>
-        <a class="line" href="https://www.themoviedb.org/settings/api" target="_blank" rel="noopener noreferrer">Ottieni la chiave TMDB</a>
       </div>
       <div class="targets">
         <span class="target"><img data-slug="stremio" alt="" />Stremio</span>
@@ -328,17 +312,12 @@
 
     <div class="band" aria-hidden="true"><div class="track" id="track"></div></div>
 
-    <div class="covers" aria-hidden="true">
-      <div class="cover"><span>TOP 10</span><em>1</em></div>
-      <div class="cover"><span>TOP 10</span><em>2</em></div>
-      <div class="cover"><span>TOP 10</span><em>3</em></div>
-    </div>
+    <div class="covers" id="covers" aria-hidden="true"></div>
 
     <section class="panel" id="start">
       <!-- STEP 1 -->
       <div class="step">
-        <div class="step-title"><span class="num">1</span><h2>Scegli i cataloghi Top 10</h2></div>
-        <p class="sub">Seleziona le piattaforme di cui vuoi vedere la classifica.</p>
+        <div class="step-title"><span class="eyebrow">Cataloghi</span><h2>Scegli le classifiche</h2><p class="sub">Seleziona le piattaforme di cui vuoi vedere la Top 10.</p></div>
 
         <div class="toolbar">
           <input id="search" class="search" type="search" placeholder="Cerca catalogo…" aria-label="Cerca catalogo" />
@@ -359,31 +338,16 @@
 
       <!-- STEP 2 -->
       <div class="step">
-        <div class="step-title"><span class="num">2</span><h2>Recupera la tua TMDB API key</h2></div>
+        <div class="step-title"><span class="eyebrow">Chiave TMDB</span><h2>Collega il tuo account</h2></div>
 
-        <div class="tmdb-card">
-          <img class="tmdb-logo" data-slug="tmdb" alt="TMDB" onerror="this.style.display='none';this.nextElementSibling.style.display='block'" />
-          <svg class="tmdb-logo" style="display:none" viewBox="0 0 190 80" role="img" aria-label="TMDB">
-            <defs><linearGradient id="tg" x1="0" x2="1"><stop offset="0" stop-color="#90cea1"/><stop offset=".55" stop-color="#3cbec9"/><stop offset="1" stop-color="#00b3e5"/></linearGradient></defs>
-            <rect x="0" y="22" width="190" height="36" rx="18" fill="url(#tg)"/>
-            <text x="95" y="49" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-weight="900" font-size="27" fill="#0d253f" letter-spacing="1">TMDB</text>
-          </svg>
-          <div>
-            <p><b>Serve una chiave gratuita.</b> La usiamo solo per recuperare backdrop e logo ufficiali dei titoli.</p>
-            <a class="tmdb-btn" href="https://www.themoviedb.org/settings/api" target="_blank" rel="noopener noreferrer">
-              Ottieni la chiave su TMDB
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg>
-            </a>
-          </div>
+        <div class="key-row">
+          <img class="tmdb-logo" data-slug="tmdb" alt="TMDB" />
+          <p>Chiave gratuita, usata solo per backdrop e logo dei titoli.</p>
+          <a href="https://www.themoviedb.org/settings/api" target="_blank" rel="noopener noreferrer">Ottieni la chiave
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg></a>
         </div>
 
-        <ol class="how">
-          <li>Accedi (o registrati) su themoviedb.org e apri <b>Impostazioni → API</b>.</li>
-          <li>Richiedi una chiave <b>Developer</b> (gratuita, uso personale).</li>
-          <li>Copia la <b>API Key (v3 auth)</b> da 32 caratteri e incollala qui sotto.</li>
-        </ol>
-
-        <div class="field" style="margin-top:16px">
+        <div class="field">
           <input id="tmdbKey" type="password" autocomplete="off" spellcheck="false" placeholder="Incolla la TMDB API Key (v3)" />
           <div class="tools">
             <button type="button" id="pasteBtn" title="Incolla dagli appunti">Incolla</button>
@@ -395,12 +359,18 @@
         </div>
         <div id="keyStatus" class="status"></div>
         <label class="remember"><input type="checkbox" id="remember" /> Ricorda la chiave su questo browser</label>
+        <details class="how"><summary>Come ottenerla</summary>
+          <ol>
+            <li>Accedi (o registrati) su themoviedb.org e apri <b>Impostazioni → API</b>.</li>
+            <li>Richiedi una chiave <b>Developer</b> (gratuita, uso personale).</li>
+            <li>Copia la <b>API Key (v3 auth)</b> da 32 caratteri e incollala qui.</li>
+          </ol></details>
         <p class="hint">La chiave non viene salvata su alcun database: finisce solo, cifrata, nel tuo URL personale.</p>
       </div>
 
       <!-- STEP 3 -->
       <div class="step">
-        <div class="step-title"><span class="num">3</span><h2>Genera e installa</h2></div>
+        <div class="step-title"><span class="eyebrow">Installazione</span><h2>Genera il tuo addon</h2></div>
 
         <div class="gen">
           <div class="gen-info">
@@ -447,7 +417,12 @@
 
     /* ---------- loghi reali dei servizi (Simple Icons) ---------- */
     const ICON_CDN = "https://cdn.jsdelivr.net/npm/simple-icons@11/icons/";
+    const svgUri = (w, h, body) => "data:image/svg+xml;utf8," + encodeURIComponent(
+      `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}"><g fill="#fff" font-family="Arial Black, Arial, Helvetica, sans-serif" font-weight="900">${body}</g></svg>`);
     const LOGO = {
+      hbomax:  svgUri(120, 48, '<text x="60" y="38" font-size="42" text-anchor="middle" letter-spacing="-2">max</text>'),
+      rakuten: svgUri(150, 48, '<text x="75" y="35" font-size="30" text-anchor="middle" letter-spacing="-1">Rakuten TV</text>'),
+      chili:   svgUri(120, 48, '<text x="60" y="36" font-size="34" text-anchor="middle" letter-spacing="1">CHILI</text>'),
       tmdb:    "https://upload.wikimedia.org/wikipedia/commons/8/89/Tmdb.new.logo.svg",
       disney:  "https://upload.wikimedia.org/wikipedia/commons/3/3e/Disney%2B_logo.svg",
       now:     "https://upload.wikimedia.org/wikipedia/commons/0/0d/Now_logo.svg",
@@ -460,7 +435,9 @@
       [/rai\s?play|\brai\b/i, { url: LOGO.raiplay }, "0094D9"],
       [/\bnow\b|now ?tv/i,   { url: LOGO.now },     "00D1B2"],
       [/prime|amazon/i,       "primevideo",      "00A8E1"],
-      [/hbo|max/i,            "hbomax",          "7B2BF9"],
+      [/hbo|\bmax\b/i,        { url: LOGO.hbomax },  "5822B4"],
+      [/rakuten/i,            { url: LOGO.rakuten }, "BF0000"],
+      [/chili/i,              { url: LOGO.chili },   "E4002B"],
       [/apple/i,              "appletv",         "9AA0A6"],
       [/paramount/i,          "paramountplus",   "0064FF"],
       [/crunchyroll/i,        "crunchyroll",     "F47521"],
@@ -522,8 +499,7 @@
       if (img.dataset.white) img.style.filter = "invert(1) brightness(2)";
       else if (img.dataset.slug !== "tmdb" && img.closest(".target")) img.style.filter = "invert(1) brightness(2)";
       img.onerror = () => {
-        const fb = img.classList.contains("tmdb-logo") && img.nextElementSibling;
-        if (fb) { img.style.display = "none"; fb.style.display = "block"; } else img.remove();
+        img.remove();
       };
     });
 
@@ -709,15 +685,28 @@
 
     /* ---------- v3: marquee loghi + spotlight ---------- */
     (function () {
-      const names = [["Netflix","netflix"],["Disney+",LOGO.disney],["Prime Video","primevideo"],["NOW",LOGO.now],
-        ["HBO Max","hbomax"],["RaiPlay",LOGO.raiplay],["Apple TV+","appletv"],["Paramount+","paramountplus"],
-        ["Crunchyroll","crunchyroll"],["Stremio","stremio"],["TMDB",LOGO.tmdb]];
-      const row = names.map(([n, src]) => {
-        const custom = src.startsWith("http");
+      const items = ["netflix", LOGO.disney, "primevideo", LOGO.now, LOGO.hbomax, LOGO.raiplay, "appletv",
+        "paramountplus", "crunchyroll", LOGO.rakuten, LOGO.chili, "stremio", LOGO.tmdb];
+      const row = items.map(src => {
+        const custom = src.startsWith("http") || src.startsWith("data:");
         const url = custom ? src : `${ICON_CDN}${src}.svg`;
-        return `<span class="brand${custom ? " custom" : ""}"><img src="${url}" alt="" referrerpolicy="no-referrer" onerror="this.remove()" />${custom ? "" : n}</span>`;
+        return `<span class="brand${custom ? " custom" : ""}"><img src="${url}" alt="" referrerpolicy="no-referrer" onerror="this.parentNode.remove()" /></span>`;
       }).join("");
       $("track").innerHTML = row + row;
+    })();
+
+    /* ---------- cover casuali ---------- */
+    (function () {
+      const titles = ["Notte Eterna", "Ombre di Roma", "Oltre il Confine", "Ultimo Inverno", "Codice Rosso", "La Città Muta",
+        "Rotta Sud", "Sangue Blu", "Eclissi", "Mare Nero", "Il Sentiero", "Fuoco Lento", "Orizzonte", "Vertigine", "Lupi di Strada"];
+      const pick = [...titles].sort(() => Math.random() - .5).slice(0, 4);
+      const h0 = Math.floor(Math.random() * 360);
+      $("covers").innerHTML = pick.map((t, i) => {
+        const h = (h0 + i * 83 + Math.random() * 30) % 360;
+        const x = 20 + Math.random() * 60, y = 15 + Math.random() * 45;
+        const bg = `radial-gradient(circle at ${x}% ${y}%, hsl(${(h + 40) % 360} 90% 66%) 0, transparent 46%), linear-gradient(${120 + Math.random() * 90}deg, hsl(${h} 70% 38%), hsl(${(h + 60) % 360} 75% 16%))`;
+        return `<div class="cv"><span class="n">${i + 1}</span><span class="poster" style="background:${bg}"><i>TOP 10</i><b>${t}</b></span></div>`;
+      }).join("");
     })();
 
     loadCatalogs();
