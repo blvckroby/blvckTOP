@@ -14,6 +14,7 @@
     * { box-sizing: border-box; }
     :root {
       --bg: #08090b;
+      --card-bg: rgba(255,255,255,.025);
       --line: rgba(255,255,255,.08);
       --line2: rgba(255,255,255,.16);
       --text: #f4f5f7;
@@ -104,25 +105,199 @@
     .g-bk { background: #000; }
     .o.on .g-tr, .o.on .g-bk { box-shadow: 0 0 0 1px #fff; }
 
-    /* elenco cataloghi */
+    /* elenco cataloghi con card attive / inattive */
     .list { border-top: 1px solid var(--line); }
-    .row { padding: 16px 0; border-bottom: 1px solid var(--line); --brand: #fff; }
+    .row { 
+      padding: 16px 18px; 
+      margin: 10px 0;
+      border: 1px solid var(--line); 
+      border-radius: 14px;
+      background: var(--card-bg);
+      transition: all .25s var(--ease);
+      --brand: #8C75FF;
+      --brand-glow: rgba(140, 117, 255, 0.2);
+      --brand-border: rgba(140, 117, 255, 0.4);
+    }
+    .row.inactive {
+      opacity: .55;
+      background: transparent;
+      border-color: rgba(255,255,255,.05);
+    }
+    .row.inactive:hover {
+      opacity: .85;
+      border-color: rgba(255,255,255,.1);
+    }
+    .row.active {
+      opacity: 1;
+      background: rgba(255,255,255,.028);
+      border-color: var(--brand-border);
+      box-shadow: 0 4px 20px rgba(0,0,0,.45);
+    }
+
     .row-main { display: flex; align-items: center; gap: 16px; }
-    .logo { width: 42px; height: 42px; flex: 0 0 auto; display: grid; place-items: center; border-radius: 11px; background: rgba(255,255,255,.055); border: 1px solid var(--line); overflow: hidden; }
-    .logo img { width: 24px; height: 24px; object-fit: contain; filter: brightness(0) invert(1); }
-    .logo.wide img { width: 30px; height: 18px; }
-    .logo.big img { width: 36px; height: 36px; }
-    .logo.native img { filter: none; width: 26px; height: 26px; }
+    
+    .logo { 
+      width: 44px; height: 44px; flex: 0 0 auto; 
+      display: grid; place-items: center; 
+      border-radius: 12px; 
+      background: rgba(255,255,255,.04); 
+      border: 1px solid var(--line); 
+      overflow: hidden; 
+      transition: all .25s var(--ease);
+      user-select: none;
+    }
+    .row.inactive .logo {
+      filter: grayscale(1);
+      opacity: .35;
+      background: rgba(255,255,255,.02);
+      border-color: rgba(255,255,255,.06);
+      box-shadow: none;
+    }
+    .row.active .logo {
+      filter: none;
+      opacity: 1;
+      background: rgba(255,255,255,.07);
+      border-color: var(--brand-border);
+      box-shadow: 0 0 16px var(--brand-glow);
+    }
+    .logo img { width: 26px; height: 26px; object-fit: contain; transition: filter .25s; }
+    .logo.wide img { width: 34px; height: 20px; }
+    .logo.big img { width: 38px; height: 38px; }
     .logo.mono { font-weight: 700; font-size: 16px; color: #cfd3da; }
-    .row-name { flex: 1; min-width: 0; font-weight: 500; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    
+    .brand-icon {
+      width: 24px;
+      height: 24px;
+      background-color: var(--brand);
+      -webkit-mask-size: contain;
+      mask-size: contain;
+      -webkit-mask-position: center;
+      mask-position: center;
+      -webkit-mask-repeat: no-repeat;
+      mask-repeat: no-repeat;
+      -webkit-mask-image: var(--icon-url);
+      mask-image: var(--icon-url);
+      transition: background-color .25s;
+    }
+    .row.inactive .brand-icon {
+      background-color: #717784 !important;
+    }
+    .row.active .brand-icon {
+      background-color: var(--brand);
+    }
+
+    .row-name { 
+      flex: 1; min-width: 0; 
+      font-weight: 500; font-size: 15px; 
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; 
+      transition: color .2s;
+    }
+    .row.inactive .row-name { color: var(--muted); }
+    .row.active .row-name { color: #fff; font-weight: 600; }
+
     .chips { display: flex; gap: 6px; }
-    .chip { height: 32px; padding: 0 15px; border-radius: 999px; border: 1px solid var(--line2); color: var(--muted); font-size: 13px; font-weight: 500; transition: .2s; display: inline-flex; align-items: center; gap: 8px; }
-    .chip:hover { color: #fff; }
-    .chip.on { background: #f4f5f7; color: #0a0b0d; border-color: #f4f5f7; }
-    .cfg { margin: 14px 0 0 58px; display: grid; gap: 4px; }
+    .chip { 
+      height: 32px; padding: 0 14px; 
+      border-radius: 999px; border: 1px solid var(--line2); 
+      color: var(--muted); font-size: 13px; font-weight: 500; 
+      transition: .2s; display: inline-flex; align-items: center; gap: 6px; 
+      background: transparent;
+    }
+    .chip:hover { color: #fff; border-color: rgba(255,255,255,.3); }
+    .chip.on { background: #f4f5f7; color: #0a0b0d; border-color: #f4f5f7; font-weight: 600; }
+
+    /* configuratore interno alla card attiva */
+    .cfg { 
+      margin: 16px 0 4px 0; 
+      padding-top: 14px; 
+      border-top: 1px solid rgba(255,255,255,.06); 
+      display: grid; gap: 14px; 
+    }
+    .cfg-item {
+      background: rgba(0,0,0,.28);
+      border-radius: 12px;
+      padding: 12px 14px;
+      border: 1px solid rgba(255,255,255,.05);
+    }
     .cfg-line { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; }
-    .cfg-line > b { width: 46px; font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--dim); font-weight: 600; }
+    .cfg-line > b { width: 50px; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--text); font-weight: 600; }
     .cfg-line .sep { width: 1px; height: 14px; background: var(--line); margin: 0 8px; }
+
+    /* anteprime live */
+    .previews {
+      margin-top: 12px;
+      padding-top: 10px;
+      border-top: 1px dashed rgba(255,255,255,.08);
+    }
+    .preview-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    .preview-tag {
+      font-size: 10.5px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--dim);
+      font-weight: 600;
+    }
+    .preview-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .preview-card {
+      position: relative;
+      border-radius: 8px;
+      overflow: hidden;
+      transition: width .3s var(--ease), aspect-ratio .3s var(--ease), transform .2s ease;
+      box-shadow: 0 3px 12px rgba(0,0,0,.4);
+      background: #121316;
+    }
+    .preview-card:hover {
+      transform: translateY(-2px);
+    }
+    .preview-card.landscape {
+      width: clamp(140px, 28vw, 190px);
+      aspect-ratio: 16/9;
+    }
+    .preview-card.poster {
+      width: clamp(95px, 18vw, 125px);
+      aspect-ratio: 2/3;
+    }
+    .preview-card.transparent {
+      background: conic-gradient(#1a1d24 25%, #242832 0 50%, #1a1d24 0 75%, #242832 0) 0 0 / 10px 10px;
+      border: 1px solid rgba(255,255,255,.12);
+    }
+    .preview-card.black {
+      background: #000000;
+      border: 1px solid rgba(255,255,255,.18);
+    }
+    .preview-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: opacity .3s;
+    }
+    .preview-rank {
+      position: absolute;
+      top: 5px;
+      left: 5px;
+      font-size: 9.5px;
+      font-weight: 800;
+      background: rgba(0,0,0,.75);
+      color: #fff;
+      padding: 2px 5px;
+      border-radius: 4px;
+      backdrop-filter: blur(4px);
+      border: 1px solid rgba(255,255,255,.15);
+      pointer-events: none;
+      z-index: 2;
+    }
+
     .skeleton { height: 74px; border-bottom: 1px solid var(--line); background: linear-gradient(90deg, transparent, rgba(255,255,255,.04), transparent); background-size: 200% 100%; animation: sh 1.4s linear infinite; }
     @keyframes sh { to { background-position: -200% 0; } }
 
@@ -153,8 +328,8 @@
     @media (max-width: 700px) {
       .page { width: calc(100% - 32px); padding-top: 40px; }
       .covers { gap: 10px; } .cv:nth-child(n+3) { display: none; }
-      .row-main { flex-wrap: wrap; } .chips { margin-left: 58px; }
-      .cfg { margin-left: 0; } .cfg-line > b { width: 100%; }
+      .row-main { flex-wrap: wrap; } .chips { margin-left: 60px; }
+      .cfg-line > b { width: 100%; }
       .search { flex: 1 1 100%; } .counter { margin-left: 0; width: 100%; padding: 0; }
       .url-row { flex-direction: column; } .url-row .ctl { width: 100%; }
       .gen { flex-direction: column; align-items: stretch; } .gen .btn { justify-content: center; }
@@ -185,7 +360,7 @@
       <div class="step">
         <div class="step-head">
           <span class="step-n">01</span>
-          <div><h2>Scegli le classifiche</h2><p class="sub">Per ogni servizio scegli film, serie o entrambi.</p></div>
+          <div><h2>Scegli le classifiche</h2><p class="sub">Per ogni servizio scegli film, serie o entrambi. Clicca sul servizio per attivarlo.</p></div>
         </div>
 
         <div class="toolbar">
@@ -195,7 +370,7 @@
             <button type="button" data-f="movie">Film</button>
             <button type="button" data-f="series">Serie</button>
           </div>
-          <button class="ctl" id="allBtn" type="button">Seleziona</button>
+          <button class="ctl" id="allBtn" type="button">Seleziona tutti</button>
           <button class="ctl" id="noneBtn" type="button">Azzera</button>
           <span class="counter"><b id="count">0</b> selezionati</span>
         </div>
@@ -280,34 +455,32 @@
     };
 
     const BRANDS = [
-      [/netflix/i,             "netflix"],
-      [/disney/i,              { url: LOGO.disney, wide: true }],
-      [/rai\s?play|\brai\b/i,  { url: LOGO.raiplay, wide: true }],
-      [/\bnow\b|now ?tv/i,     { url: LOGO.now, wide: true }],
-      [/prime|amazon/i,        { url: LOGO.prime, big: true }],
-      [/tim\s?vision|\btim\b/i,{ url: LOGO.tim, wide: true }],
-      [/discovery/i,           { url: LOGO.discovery, big: true, native: true }],
-      [/hbo|\bmax\b/i,         { url: LOGO.hbomax, wide: true }],
-      [/rakuten/i,             { url: LOGO.rakuten, wide: true }],
-      [/chili/i,               { url: LOGO.chili, wide: true }],
-      [/apple/i,               "appletv"],
-      [/paramount/i,           "paramountplus"],
-      [/crunchyroll/i,         "crunchyroll"],
-      [/hulu/i,                "hulu"],
-      [/peacock/i,             "peacock"],
-      [/youtube/i,             "youtube"],
-      [/sky/i,                 "sky"],
-      [/dazn/i,                "dazn"],
-      [/infinity|mediaset|canale ?5/i, { url: LOGO.infinity, wide: true }],
-      [/plex/i,                "plex"],
-      [/tmdb|themoviedb/i,     { url: LOGO.tmdb, wide: true }],
-      [/imdb/i,                "imdb"],
-      [/trakt/i,               "trakt"]
+      [/netflix/i,             { id: "netflix", color: "#E50914" }],
+      [/disney/i,              { url: LOGO.disney, wide: true, color: "#155EEF" }],
+      [/rai\s?play|\brai\b/i,  { url: LOGO.raiplay, wide: true, color: "#0066CC" }],
+      [/\bnow\b|now ?tv/i,     { url: LOGO.now, wide: true, color: "#00CFFF" }],
+      [/prime|amazon/i,        { url: LOGO.prime, big: true, color: "#00A8E1" }],
+      [/tim\s?vision|\btim\b/i,{ url: LOGO.tim, wide: true, color: "#003399" }],
+      [/discovery/i,           { url: LOGO.discovery, big: true, native: true, color: "#003399" }],
+      [/hbo|\bmax\b/i,         { id: "max", color: "#7D57FF" }],
+      [/rakuten/i,             { id: "rakuten", color: "#BF0000" }],
+      [/chili/i,               { url: LOGO.chili, wide: true, color: "#FF5A1F" }],
+      [/apple/i,               { id: "appletv", color: "#F4F5F7" }],
+      [/paramount/i,           { id: "paramountplus", color: "#0064FF" }],
+      [/crunchyroll/i,         { id: "crunchyroll", color: "#F47521" }],
+      [/hulu/i,                { id: "hulu", color: "#1CE783" }],
+      [/youtube/i,             { id: "youtube", color: "#FF0000" }],
+      [/sky/i,                 { id: "sky", color: "#0072C9" }],
+      [/dazn/i,                { id: "dazn", color: "#F3F3F3" }],
+      [/infinity|mediaset|canale ?5/i, { url: LOGO.infinity, wide: true, color: "#00A3E0" }],
+      [/plex/i,                { id: "plex", color: "#E5A00D" }],
+      [/tmdb|themoviedb/i,     { url: LOGO.tmdb, wide: true, color: "#01B4E4" }],
+      [/imdb/i,                { id: "imdb", color: "#F5C518" }],
+      [/trakt/i,               { id: "trakt", color: "#ED1C24" }]
     ];
 
     const brandFor = name => {
-      for (const [re, src] of BRANDS) if (re.test(name))
-        return typeof src === "string" ? { url: `${ICON_CDN}${src}.svg` } : src;
+      for (const [re, src] of BRANDS) if (re.test(name)) return src;
       return null;
     };
 
@@ -315,17 +488,37 @@
       const brand = brandFor(name);
       const box = document.createElement("div");
       box.className = "logo";
-      const monogram = () => { box.className = "logo mono"; box.textContent = (name.match(/[A-Za-z0-9]/) || ["T"])[0].toUpperCase(); };
-      if (!brand) { monogram(); return box; }
-      if (brand.wide) box.classList.add("wide");
-      if (brand.big) box.classList.add("big");
-      if (brand.native) box.classList.add("native");
-      const img = new Image();
-      img.alt = ""; img.loading = "lazy"; img.decoding = "async"; img.referrerPolicy = "no-referrer";
-      img.src = brand.url;
-      img.onerror = () => { img.remove(); monogram(); };
-      box.append(img);
-      return box;
+      const monogram = () => { 
+        box.className = "logo mono"; 
+        box.textContent = (name.match(/[A-Za-z0-9]/) || ["T"])[0].toUpperCase(); 
+      };
+      
+      if (!brand) { 
+        monogram(); 
+        return { el: box, color: "#8C75FF" }; 
+      }
+
+      const brandColor = brand.color || "#8C75FF";
+
+      if (brand.id) {
+        const icon = document.createElement("div");
+        icon.className = "brand-icon";
+        icon.style.setProperty("--icon-url", `url('${ICON_CDN}${brand.id}.svg')`);
+        box.append(icon);
+      } else if (brand.url) {
+        if (brand.wide) box.classList.add("wide");
+        if (brand.big) box.classList.add("big");
+        if (brand.native) box.classList.add("native");
+        const img = new Image();
+        img.alt = ""; img.loading = "lazy"; img.decoding = "async"; img.referrerPolicy = "no-referrer";
+        img.src = brand.url;
+        img.onerror = () => { img.remove(); monogram(); };
+        box.append(img);
+      } else {
+        monogram();
+      }
+
+      return { el: box, color: brandColor };
     }
 
     document.querySelectorAll("img[data-logo]").forEach(img => {
@@ -352,7 +545,13 @@
         const name = providerOf(c.name);
         const key = name.toLowerCase();
         if (!map.has(key)) map.set(key, { key, name, items: [] });
-        map.get(key).items.push({ ...c, checked: true, shape: "landscape", canvasBackground: "transparent" });
+        // Default: tutto spento (checked: false)
+        map.get(key).items.push({ 
+          ...c, 
+          checked: false, 
+          shape: "landscape", 
+          canvasBackground: "transparent" 
+        });
       });
       map.forEach(g => g.items.sort((a, b) => (a.type === "movie" ? 0 : 1) - (b.type === "movie" ? 0 : 1)));
       return [...map.values()];
@@ -370,9 +569,9 @@
     function updateSummary() {
       const n = allItems().filter(c => c.checked).length;
       countEl.textContent = n;
-      $("genSummary").textContent = n ? `${n} ${n === 1 ? "classifica" : "classifiche"}` : "Nessuna classifica selezionata";
+      $("genSummary").textContent = n ? `${n} ${n === 1 ? "classifica" : "classifiche"}` : "Nessun catalogo selezionato";
       const sub = $("genSub");
-      sub.textContent = !n ? "Scegli almeno una classifica" : "Tutto pronto: genera il tuo manifest";
+      sub.textContent = !n ? "Scegli almeno una classifica per continuare" : "Tutto pronto: genera il tuo manifest";
       sub.classList.toggle("ready", !!n);
     }
 
@@ -382,7 +581,7 @@
       }));
     }
 
-    function optBtn(item, prop, value, text, glyph, scope) {
+    function optBtn(item, prop, value, text, glyph, scope, onChange) {
       const b = document.createElement("button");
       b.type = "button";
       b.className = "o" + (item[prop] === value ? " on" : "");
@@ -390,6 +589,7 @@
       b.addEventListener("click", () => {
         item[prop] = value;
         scope.querySelectorAll(`[data-p="${prop}"]`).forEach(x => x.classList.toggle("on", x === b));
+        if (typeof onChange === "function") onChange();
       });
       b.dataset.p = prop;
       return b;
@@ -405,20 +605,28 @@
         updateSummary();
         return;
       }
+
       list.forEach(g => {
+        const isGroupActive = g.items.some(i => i.checked);
+        const { el: logoEl, color: brandColor } = makeLogo(g.name);
+
         const row = document.createElement("div");
-        row.className = "row";
+        row.className = "row " + (isGroupActive ? "active" : "inactive");
+        row.style.setProperty("--brand", brandColor);
+        row.style.setProperty("--brand-glow", `${brandColor}40`);
+        row.style.setProperty("--brand-border", `${brandColor}66`);
+
         const main = document.createElement("div");
         main.className = "row-main";
+
         const name = document.createElement("div");
         name.className = "row-name";
         name.textContent = g.name;
         name.style.cursor = "pointer";
-        name.title = "Clicca per selezionare/deselezionare tutto il servizio";
+        name.title = "Clicca per attivare/disattivare il servizio";
 
-        const logoEl = makeLogo(g.name);
         logoEl.style.cursor = "pointer";
-        logoEl.title = "Clicca per selezionare/deselezionare tutto il servizio";
+        logoEl.title = "Clicca per attivare/disattivare il servizio";
 
         const toggleGroup = () => {
           const anyUnchecked = g.items.some(i => !i.checked);
@@ -437,20 +645,74 @@
         const drawCfg = () => {
           cfg.innerHTML = "";
           const checkedItems = g.items.filter(i => i.checked);
+          
           checkedItems.forEach(i => {
+            const itemBox = document.createElement("div");
+            itemBox.className = "cfg-item";
+
             const line = document.createElement("div");
             line.className = "cfg-line";
             const label = document.createElement("b");
             label.textContent = typeLabel(i.type);
+
+            // Sezione anteprime per questo catalogo
+            const previewsWrap = document.createElement("div");
+            previewsWrap.className = "previews";
+
+            const previewHeader = document.createElement("div");
+            previewHeader.className = "preview-header";
+            const tag = document.createElement("span");
+            tag.className = "preview-tag";
+            tag.textContent = `Anteprima Top 10 (${typeLabel(i.type)})`;
+            previewHeader.append(tag);
+
+            const previewRow = document.createElement("div");
+            previewRow.className = "preview-row";
+
+            // Mostra anteprima 1, 2, 3
+            const ranks = [1, 2, 3];
+            const cards = ranks.map(rank => {
+              const card = document.createElement("div");
+              card.className = `preview-card ${i.shape} ${i.canvasBackground}`;
+
+              const badge = document.createElement("span");
+              badge.className = "preview-rank";
+              badge.textContent = `#${rank}`;
+
+              const img = document.createElement("img");
+              img.loading = "lazy";
+              img.decoding = "async";
+              img.alt = `Top ${rank}`;
+
+              const updateImg = () => {
+                card.className = `preview-card ${i.shape} ${i.canvasBackground}`;
+                img.src = `/top-cover?catalogId=${encodeURIComponent(i.id)}&type=${encodeURIComponent(i.type)}&shape=${i.shape}&canvasBackground=${i.canvasBackground}&rank=${rank}`;
+              };
+
+              updateImg();
+              card.append(badge, img);
+              card._updateImg = updateImg;
+              return card;
+            });
+
+            const onConfigChange = () => {
+              cards.forEach(c => c._updateImg());
+            };
+
             line.append(label,
-              optBtn(i, "shape", "landscape", "Orizzontale", "g-land", line),
-              optBtn(i, "shape", "poster", "Verticale", "g-port", line));
+              optBtn(i, "shape", "landscape", "Orizzontale", "g-land", line, onConfigChange),
+              optBtn(i, "shape", "poster", "Verticale", "g-port", line, onConfigChange));
             const sep = document.createElement("span"); sep.className = "sep";
             line.append(sep,
-              optBtn(i, "canvasBackground", "transparent", "Trasparente", "g-tr", line),
-              optBtn(i, "canvasBackground", "black", "Nero", "g-bk", line));
-            cfg.append(line);
+              optBtn(i, "canvasBackground", "transparent", "Trasparente", "g-tr", line, onConfigChange),
+              optBtn(i, "canvasBackground", "black", "Nero", "g-bk", line, onConfigChange));
+
+            previewRow.append(...cards);
+            previewsWrap.append(previewHeader, previewRow);
+            itemBox.append(line, previewsWrap);
+            cfg.append(itemBox);
           });
+
           cfg.hidden = checkedItems.length === 0;
         };
 
@@ -466,6 +728,9 @@
             chip.classList.toggle("on", i.checked);
             chip.textContent = `${i.checked ? "✓ " : ""}${typeLabel(i.type)}`;
             chip.setAttribute("aria-pressed", i.checked);
+            
+            const anyChecked = g.items.some(x => x.checked);
+            row.className = "row " + (anyChecked ? "active" : "inactive");
             drawCfg();
             updateSummary();
           });
@@ -567,7 +832,7 @@
       $("track").innerHTML = row + row;
     })();
 
-    /* ---------- cover di esempio ---------- */
+    /* ---------- cover di esempio in hero ---------- */
     (function () {
       const base = "/top-cover";
       const ids = [1423191, 1377237, 1283515, 977942];

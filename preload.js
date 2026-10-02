@@ -23,16 +23,18 @@ function catalogAccent(catalog = {}) {
   const key = `${catalog.id || ""} ${catalog.name || ""}`.toLowerCase();
 
   if (key.includes("netflix")) return "#E50914";
-  if (key.includes("prime")) return "#00A8E1";
-  if (key.includes("amazon")) return "#00A8E1";
+  if (key.includes("prime") || key.includes("amazon")) return "#00A8E1";
   if (key.includes("disney")) return "#2D7DFF";
   if (key.includes("apple")) return "#D8DFEA";
-  if (key.includes("now")) return "#00CFFF";
+  if (key.includes("now") || key.includes("sky")) return "#00CFFF";
   if (key.includes("paramount")) return "#0064FF";
   if (key.includes("raiplay") || key.includes("rai")) return "#1C6DFF";
   if (key.includes("rakuten")) return "#BF0000";
   if (key.includes("chili")) return "#FF5A1F";
   if (key.includes("max") || key.includes("hbo")) return "#7D57FF";
+  if (key.includes("infinity") || key.includes("mediaset")) return "#00A3E0";
+  if (key.includes("timvision") || key.includes("tim")) return "#003399";
+  if (key.includes("discovery")) return "#003399";
 
   return "#8C75FF";
 }

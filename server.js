@@ -130,16 +130,18 @@ export function catalogAccent(catalog = {}) {
   const key = `${catalog.id || ""} ${catalog.name || ""}`.toLowerCase();
 
   if (key.includes("netflix")) return "#E50914";
-  if (key.includes("prime")) return "#00A8E1";
-  if (key.includes("amazon")) return "#00A8E1";
+  if (key.includes("prime") || key.includes("amazon")) return "#00A8E1";
   if (key.includes("disney")) return "#2D7DFF";
   if (key.includes("apple")) return "#D8DFEA";
-  if (key.includes("now")) return "#00CFFF";
+  if (key.includes("now") || key.includes("sky")) return "#00CFFF";
   if (key.includes("paramount")) return "#0064FF";
   if (key.includes("raiplay") || key.includes("rai")) return "#1C6DFF";
   if (key.includes("rakuten")) return "#BF0000";
   if (key.includes("chili")) return "#FF5A1F";
   if (key.includes("max") || key.includes("hbo")) return "#7D57FF";
+  if (key.includes("infinity") || key.includes("mediaset")) return "#00A3E0";
+  if (key.includes("timvision") || key.includes("tim")) return "#003399";
+  if (key.includes("discovery")) return "#003399";
 
   return "#8C75FF";
 }
@@ -436,14 +438,35 @@ app.get(["/c/:token/top-cover", "/top-cover"], async (req, res) => {
 
     let artworkUrl = req.query.artwork ? String(req.query.artwork) : null;
     let logoUrl = req.query.logo ? String(req.query.logo) : null;
+    let resolvedTmdbId = tmdbId;
 
     const catalog = config?.catalogs?.find(c => c.id === catalogId) || { id: catalogId };
     const accent = catalogAccent(catalog);
+    const effectiveType = type === "series" || type === "tv" ? "tv" : "movie";
+
+    // If artworkUrl is not provided and no tmdbId is passed, resolve from the catalogId
+    if (!artworkUrl && !resolvedTmdbId && catalogId) {
+      try {
+        const catType = type === "series" || type === "tv" ? "series" : "movie";
+        const sourceUrl = `${sourceBaseUrl()}/catalog/${encodeURIComponent(catType)}/${encodeURIComponent(catalogId)}.json`;
+        const catData = await fetchJson(sourceUrl);
+        const metas = Array.isArray(catData?.metas) ? catData.metas : [];
+        const item = metas[rank - 1] || metas[0];
+        if (item) {
+          resolvedTmdbId = await resolveTmdbId(catType, item.id || item.tmdbId, DEFAULT_TMDB_KEY);
+          if (!resolvedTmdbId) {
+            artworkUrl = shape === "poster" ? (item.poster || item.background) : (item.background || item.poster);
+          }
+        }
+      } catch (catErr) {
+        console.warn(`[top-cover] Errore lookup catalogId ${catalogId} rank ${rank}:`, catErr.message);
+      }
+    }
 
     // If artworkUrl is not provided yet, resolve it via TMDB
-    if (tmdbId && !artworkUrl) {
+    if (resolvedTmdbId && !artworkUrl) {
       try {
-        const images = await getTmdbImages(type, tmdbId, DEFAULT_TMDB_KEY);
+        const images = await getTmdbImages(effectiveType, resolvedTmdbId, DEFAULT_TMDB_KEY);
         artworkUrl = shape === "poster"
           ? choosePoster(images)
           : chooseBackdrop(images);
@@ -454,11 +477,11 @@ app.get(["/c/:token/top-cover", "/top-cover"], async (req, res) => {
           logoUrl = chooseLogo(images);
         }
       } catch (tmdbErr) {
-        console.warn(`Errore fetch immagini TMDB ${tmdbId}:`, tmdbErr.message);
+        console.warn(`Errore fetch immagini TMDB ${resolvedTmdbId}:`, tmdbErr.message);
       }
-    } else if (shape === "landscape" && tmdbId && !logoUrl) {
+    } else if (shape === "landscape" && resolvedTmdbId && !logoUrl) {
       try {
-        const images = await getTmdbImages(type, tmdbId, DEFAULT_TMDB_KEY);
+        const images = await getTmdbImages(effectiveType, resolvedTmdbId, DEFAULT_TMDB_KEY);
         logoUrl = chooseLogo(images);
       } catch {}
     }
@@ -469,14 +492,14 @@ app.get(["/c/:token/top-cover", "/top-cover"], async (req, res) => {
 
     const coverKey = computeCoverKey({
       rank,
-      type,
+      type: effectiveType,
       shape,
-      tmdbId,
+      tmdbId: resolvedTmdbId,
       catalogId,
       canvasBackground,
       accent,
       artworkUrl,
-      logoUrl
+      logoUrl: shape === "landscape" ? logoUrl : null
     });
 
     // 1. Check persistent disk cache (instant response via sendFile)
