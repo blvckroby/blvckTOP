@@ -98,3 +98,548 @@
     .o.on { color: #fff; border-color: var(--line2); background: rgba(255,255,255,.05); }
     .g-land, .g-port { display: block; border: 1.25px solid currentColor; border-radius: 2px; }
     .g-land { width: 16px; height: 9px; }
+    .g-port { width: 9px; height: 16px; }
+    .g-tr, .g-bk { display: block; width: 13px; height: 13px; border-radius: 50%; box-shadow: 0 0 0 1px rgba(255,255,255,.4); }
+    .g-tr { background: conic-gradient(#555a64 25%, #a5aab4 0 50%, #555a64 0 75%, #a5aab4 0) 0 0 / 6px 6px; }
+    .g-bk { background: #000; }
+    .o.on .g-tr, .o.on .g-bk { box-shadow: 0 0 0 1px #fff; }
+
+    /* elenco cataloghi: righe, non card */
+    .list { border-top: 1px solid var(--line); }
+    .row { padding: 16px 0; border-bottom: 1px solid var(--line); --brand: #fff; }
+    .row-main { display: flex; align-items: center; gap: 16px; }
+    .logo { width: 42px; height: 42px; flex: 0 0 auto; display: grid; place-items: center; border-radius: 11px; background: rgba(255,255,255,.055); border: 1px solid var(--line); overflow: hidden; }
+    .logo img { width: 24px; height: 24px; object-fit: contain; filter: brightness(0) invert(1); }
+    .logo.wide img { width: 30px; height: 18px; }
+    .logo.big img { width: 36px; height: 36px; }
+    .logo.native img { filter: none; width: 26px; height: 26px; }
+    .logo.mono { font-weight: 700; font-size: 16px; color: #cfd3da; }
+    .row-name { flex: 1; min-width: 0; font-weight: 500; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .chips { display: flex; gap: 6px; }
+    .chip { height: 32px; padding: 0 15px; border-radius: 999px; border: 1px solid var(--line2); color: var(--muted); font-size: 13px; font-weight: 500; transition: .2s; display: inline-flex; align-items: center; gap: 8px; }
+    .chip:hover { color: #fff; }
+    .chip.on { background: #f4f5f7; color: #0a0b0d; border-color: #f4f5f7; }
+    .cfg { margin: 14px 0 0 58px; display: grid; gap: 4px; }
+    .cfg-line { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; }
+    .cfg-line > b { width: 46px; font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--dim); font-weight: 600; }
+    .cfg-line .sep { width: 1px; height: 14px; background: var(--line); margin: 0 8px; }
+    .skeleton { height: 74px; border-bottom: 1px solid var(--line); background: linear-gradient(90deg, transparent, rgba(255,255,255,.04), transparent); background-size: 200% 100%; animation: sh 1.4s linear infinite; }
+    @keyframes sh { to { background-position: -200% 0; } }
+
+    /* chiave TMDB */
+    .key-row { display: flex; align-items: center; gap: 18px; padding: 0 0 18px; }
+    .key-row img { width: 64px; height: 20px; object-fit: contain; flex: 0 0 auto; }
+    .key-row p { flex: 1; margin: 0; color: var(--muted); font-size: 14px; line-height: 1.5; }
+    .field { position: relative; }
+    .field input { width: 100%; height: 52px; border-radius: 14px; border: 1px solid var(--line2); background: transparent; color: #fff; padding: 0 110px 0 18px; outline: none;
+      font: 14px ui-monospace, SFMono-Regular, Menlo, monospace; transition: border-color .2s; }
+    .field input:focus { border-color: rgba(255,255,255,.45); }
+    .tools { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); display: flex; gap: 4px; }
+    .tools button { height: 34px; padding: 0 12px; border-radius: 10px; color: #cfd3da; font-size: 12.5px; font-weight: 500; }
+    .tools button:hover { background: rgba(255,255,255,.08); color: #fff; }
+    .icon-btn { width: 34px; display: grid; place-items: center; padding: 0 !important; }
+    .icon-btn svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+    .icon-btn .i-hide { display: none; }
+    .icon-btn[aria-pressed="true"] .i-show { display: none; }
+    .icon-btn[aria-pressed="true"] .i-hide { display: block; }
+    .status { margin-top: 10px; min-height: 18px; font-size: 13px; color: var(--muted); }
+    .status.ok { color: var(--good); } .status.bad { color: var(--bad); }
+    .remember { display: flex; align-items: center; gap: 9px; margin-top: 6px; color: var(--muted); font-size: 13px; cursor: pointer; }
+    .remember input { accent-color: #fff; }
+    details.how { margin-top: 14px; font-size: 13px; color: var(--muted); }
+    details.how summary { cursor: pointer; width: fit-content; list-style: none; border-bottom: 1px solid var(--line2); padding-bottom: 1px; }
+    details.how summary::-webkit-details-marker { display: none; }
+    details.how ol { margin: 12px 0 0; padding-left: 18px; display: grid; gap: 6px; }
+    .hint { margin: 16px 0 0; color: var(--dim); font-size: 13px; line-height: 1.55; }
+
+    /* genera */
+    .gen { display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
+    .gen-info strong { display: block; font-family: var(--serif); font-weight: 400; font-size: 26px; letter-spacing: -.01em; }
+    .gen-sub { display: block; margin-top: 4px; color: var(--muted); font-size: 13px; }
+    .gen-sub.ready { color: var(--good); }
+    .gen .btn { height: 52px; padding: 0 30px; font-size: 15px; }
+    .message { display: none; margin-top: 18px; font-size: 13px; }
+    .message.ok { display: block; color: var(--good); }
+    .message.bad { display: block; color: var(--bad); }
+    .result { display: none; margin-top: 26px; padding: 24px; border-radius: 18px; border: 1px solid var(--line2); background: rgba(255,255,255,.025); }
+    .result.show { display: block; animation: pop .5s var(--ease); }
+    @keyframes pop { from { opacity: 0; transform: translateY(8px); } }
+    .result label { display: block; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+    .url-row { display: flex; gap: 8px; }
+    .url-row input { flex: 1; min-width: 0; height: var(--h); border-radius: 999px; border: 1px solid var(--line); background: transparent; color: #fff; padding: 0 16px; font: 13px ui-monospace, monospace; outline: none; }
+    .install { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+    .install a { display: inline-flex; align-items: center; justify-content: center; gap: 10px; height: 44px; padding: 0 22px; border-radius: 999px; border: 1px solid var(--line2); color: #fff; font-size: 14px; font-weight: 500; text-decoration: none; transition: .2s; }
+    .install a:hover { background: rgba(255,255,255,.07); }
+    .install a img { height: 18px; width: auto; max-width: 84px; object-fit: contain; }
+    .install a img.wm { filter: brightness(0) invert(1); }
+
+    footer { padding-top: 36px; border-top: 1px solid var(--line); text-align: center; color: var(--dim); font-size: 12px; line-height: 1.8; }
+    footer a { color: var(--muted); }
+
+    @media (max-width: 700px) {
+      .page { width: calc(100% - 32px); padding-top: 40px; }
+      .covers { gap: 10px; } .cv:nth-child(n+3) { display: none; }
+      .row-main { flex-wrap: wrap; } .chips { margin-left: 58px; }
+      .cfg { margin-left: 0; } .cfg-line > b { width: 100%; }
+      .search { flex: 1 1 100%; } .counter { margin-left: 0; width: 100%; padding: 0; }
+      .key-row { flex-wrap: wrap; } .url-row { flex-direction: column; } .url-row .ctl { width: 100%; }
+      .gen { flex-direction: column; align-items: stretch; } .gen .btn { justify-content: center; }
+      .field input { font-size: 16px; }
+    }
+    @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="hero">
+      <span class="eyebrow">blvckTOP · Nuvio &amp; Stremio</span>
+      <h1><span>Crea il tuo</span><br /><em>Top&nbsp;10</em></h1>
+      <p class="lede">Le classifiche dei tuoi servizi in streaming, con cover su misura: orizzontali o verticali, su sfondo trasparente o nero.</p>
+      <div class="cta">
+        <a class="btn" href="#start">Inizia <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M6 13l6 6 6-6"/></svg></a>
+        <a class="link" href="#key">Ho già la chiave TMDB</a>
+      </div>
+      <div class="targets">
+        <span><img data-logo="stremio" alt="" />Stremio</span>
+        <span><img class="wm" data-logo="nuvio" alt="Nuvio" /></span>
+        <span><img data-logo="tmdb" alt="TMDB" /></span>
+      </div>
+    </header>
+
+    <div class="band" aria-hidden="true"><div class="track" id="track"></div></div>
+    <div class="covers" id="covers" aria-hidden="true"></div>
+
+    <section id="start">
+      <div class="step">
+        <div class="step-head">
+          <span class="step-n">01</span>
+          <div><h2>Scegli le classifiche</h2><p class="sub">Per ogni servizio scegli film, serie o entrambi.</p></div>
+        </div>
+
+        <div class="toolbar">
+          <input id="search" class="ctl search" type="search" placeholder="Cerca servizio" aria-label="Cerca servizio" />
+          <div class="ctl seg" role="group" aria-label="Filtro tipo">
+            <button type="button" class="on" data-f="all">Tutti</button>
+            <button type="button" data-f="movie">Film</button>
+            <button type="button" data-f="series">Serie</button>
+          </div>
+          <button class="ctl" id="allBtn" type="button">Seleziona</button>
+          <button class="ctl" id="noneBtn" type="button">Azzera</button>
+          <span class="counter"><b id="count">0</b> selezionati</span>
+        </div>
+
+        <div class="bulk">
+          <span class="grp"><em>Formato per tutti</em>
+            <button class="o on" type="button" data-bulk="shape" data-v="landscape"><i class="g-land"></i>Orizzontale</button>
+            <button class="o" type="button" data-bulk="shape" data-v="poster"><i class="g-port"></i>Verticale</button></span>
+          <span class="grp"><em>Sfondo per tutti</em>
+            <button class="o on" type="button" data-bulk="bg" data-v="transparent"><i class="g-tr"></i>Trasparente</button>
+            <button class="o" type="button" data-bulk="bg" data-v="black"><i class="g-bk"></i>Nero</button></span>
+        </div>
+
+        <div id="catalogs" class="list">
+          <div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>
+        </div>
+      </div>
+
+      <div class="step" id="key">
+        <div class="step-head">
+          <span class="step-n">02</span>
+          <div><h2>Collega TMDB</h2></div>
+        </div>
+        <div class="key-row">
+          <img data-logo="tmdb" alt="TMDB" />
+          <p>Chiave gratuita, usata solo per backdrop, poster e loghi dei titoli.</p>
+          <a class="link" href="https://www.themoviedb.org/settings/api" target="_blank" rel="noopener noreferrer">Ottieni la chiave ↗</a>
+        </div>
+        <div class="field">
+          <input id="tmdbKey" type="password" autocomplete="off" spellcheck="false" placeholder="API Key (v3)" />
+          <div class="tools">
+            <button type="button" id="pasteBtn" title="Incolla dagli appunti">Incolla</button>
+            <button type="button" id="eyeBtn" class="icon-btn" aria-label="Mostra la chiave" aria-pressed="false" title="Mostra / nascondi">
+              <svg class="i-show" viewBox="0 0 24 24"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>
+              <svg class="i-hide" viewBox="0 0 24 24"><path d="M3 3l18 18M10.6 5.1A9.7 9.7 0 0 1 12 5c6.4 0 10 7 10 7a17 17 0 0 1-3.2 4M6.5 6.6C3.8 8.4 2 12 2 12s3.6 7 10 7c1.6 0 3-.4 4.3-1M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg>
+            </button>
+          </div>
+        </div>
+        <div id="keyStatus" class="status"></div>
+        <label class="remember"><input type="checkbox" id="remember" /> Ricorda la chiave su questo browser</label>
+        <details class="how"><summary>Come ottenerla</summary>
+          <ol>
+            <li>Accedi (o registrati) su themoviedb.org e apri <b>Impostazioni → API</b>.</li>
+            <li>Richiedi una chiave <b>Developer</b> (gratuita, uso personale).</li>
+            <li>Copia la <b>API Key (v3 auth)</b> da 32 caratteri e incollala qui.</li>
+          </ol></details>
+        <p class="hint">La chiave non viene salvata su alcun database: finisce solo, cifrata, nel tuo URL personale.</p>
+      </div>
+
+      <div class="step">
+        <div class="step-head">
+          <span class="step-n">03</span>
+          <div><h2>Genera e installa</h2></div>
+        </div>
+        <div class="gen">
+          <div class="gen-info">
+            <strong id="genSummary">Nessun catalogo selezionato</strong>
+            <span class="gen-sub" id="genSub">Aggiungi la tua chiave TMDB per continuare</span>
+          </div>
+          <button id="generateBtn" class="btn" type="button">
+            <span class="label">Genera manifest</span>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </button>
+        </div>
+        <div id="message" class="message"></div>
+
+        <div id="result" class="result">
+          <label for="manifestUrl">Il tuo manifest</label>
+          <div class="url-row">
+            <input id="manifestUrl" type="text" readonly />
+            <button id="copyBtn" class="ctl" type="button">Copia</button>
+          </div>
+          <div class="install">
+            <a id="stremioBtn" href="#"><img data-logo="stremio" alt="" />Installa su Stremio</a>
+            <a id="nuvioBtn" href="#"><img class="wm" data-logo="nuvio" alt="" />Installa su Nuvio</a>
+          </div>
+          <p class="hint">In Nuvio: <b>Impostazioni → Addon → Aggiungi</b> e incolla l'URL se il pulsante non si apre. Conserva l'URL: contiene la configurazione cifrata.</p>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      This product uses the TMDB API but is not endorsed or certified by TMDB.<br />
+      Loghi e marchi appartengono ai rispettivi proprietari.
+    </footer>
+  </main>
+
+  <script>
+    const $ = id => document.getElementById(id);
+    const catalogsEl = $("catalogs"), keyEl = $("tmdbKey"), generateBtn = $("generateBtn"),
+          message = $("message"), result = $("result"), manifestUrl = $("manifestUrl"),
+          keyStatus = $("keyStatus"), countEl = $("count");
+
+    /* ---------- loghi ---------- */
+    const ICON_CDN = "https://cdn.jsdelivr.net/npm/simple-icons@11/icons/";
+    const GH = "https://raw.githubusercontent.com/blvckroby/MusicDB/refs/heads/main/loghi/svg/";
+    const svgUri = (w, h, body) => "data:image/svg+xml;utf8," + encodeURIComponent(
+      `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}"><g fill="#fff" font-family="Arial Black, Arial, Helvetica, sans-serif" font-weight="900">${body}</g></svg>`);
+    const LOGO = {
+      prime:    GH + "prime-logo.svg",
+      discovery:GH + "discovery_plus.svg",
+      infinity: "https://upload.wikimedia.org/wikipedia/commons/2/2f/Mediaset_Infinity_logo.svg",
+      tim:      "https://upload.wikimedia.org/wikipedia/commons/a/a3/TIMvision_logo_%282026-present%29.svg",
+      stremio:  "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/stremio.svg",
+      nuvio:    "https://nuvio.tv/assets/nuvio-app-logo-wordmark.webp",
+      hbomax:   "https://upload.wikimedia.org/wikipedia/commons/b/b3/HBO_Max_%282025%29.svg",
+      rakuten:  "https://upload.wikimedia.org/wikipedia/commons/e/e5/Rakuten_TV_logo.svg",
+      chili:    svgUri(120, 48, '<text x="60" y="36" font-size="34" text-anchor="middle" letter-spacing="1">CHILI</text>'),
+      tmdb:     "https://upload.wikimedia.org/wikipedia/commons/8/89/Tmdb.new.logo.svg",
+      disney:   "https://upload.wikimedia.org/wikipedia/commons/3/3e/Disney%2B_logo.svg",
+      now:      "https://upload.wikimedia.org/wikipedia/commons/0/0d/Now_logo.svg",
+      raiplay:  "https://upload.wikimedia.org/wikipedia/commons/6/6d/RaiPlay_2023_logo.svg"
+    };
+    // [regex, slug Simple Icons | {url, wide?, big?}]
+    const BRANDS = [
+      [/netflix/i,             "netflix"],
+      [/disney/i,              { url: LOGO.disney, wide: true }],
+      [/rai\s?play|\brai\b/i,  { url: LOGO.raiplay, wide: true }],
+      [/\bnow\b|now ?tv/i,     { url: LOGO.now, wide: true }],
+      [/prime|amazon/i,        { url: LOGO.prime, big: true }],
+      [/tim\s?vision|\btim\b/i,{ url: LOGO.tim, wide: true }],
+      [/discovery/i,           { url: LOGO.discovery, big: true, native: true }],
+      [/hbo|\bmax\b/i,         { url: LOGO.hbomax, wide: true }],
+      [/rakuten/i,             { url: LOGO.rakuten, wide: true }],
+      [/chili/i,               { url: LOGO.chili, wide: true }],
+      [/apple/i,               "appletv"],
+      [/paramount/i,           "paramountplus"],
+      [/crunchyroll/i,         "crunchyroll"],
+      [/hulu/i,                "hulu"],
+      [/peacock/i,             "peacock"],
+      [/youtube/i,             "youtube"],
+      [/sky/i,                 "sky"],
+      [/dazn/i,                "dazn"],
+      [/infinity|mediaset|canale ?5/i, { url: LOGO.infinity, wide: true }],
+      [/plex/i,                "plex"],
+      [/tmdb|themoviedb/i,     { url: LOGO.tmdb, wide: true }],
+      [/imdb/i,                "imdb"],
+      [/trakt/i,               "trakt"]
+    ];
+    const brandFor = name => {
+      for (const [re, src] of BRANDS) if (re.test(name))
+        return typeof src === "string" ? { url: `${ICON_CDN}${src}.svg` } : src;
+      return null;
+    };
+
+    function makeLogo(name) {
+      const brand = brandFor(name);
+      const box = document.createElement("div");
+      box.className = "logo";
+      const monogram = () => { box.className = "logo mono"; box.textContent = (name.match(/[A-Za-z0-9]/) || ["T"])[0].toUpperCase(); };
+      if (!brand) { monogram(); return box; }
+      if (brand.wide) box.classList.add("wide");
+      if (brand.big) box.classList.add("big");
+      if (brand.native) box.classList.add("native");
+      const img = new Image();
+      img.alt = ""; img.loading = "lazy"; img.decoding = "async"; img.referrerPolicy = "no-referrer";
+      img.src = brand.url;
+      img.onerror = () => { img.remove(); monogram(); };
+      box.append(img);
+      return box;
+    }
+
+    document.querySelectorAll("img[data-logo]").forEach(img => {
+      img.src = LOGO[img.dataset.logo];
+      img.referrerPolicy = "no-referrer";
+      img.onerror = () => { const p = img.parentElement; img.remove(); if (p && !p.textContent.trim()) p.textContent = img.alt; };
+    });
+
+    /* ---------- cataloghi raggruppati per servizio ---------- */
+    let groups = [], typeFilter = "all";
+    const TYPE_LABEL = { movie: "Film", series: "Serie" };
+    const typeLabel = t => TYPE_LABEL[t] || t;
+
+    // "Netflix Top 10 Serie TV" -> "Netflix"
+    function providerOf(name) {
+      const clean = name
+        .replace(/\b(top\s*-?\s*\d*|classifica|film|movies?|serie\s*tv|serie|series|tv\s*shows?|show)\b/gi, " ")
+        .replace(/[-–—·|:()]+/g, " ").replace(/\s+/g, " ").trim();
+      return clean || name;
+    }
+
+    function buildGroups(catalogs) {
+      const map = new Map();
+      catalogs.forEach(c => {
+        const name = providerOf(c.name);
+        const key = name.toLowerCase();
+        if (!map.has(key)) map.set(key, { key, name, items: [] });
+        map.get(key).items.push({ ...c, checked: true, shape: "landscape", canvasBackground: "transparent" });
+      });
+      map.forEach(g => g.items.sort((a, b) => (a.type === "movie" ? 0 : 1) - (b.type === "movie" ? 0 : 1)));
+      return [...map.values()];
+    }
+
+    const allItems = () => groups.flatMap(g => g.items);
+    const visibleItems = () => {
+      const q = $("search").value.trim().toLowerCase();
+      return groups.filter(g => g.name.toLowerCase().includes(q))
+        .flatMap(g => g.items).filter(i => typeFilter === "all" || i.type === typeFilter);
+    };
+
+    function setMessage(text, type) { message.textContent = text; message.className = `message ${type}`; }
+
+    function updateSummary() {
+      const n = allItems().filter(c => c.checked).length;
+      countEl.textContent = n;
+      const hasKey = /^[a-f0-9]{32}$/i.test(keyEl.value.trim());
+      $("genSummary").textContent = n ? `${n} ${n === 1 ? "classifica" : "classifiche"}` : "Nessuna classifica selezionata";
+      const sub = $("genSub");
+      sub.textContent = !n ? "Scegli almeno una classifica" : hasKey ? "Tutto pronto: genera il tuo manifest" : "Aggiungi la tua chiave TMDB per continuare";
+      sub.classList.toggle("ready", !!n && hasKey);
+    }
+
+    function selectedCatalogs() {
+      return allItems().filter(c => c.checked).map(c => ({
+        id: c.id, type: c.type, shape: c.shape, canvasBackground: c.canvasBackground
+      }));
+    }
+
+    function optBtn(item, prop, value, text, glyph, scope) {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "o" + (item[prop] === value ? " on" : "");
+      b.innerHTML = `<i class="${glyph}"></i>${text}`;
+      b.addEventListener("click", () => {
+        item[prop] = value;
+        scope.querySelectorAll(`[data-p="${prop}"]`).forEach(x => x.classList.toggle("on", x === b));
+      });
+      b.dataset.p = prop;
+      return b;
+    }
+
+    function renderCatalogs() {
+      const q = $("search").value.trim().toLowerCase();
+      const list = groups.filter(g => g.name.toLowerCase().includes(q) &&
+        (typeFilter === "all" || g.items.some(i => i.type === typeFilter)));
+      catalogsEl.innerHTML = "";
+      if (!list.length) {
+        catalogsEl.innerHTML = '<p class="sub" style="padding:20px 0">Nessun servizio trovato.</p>';
+        updateSummary();
+        return;
+      }
+      list.forEach(g => {
+        const row = document.createElement("div");
+        row.className = "row";
+        const main = document.createElement("div");
+        main.className = "row-main";
+        const name = document.createElement("div");
+        name.className = "row-name";
+        name.textContent = g.name;
+        const chips = document.createElement("div");
+        chips.className = "chips";
+        const cfg = document.createElement("div");
+        cfg.className = "cfg";
+
+        const drawCfg = () => {
+          cfg.innerHTML = "";
+          g.items.filter(i => i.checked).forEach(i => {
+            const line = document.createElement("div");
+            line.className = "cfg-line";
+            const label = document.createElement("b");
+            label.textContent = typeLabel(i.type);
+            line.append(label,
+              optBtn(i, "shape", "landscape", "Orizzontale", "g-land", line),
+              optBtn(i, "shape", "poster", "Verticale", "g-port", line));
+            const sep = document.createElement("span"); sep.className = "sep";
+            line.append(sep,
+              optBtn(i, "canvasBackground", "transparent", "Trasparente", "g-tr", line),
+              optBtn(i, "canvasBackground", "black", "Nero", "g-bk", line));
+            cfg.append(line);
+          });
+          cfg.hidden = !cfg.children.length;
+        };
+
+        g.items.forEach(i => {
+          const chip = document.createElement("button");
+          chip.type = "button";
+          chip.className = "chip" + (i.checked ? " on" : "");
+          chip.textContent = typeLabel(i.type);
+          chip.setAttribute("aria-pressed", i.checked);
+          chip.addEventListener("click", () => {
+            i.checked = !i.checked;
+            chip.classList.toggle("on", i.checked);
+            chip.setAttribute("aria-pressed", i.checked);
+            drawCfg(); updateSummary();
+          });
+          chips.append(chip);
+        });
+
+        main.append(makeLogo(g.name), name, chips);
+        row.append(main, cfg);
+        drawCfg();
+        catalogsEl.append(row);
+      });
+      updateSummary();
+    }
+
+    async function loadCatalogs() {
+      try {
+        const res = await fetch("/api/catalogs");
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Errore cataloghi");
+        groups = buildGroups(data.catalogs);
+        renderCatalogs();
+      } catch (err) {
+        catalogsEl.innerHTML = "";
+        const s = document.createElement("p");
+        s.className = "sub"; s.style.color = "var(--bad)"; s.textContent = err.message;
+        catalogsEl.append(s);
+      }
+    }
+
+    $("search").addEventListener("input", renderCatalogs);
+    document.querySelectorAll(".seg button").forEach(b => b.addEventListener("click", () => {
+      document.querySelectorAll(".seg button").forEach(x => x.classList.remove("on"));
+      b.classList.add("on");
+      typeFilter = b.dataset.f;
+      renderCatalogs();
+    }));
+    $("allBtn").addEventListener("click", () => { visibleItems().forEach(c => c.checked = true); renderCatalogs(); });
+    $("noneBtn").addEventListener("click", () => { visibleItems().forEach(c => c.checked = false); renderCatalogs(); });
+    document.querySelectorAll("[data-bulk]").forEach(b => b.addEventListener("click", () => {
+      const prop = b.dataset.bulk === "shape" ? "shape" : "canvasBackground";
+      allItems().forEach(c => { c[prop] = b.dataset.v; });
+      document.querySelectorAll(`[data-bulk="${b.dataset.bulk}"]`).forEach(x => x.classList.toggle("on", x === b));
+      renderCatalogs();
+    }));
+
+    /* ---------- chiave TMDB ---------- */
+    function checkKeyFormat() {
+      const v = keyEl.value.trim();
+      if (!v) { keyStatus.textContent = ""; keyStatus.className = "status"; return; }
+      if (/^[a-f0-9]{32}$/i.test(v)) { keyStatus.textContent = "✓ Formato valido (v3)"; keyStatus.className = "status ok"; }
+      else if (v.startsWith("eyJ")) { keyStatus.textContent = "Questo sembra il Read Access Token: serve la API Key (v3) da 32 caratteri."; keyStatus.className = "status bad"; }
+      else { keyStatus.textContent = "La chiave v3 è di 32 caratteri esadecimali."; keyStatus.className = "status bad"; }
+    }
+    keyEl.addEventListener("input", () => { checkKeyFormat(); updateSummary(); });
+    $("eyeBtn").addEventListener("click", e => {
+      const show = keyEl.type === "password";
+      keyEl.type = show ? "text" : "password";
+      e.currentTarget.setAttribute("aria-pressed", show);
+      e.currentTarget.setAttribute("aria-label", show ? "Nascondi la chiave" : "Mostra la chiave");
+    });
+    $("pasteBtn").addEventListener("click", async () => {
+      try { keyEl.value = (await navigator.clipboard.readText()).trim(); checkKeyFormat(); updateSummary(); }
+      catch { keyEl.focus(); }
+    });
+    try {
+      const saved = localStorage.getItem("tmdbKey");
+      if (saved) { keyEl.value = saved; $("remember").checked = true; checkKeyFormat(); updateSummary(); }
+    } catch {}
+
+    /* ---------- genera ---------- */
+    generateBtn.addEventListener("click", async () => {
+      const tmdbApiKey = keyEl.value.trim();
+      const catalogs = selectedCatalogs();
+      result.classList.remove("show");
+
+      if (!catalogs.length) return setMessage("Seleziona almeno una classifica.", "bad");
+      if (!tmdbApiKey) { keyEl.focus(); return setMessage("Inserisci la tua TMDB API key.", "bad"); }
+
+      generateBtn.disabled = true;
+      generateBtn.querySelector(".label").textContent = "Generazione…";
+      try {
+        const res = await fetch("/api/generate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ tmdbApiKey, catalogs })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Errore generazione");
+        try {
+          if ($("remember").checked) localStorage.setItem("tmdbKey", tmdbApiKey);
+          else localStorage.removeItem("tmdbKey");
+        } catch {}
+        manifestUrl.value = data.manifestUrl;
+        $("stremioBtn").href = "stremio://" + data.manifestUrl.replace(/^https?:\/\//, "");
+        $("nuvioBtn").href = "nuvio://addon?url=" + encodeURIComponent(data.manifestUrl);
+        result.classList.add("show");
+        result.scrollIntoView({ behavior: "smooth", block: "center" });
+        setMessage(`Manifest generato con ${data.catalogCount} cataloghi.`, "ok");
+      } catch (err) {
+        setMessage(err.message, "bad");
+      } finally {
+        generateBtn.disabled = false;
+        generateBtn.querySelector(".label").textContent = "Genera manifest";
+      }
+    });
+
+    $("copyBtn").addEventListener("click", async () => {
+      try { await navigator.clipboard.writeText(manifestUrl.value); }
+      catch { manifestUrl.select(); document.execCommand("copy"); }
+      $("copyBtn").textContent = "Copiato";
+      setTimeout(() => $("copyBtn").textContent = "Copia", 1800);
+    });
+
+    /* ---------- banda loghi ---------- */
+    (function () {
+      const items = ["netflix", LOGO.disney, LOGO.prime, LOGO.now, LOGO.hbomax, LOGO.raiplay, "appletv",
+        LOGO.infinity, LOGO.tim, LOGO.discovery, "paramountplus", LOGO.rakuten, LOGO.chili];
+      const row = items.map(src => {
+        const url = /^(https?:|data:)/.test(src) ? src : `${ICON_CDN}${src}.svg`;
+        return `<span class="brand"><img src="${url}" alt="" referrerpolicy="no-referrer" onerror="this.parentNode.remove()" /></span>`;
+      }).join("");
+      $("track").innerHTML = row + row;
+    })();
+
+    /* ---------- cover di esempio ---------- */
+    (function () {
+      const base = "https://blvcktop.onrender.com/c/nmoG69qfX6e3tqJVtEaK0sLlrNOFz-tITBc8c_UFds0rhMDfnZ-4y3Voo2jyILN134ZxoR2UJGX-vRgMiRxzjHUXd89UodKEP0DDdxnmMvgKDSz8-zLo7LJDe4N8s3SPRqLqnpSKVUJ7EsFDX-pns5AQ-m87EnZfertRA1iCNCf7WWI8PYUdK2NNhNKJv340KtymzpS7ZIsBqhJ3wzX25TFm1ABaccoq2schhTtYqnHtCkrUbhXQ9UzmzZFB-Ey53JVyhROvBnG1r4rWkFRsUbZR18xymaqjAipZFx5lWWy6rKQd_nAOfwSl12l7arfrHIzvDqtALiliTrSIrsSetFYbqK_F0g8Rf6QkqgU5T2UOX_WbX5cann-Uk-ZdMrXn-RmrxaXLRb2BevMgu_9WX66lThnGFEsRE77gjZ9JGP0MJ4_iE3Nw0b6p2BxN4oSm8pwy5uBfb-YmVPBegWqUCnvzhfMNlxEAs2w5d7iWFnvWMqGQ0_HZPjfeFV0rCUZl_X1pScNTQb_uUkjfz_YsZ9C7kIHp1LNUJ1PAumE3bodIYfg5SSNVJ82tyPjIBJ9lw8YTyLN6CMeQz09UinnLpiBYXwxxhK2Adcd3sW3KMuxbjoYJygrtYCVufR7qGXdr-z4wrzvzV23krFKiv5KzZzPKeHy0DD52Nx0OFkR6TiSNf4XqLgrgQzjX08mgIb7iYE0G8iKdeJFwK144VLwrFXqWy_TvMGfSAgPE4feLv26DK3jZ2A-QL_21xOQ6BI6ZzxSOl0p6aurvM_naUa6wU4NsGqVUSEjqrvkDLZEz8iMaEVo7AuTNY-5XZ8-DglPQ3L2vcWc82Z6bmWZbpUr7enEoGyJko51JIZp9ruM2bRMMBUKstcC6EmkVVTJRs4ckIs5YRbp6tyvW3553lnUSiFMqGdVWfIeb3iPJjI0NWuhEcL7PAgAbrAsEghLgvk3z7Gt3Gd9fVxpPfIjF1qwzjoimmM87a0hhYWCsvid40PTwq3CJZbq-4XA14QrKKZzKnRwZYvnGOYe0teyJCxbSKoxpqpa3I51atLzL_z5RpM2r8nyWczxBX6GV_Jp8olbIy0Zzy45Ij56EddhEqL90YxBkXiJcmSVAtKf7sbGbJWUu72jHn2LGfhrV5Cv0ISXfrrnuAByr8nTuju9yndzcOqBxKQ_9XHFJcVYqMmI_wyvQH4uqMBlLoaMYwzV9hQLv-lbY6YyJs7nlZaXVz4G0pu_WS-uB-7EG65f9Mt9XQMJHx-4JC4Dp3SbgOsHpEiRHwninHX48lwUOzgDQlREkcW-rgH0XhAeAnjFUGYCSTaCpMHApYwXdEU0QRjsdoNNNlVWFjMc5MuPnO6nXSo1DCw46JCx8b1uBj8j4E3CZEfNUfmlhxhbxCMV1cVjgqlYzuZ4XGwpe0w-nG3t-7ROjDBp1btNMmknc6wP7YEoLSX0dcVPUyoxfOf95e1gnCFV_oNn1kD9nf-6MqN7maQk7I7lIDMI2KnZNvOCzmQ2Fbg/top-cover";
+      const ids = [1423191, 1377237, 1283515, 977942];
+      $("covers").innerHTML = ids.map((id, i) =>
+        `<div class="cv"><span class="poster"><img src="${base}?rank=${i + 1}&type=movie&tmdbId=${id}" alt="" decoding="async" referrerpolicy="no-referrer" onerror="this.remove()" /></span></div>`
+      ).join("");
+    })();
+
+    loadCatalogs();
+  </script>
+</body>
+</html>
