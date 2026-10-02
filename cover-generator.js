@@ -149,40 +149,40 @@ function numberSvg(rank, layout, accent, genre = "", rating = "") {
   let metaXml = "";
 
   if (layout === LAYOUTS.landscape) {
-    // Under the card (300..1200) -> metaX = 750, in the bottom space (613..720) -> metaY = 668
-    const metaX = 750;
+    // Exact center of whole canvas background (0..1280) -> metaX = 640, in bottom space -> metaY = 668
+    const metaX = 640;
     const metaY = 668;
 
     if (escapedGenre && ratingVal) {
-      const gSize = escapedGenre.length > 15 ? 24 : (escapedGenre.length > 11 ? 27 : 31);
+      const gSize = escapedGenre.length > 14 ? 32 : (escapedGenre.length > 10 ? 36 : 40);
       metaXml = `
         <text x="${metaX}" y="${metaY}" text-anchor="middle" font-family="Inter, -apple-system, BlinkMacSystemFont, Arial, sans-serif" filter="url(#metaShadow)">
-          <tspan fill="#F1F5F9" font-size="${gSize}" font-weight="900" letter-spacing="2">${escapedGenre}</tspan>
-          <tspan fill="#64748B" font-size="24" font-weight="800">   •   </tspan>
-          <tspan fill="#FFB800" font-size="36" font-weight="900">★ </tspan>
-          <tspan fill="#FFFFFF" font-size="36" font-weight="900">${ratingVal}</tspan>
+          <tspan fill="#F1F5F9" font-size="${gSize}" font-weight="900" letter-spacing="2.5">${escapedGenre}</tspan>
+          <tspan fill="#94A3B8" font-size="30" font-weight="800">   •   </tspan>
+          <tspan fill="#FFB800" font-size="46" font-weight="900">★ </tspan>
+          <tspan fill="#FFFFFF" font-size="46" font-weight="900">${ratingVal}</tspan>
         </text>
       `;
     } else if (escapedGenre) {
-      metaXml = `<text x="${metaX}" y="${metaY}" text-anchor="middle" font-family="Inter, -apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="31" font-weight="900" letter-spacing="2" fill="#F1F5F9" filter="url(#metaShadow)">${escapedGenre}</text>`;
+      metaXml = `<text x="${metaX}" y="${metaY}" text-anchor="middle" font-family="Inter, -apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="40" font-weight="900" letter-spacing="2.5" fill="#F1F5F9" filter="url(#metaShadow)">${escapedGenre}</text>`;
     } else if (ratingVal) {
-      metaXml = `<text x="${metaX}" y="${metaY}" text-anchor="middle" font-family="Inter, -apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="36" font-weight="900" filter="url(#metaShadow)"><tspan fill="#FFB800">★ </tspan><tspan fill="#FFFFFF">${ratingVal}</tspan></text>`;
+      metaXml = `<text x="${metaX}" y="${metaY}" text-anchor="middle" font-family="Inter, -apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="46" font-weight="900" filter="url(#metaShadow)"><tspan fill="#FFB800">★ </tspan><tspan fill="#FFFFFF">${ratingVal}</tspan></text>`;
     }
   } else {
     // Poster / Portrait
-    // Under the poster card (210..940) -> metaX = 575, in the bottom space (1260..1500)
-    const metaX = 575;
+    // Exact center of whole canvas background (0..1000) -> metaX = 500, in bottom space (1260..1500)
+    const metaX = 500;
 
     if (escapedGenre && ratingVal) {
-      const gSize = escapedGenre.length > 15 ? 26 : (escapedGenre.length > 11 ? 30 : 34);
+      const gSize = escapedGenre.length > 14 ? 36 : (escapedGenre.length > 10 ? 42 : 48);
       metaXml = `
-        <text x="${metaX}" y="1342" text-anchor="middle" font-family="Inter, -apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="${gSize}" font-weight="900" letter-spacing="2.5" fill="#F1F5F9" filter="url(#metaShadow)">${escapedGenre}</text>
-        <text x="${metaX}" y="1415" text-anchor="middle" font-family="Inter, -apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="48" font-weight="900" filter="url(#metaShadow)"><tspan fill="#FFB800">★ </tspan><tspan fill="#FFFFFF">${ratingVal}</tspan></text>
+        <text x="${metaX}" y="1335" text-anchor="middle" font-family="Inter, -apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="${gSize}" font-weight="900" letter-spacing="3" fill="#F1F5F9" filter="url(#metaShadow)">${escapedGenre}</text>
+        <text x="${metaX}" y="1420" text-anchor="middle" font-family="Inter, -apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="64" font-weight="900" filter="url(#metaShadow)"><tspan fill="#FFB800">★ </tspan><tspan fill="#FFFFFF">${ratingVal}</tspan></text>
       `;
     } else if (escapedGenre) {
-      metaXml = `<text x="${metaX}" y="1380" text-anchor="middle" font-family="Inter, -apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="34" font-weight="900" letter-spacing="2.5" fill="#F1F5F9" filter="url(#metaShadow)">${escapedGenre}</text>`;
+      metaXml = `<text x="${metaX}" y="1375" text-anchor="middle" font-family="Inter, -apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="48" font-weight="900" letter-spacing="3" fill="#F1F5F9" filter="url(#metaShadow)">${escapedGenre}</text>`;
     } else if (ratingVal) {
-      metaXml = `<text x="${metaX}" y="1380" text-anchor="middle" font-family="Inter, -apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="48" font-weight="900" filter="url(#metaShadow)"><tspan fill="#FFB800">★ </tspan><tspan fill="#FFFFFF">${ratingVal}</tspan></text>`;
+      metaXml = `<text x="${metaX}" y="1375" text-anchor="middle" font-family="Inter, -apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="64" font-weight="900" filter="url(#metaShadow)"><tspan fill="#FFB800">★ </tspan><tspan fill="#FFFFFF">${ratingVal}</tspan></text>`;
     }
   }
 
@@ -394,6 +394,24 @@ async function brandAmbientGlow(layout, accent) {
     .toBuffer();
 }
 
+export function parseBackgroundColor(canvasBackground) {
+  const bg = String(canvasBackground || "").toLowerCase().trim();
+  if (!bg || bg === "transparent") {
+    return { r: 0, g: 0, b: 0, alpha: 0 };
+  }
+  if (bg === "stremio" || bg === "stremio-navy" || bg === "rgb(26,23,62)" || bg === "rgb(26, 23, 62)" || bg === "#1a173e" || bg === "1a173e") {
+    return { r: 26, g: 23, b: 62, alpha: 1 };
+  }
+  if (bg === "black" || bg === "nero") {
+    return { r: 0, g: 0, b: 0, alpha: 1 };
+  }
+  if (bg.startsWith("#")) {
+    const rgb = hexToRgb(bg);
+    return { r: rgb.r, g: rgb.g, b: rgb.b, alpha: 1 };
+  }
+  return { r: 0, g: 0, b: 0, alpha: 0 };
+}
+
 export async function createTopCover({
   rank,
   artworkUrl,
@@ -440,10 +458,7 @@ export async function createTopCover({
     }
   ];
 
-  const background =
-    canvasBackground === "black"
-      ? { r: 0, g: 0, b: 0, alpha: 1 }
-      : { r: 0, g: 0, b: 0, alpha: 0 };
+  const background = parseBackgroundColor(canvasBackground);
 
   return sharp({
     create: {

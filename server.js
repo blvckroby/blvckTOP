@@ -126,6 +126,17 @@ function normalizeShape(shape) {
     : "landscape";
 }
 
+export function normalizeCanvasBackground(bg) {
+  const s = String(bg || "").toLowerCase().trim();
+  if (s === "stremio" || s === "stremio-navy" || s === "rgb(26,23,62)" || s === "rgb(26, 23, 62)" || s === "#1a173e" || s === "1a173e") {
+    return "stremio";
+  }
+  if (s === "black" || s === "nero") {
+    return "black";
+  }
+  return "transparent";
+}
+
 function getCatalogConfig(config, type, id) {
   return (config.catalogs || []).find(
     c => c.type === type && c.id === id
@@ -161,6 +172,7 @@ async function buildCoverUrl(
   catalog
 ) {
   const shape = normalizeShape(catalog.shape);
+  const canvasBackground = normalizeCanvasBackground(catalog.canvasBackground);
   const genre = Array.isArray(meta?.genres) && meta.genres.length > 0 ? meta.genres[0] : (meta?.genre || "");
   const rating = meta?.imdbRating || meta?.rating || "";
 
@@ -178,13 +190,10 @@ async function buildCoverUrl(
         tmdbId,
         shape,
         catalogId: catalog.id || "",
-        canvasBackground:
-          catalog.canvasBackground === "black"
-            ? "black"
-            : "transparent",
+        canvasBackground,
         genre: genre || "",
         rating: rating || "",
-        v: "7.2.4"
+        v: "7.2.5"
       });
 
       return `${publicBase(req)}/c/${token}/top-cover?${qs}`;
@@ -204,13 +213,10 @@ async function buildCoverUrl(
     artwork: fallbackArtwork,
     shape,
     catalogId: catalog.id || "",
-    canvasBackground:
-      catalog.canvasBackground === "black"
-        ? "black"
-        : "transparent",
+    canvasBackground,
     genre: genre || "",
     rating: rating || "",
-    v: "7.2.4"
+    v: "7.2.5"
   });
 
   return `${publicBase(req)}/c/${token}/top-cover?${qs}`;
@@ -280,10 +286,7 @@ app.post("/api/generate", async (req, res) => {
           type: sourceCatalog.type,
           name: sourceCatalog.name || sourceCatalog.id,
           shape: normalizeShape(requestedCatalog.shape),
-          canvasBackground:
-            requestedCatalog.canvasBackground === "black"
-              ? "black"
-              : "transparent"
+          canvasBackground: normalizeCanvasBackground(requestedCatalog.canvasBackground)
         };
       })
       .filter(Boolean);
@@ -299,12 +302,30 @@ app.post("/api/generate", async (req, res) => {
       catalogs
     });
 
-    const manifestUrl =
-      `${publicBase(req)}/c/${token}/manifest.json`;
+    // Tailored for Stremio (solid backgrounds -> "stremio" rgb(26, 23, 62))
+    const stremioCatalogs = catalogs.map(c => ({
+      ...c,
+      canvasBackground: c.canvasBackground === "black" || c.canvasBackground === "stremio" ? "stremio" : c.canvasBackground
+    }));
+    const tokenStremio = encryptConfig({ v: 3, catalogs: stremioCatalogs });
+
+    // Tailored for Nuvio (solid backgrounds -> "black" #000000)
+    const nuvioCatalogs = catalogs.map(c => ({
+      ...c,
+      canvasBackground: c.canvasBackground === "black" || c.canvasBackground === "stremio" ? "black" : c.canvasBackground
+    }));
+    const tokenNuvio = encryptConfig({ v: 3, catalogs: nuvioCatalogs });
+
+    const base = publicBase(req);
+    const manifestUrl = `${base}/c/${token}/manifest.json`;
+    const stremioManifestUrl = `${base}/c/${tokenStremio}/manifest.json`;
+    const nuvioManifestUrl = `${base}/c/${tokenNuvio}/manifest.json`;
 
     res.json({
       ok: true,
       manifestUrl,
+      stremioManifestUrl,
+      nuvioManifestUrl,
       catalogCount: catalogs.length
     });
   } catch (err) {
@@ -492,10 +513,7 @@ app.get(["/c/:token/top-cover", "/top-cover"], async (req, res) => {
     const tmdbId = req.query.tmdbId ? String(req.query.tmdbId) : null;
     const catalogId = req.query.catalogId ? String(req.query.catalogId) : "";
 
-    const canvasBackground =
-      req.query.canvasBackground === "black"
-        ? "black"
-        : "transparent";
+    const canvasBackground = normalizeCanvasBackground(req.query.canvasBackground);
 
     let artworkUrl = req.query.artwork ? String(req.query.artwork) : null;
     let resolvedTmdbId = tmdbId;

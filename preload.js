@@ -128,7 +128,7 @@ export async function preloadAllCatalogs(sourceManifestUrl, options = {}) {
 
             // Pre-generate for standard combinations
             const shapes = ["landscape", "poster"];
-            const backgrounds = ["transparent", "black"];
+            const backgrounds = ["stremio", "black", "transparent"];
 
             for (const shape of shapes) {
               const artworkUrl = shape === "poster"
