@@ -10,7 +10,6 @@ import {
   getTmdbImages,
   chooseBackdrop,
   choosePoster,
-  chooseLogo,
   DEFAULT_TMDB_KEY
 } from "./tmdb.js";
 import { createTopCover } from "./cover-generator.js";
@@ -47,8 +46,7 @@ export function computeCoverKey({
   catalogId,
   canvasBackground,
   accent,
-  artworkUrl,
-  logoUrl
+  artworkUrl
 }) {
   return [
     rank,
@@ -58,8 +56,7 @@ export function computeCoverKey({
     catalogId || "",
     canvasBackground || "transparent",
     accent || "#FFFFFF",
-    artworkUrl || "",
-    logoUrl || ""
+    artworkUrl || ""
   ].join("|");
 }
 
@@ -116,7 +113,6 @@ export async function preloadAllCatalogs(sourceManifestUrl, options = {}) {
             if (!tmdbId) continue;
 
             const images = await getTmdbImages(type, tmdbId, DEFAULT_TMDB_KEY);
-            const logoUrl = chooseLogo(images);
 
             // Pre-generate for standard combinations
             const shapes = ["landscape", "poster"];
@@ -127,8 +123,6 @@ export async function preloadAllCatalogs(sourceManifestUrl, options = {}) {
                 ? choosePoster(images)
                 : chooseBackdrop(images);
 
-              const itemLogoUrl = shape === "landscape" ? logoUrl : null;
-
               for (const canvasBackground of backgrounds) {
                 const coverKey = computeCoverKey({
                   rank,
@@ -138,8 +132,7 @@ export async function preloadAllCatalogs(sourceManifestUrl, options = {}) {
                   catalogId: catId,
                   canvasBackground,
                   accent,
-                  artworkUrl,
-                  logoUrl: itemLogoUrl
+                  artworkUrl
                 });
 
                 const existing = getCoverFilePath(coverKey);
@@ -152,7 +145,6 @@ export async function preloadAllCatalogs(sourceManifestUrl, options = {}) {
                   const pngBuffer = await createTopCover({
                     rank,
                     artworkUrl,
-                    logoUrl: itemLogoUrl,
                     shape,
                     accent,
                     canvasBackground

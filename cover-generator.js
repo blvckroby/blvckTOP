@@ -323,7 +323,6 @@ async function brandAmbientGlow(layout, accent) {
 export async function createTopCover({
   rank,
   artworkUrl,
-  logoUrl = null,
   shape = "landscape",
   accent = "#FFFFFF",
   canvasBackground = "transparent"
@@ -341,7 +340,7 @@ export async function createTopCover({
     brandAmbientGlow(layout, accent)
   ]);
 
-  const { canvas, card, logo: logoConf } = layout;
+  const { canvas, card } = layout;
 
   const composites = [
     // Soft brand tint around the number area.
@@ -364,28 +363,6 @@ export async function createTopCover({
       top: card.y
     }
   ];
-
-  // Only composite logo in landscape mode (posters already contain title)
-  if (normalized === "landscape" && logoUrl) {
-    try {
-      const logoBuffer = await fetchBuffer(logoUrl);
-      const logo = await prepareLogo(logoBuffer, layout);
-
-      composites.push({
-        input: logo.buffer,
-        left: Math.round(card.x + logoConf.left - logo.pad),
-        top: Math.round(
-          card.y +
-          card.height -
-          logoConf.bottom -
-          logo.visibleHeight -
-          logo.pad
-        )
-      });
-    } catch (err) {
-      console.warn("Logo non disponibile:", err.message);
-    }
-  }
 
   const background =
     canvasBackground === "black"

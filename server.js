@@ -24,7 +24,6 @@ import {
   getTmdbImages,
   chooseBackdrop,
   choosePoster,
-  chooseLogo,
   resolveTmdbId,
   DEFAULT_TMDB_KEY
 } from "./tmdb.js";
@@ -437,7 +436,6 @@ app.get(["/c/:token/top-cover", "/top-cover"], async (req, res) => {
         : "transparent";
 
     let artworkUrl = req.query.artwork ? String(req.query.artwork) : null;
-    let logoUrl = req.query.logo ? String(req.query.logo) : null;
     let resolvedTmdbId = tmdbId;
 
     const catalog = config?.catalogs?.find(c => c.id === catalogId) || { id: catalogId };
@@ -470,20 +468,9 @@ app.get(["/c/:token/top-cover", "/top-cover"], async (req, res) => {
         artworkUrl = shape === "poster"
           ? choosePoster(images)
           : chooseBackdrop(images);
-
-        // Official vertical posters already have the title embedded.
-        // We only add the transparent logo PNG for landscape backdrops!
-        if (shape === "landscape" && !logoUrl) {
-          logoUrl = chooseLogo(images);
-        }
       } catch (tmdbErr) {
         console.warn(`Errore fetch immagini TMDB ${resolvedTmdbId}:`, tmdbErr.message);
       }
-    } else if (shape === "landscape" && resolvedTmdbId && !logoUrl) {
-      try {
-        const images = await getTmdbImages(effectiveType, resolvedTmdbId, DEFAULT_TMDB_KEY);
-        logoUrl = chooseLogo(images);
-      } catch {}
     }
 
     if (!artworkUrl) {
@@ -498,8 +485,7 @@ app.get(["/c/:token/top-cover", "/top-cover"], async (req, res) => {
       catalogId,
       canvasBackground,
       accent,
-      artworkUrl,
-      logoUrl: shape === "landscape" ? logoUrl : null
+      artworkUrl
     });
 
     // 1. Check persistent disk cache (instant response via sendFile)
@@ -524,7 +510,6 @@ app.get(["/c/:token/top-cover", "/top-cover"], async (req, res) => {
       const png = await createTopCover({
         rank,
         artworkUrl,
-        logoUrl,
         shape,
         accent,
         canvasBackground
