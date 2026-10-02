@@ -128,7 +128,7 @@ export async function preloadAllCatalogs(sourceManifestUrl, options = {}) {
 
             // Pre-generate for standard combinations (both with and without metadata)
             const shapes = ["landscape", "poster"];
-            const backgrounds = ["transparent", "black", "stremio"];
+            const backgrounds = ["transparent", "black", "stremio", "provider"];
             const metaFlags = [true, false];
 
             for (const shape of shapes) {
@@ -168,7 +168,8 @@ export async function preloadAllCatalogs(sourceManifestUrl, options = {}) {
                       accent,
                       canvasBackground,
                       genre: effectiveGenre,
-                      rating: effectiveRating
+                      rating: effectiveRating,
+                      catalogId: catId
                     });
 
                     saveCoverBuffer(coverKey, pngBuffer);

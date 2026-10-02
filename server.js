@@ -128,6 +128,9 @@ function normalizeShape(shape) {
 
 export function normalizeCanvasBackground(bg) {
   const s = String(bg || "").toLowerCase().trim();
+  if (s === "provider" || s === "brand") {
+    return "provider";
+  }
   if (s === "stremio" || s === "stremio-navy" || s === "rgb(26,23,62)" || s === "rgb(26, 23, 62)" || s === "#1a173e" || s === "1a173e") {
     return "stremio";
   }
@@ -195,7 +198,7 @@ async function buildCoverUrl(
         showMeta: String(showMeta),
         genre: genre || "",
         rating: rating || "",
-        v: "7.2.8"
+        v: "7.2.9"
       });
 
       return `${publicBase(req)}/c/${token}/top-cover?${qs}`;
@@ -219,7 +222,7 @@ async function buildCoverUrl(
     showMeta: String(showMeta),
     genre: genre || "",
     rating: rating || "",
-    v: "7.2.8"
+    v: "7.2.9"
   });
 
   return `${publicBase(req)}/c/${token}/top-cover?${qs}`;
@@ -624,7 +627,8 @@ app.get(["/c/:token/top-cover", "/top-cover"], async (req, res) => {
         accent,
         canvasBackground,
         genre,
-        rating
+        rating,
+        catalogId
       });
 
       // Persist to disk and DB

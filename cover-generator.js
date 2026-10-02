@@ -132,16 +132,137 @@ function cleanGenre(raw) {
   return g.toUpperCase();
 }
 
-function generateGlassBackground(width, height, isStremio = true) {
-  if (!isStremio) {
+function getBrandPalette(accent = "#8C75FF", catalogKey = "") {
+  const key = String(catalogKey || "").toLowerCase();
+  
+  if (key.includes("netflix") || accent.toUpperCase() === "#E50914") {
+    return {
+      atmo: { c1: "#3d080c", c2: "#1f0305", c3: "#0a0102" },
+      body: { c1: "#570a10", c2: "#38060a", c3: "#1a0204", c4: "#050001" },
+      stroke: { s1: "#FFFFFF", s2: "#FECDD3", s3: "#F43F5E", s4: "#881337", s5: "#FDA4AF", s6: "#FFFFFF" },
+      sheen: { c1: "#FFFFFF", c2: "#FECDD3" },
+      bounce: { c1: "#E11D48", c2: "#FDA4AF" }
+    };
+  }
+
+  if (key.includes("prime") || key.includes("amazon") || accent.toUpperCase() === "#00A8E1") {
+    return {
+      atmo: { c1: "#002847", c2: "#001324", c3: "#00050d" },
+      body: { c1: "#004073", c2: "#002447", c3: "#001021", c4: "#00040a" },
+      stroke: { s1: "#FFFFFF", s2: "#BAE6FD", s3: "#38BDF8", s4: "#0284C7", s5: "#7DD3FC", s6: "#FFFFFF" },
+      sheen: { c1: "#FFFFFF", c2: "#BAE6FD" },
+      bounce: { c1: "#0284C7", c2: "#7DD3FC" }
+    };
+  }
+
+  if (key.includes("now") || key.includes("sky") || accent.toUpperCase() === "#00E575" || accent.toUpperCase() === "#00CFFF") {
+    return {
+      atmo: { c1: "#003319", c2: "#00170a", c3: "#000603" },
+      body: { c1: "#005229", c2: "#003319", c3: "#00170b", c4: "#000502" },
+      stroke: { s1: "#FFFFFF", s2: "#BBF7D0", s3: "#4ADE80", s4: "#15803D", s5: "#86EFAC", s6: "#FFFFFF" },
+      sheen: { c1: "#FFFFFF", c2: "#BBF7D0" },
+      bounce: { c1: "#16A34A", c2: "#86EFAC" }
+    };
+  }
+
+  if (key.includes("disney") || accent.toUpperCase() === "#2D7DFF" || accent.toUpperCase() === "#155EEF") {
+    return {
+      atmo: { c1: "#0c1d42", c2: "#060e21", c3: "#02040a" },
+      body: { c1: "#142d69", c2: "#0c1d42", c3: "#060d1f", c4: "#02040a" },
+      stroke: { s1: "#FFFFFF", s2: "#BFDBFE", s3: "#60A5FA", s4: "#1D4ED8", s5: "#93C5FD", s6: "#FFFFFF" },
+      sheen: { c1: "#FFFFFF", c2: "#BFDBFE" },
+      bounce: { c1: "#2563EB", c2: "#93C5FD" }
+    };
+  }
+
+  if (key.includes("apple") || accent.toUpperCase() === "#D8DFEA" || accent.toUpperCase() === "#F4F5F7") {
+    return {
+      atmo: { c1: "#26292e", c2: "#14161a", c3: "#08080a" },
+      body: { c1: "#3c4048", c2: "#26292e", c3: "#14161a", c4: "#060708" },
+      stroke: { s1: "#FFFFFF", s2: "#F1F5F9", s3: "#94A3B8", s4: "#475569", s5: "#CBD5E1", s6: "#FFFFFF" },
+      sheen: { c1: "#FFFFFF", c2: "#F1F5F9" },
+      bounce: { c1: "#64748B", c2: "#E2E8F0" }
+    };
+  }
+
+  if (key.includes("hbo") || key.includes("max") || accent.toUpperCase() === "#7D57FF") {
+    return {
+      atmo: { c1: "#2c0b47", c2: "#160524", c3: "#07010d" },
+      body: { c1: "#4a1478", c2: "#2c0b47", c3: "#130421", c4: "#040108" },
+      stroke: { s1: "#FFFFFF", s2: "#DDD6FE", s3: "#A78BFA", s4: "#6D28D9", s5: "#C4B5FD", s6: "#FFFFFF" },
+      sheen: { c1: "#FFFFFF", c2: "#DDD6FE" },
+      bounce: { c1: "#7C3AED", c2: "#C4B5FD" }
+    };
+  }
+
+  if (key.includes("paramount") || accent.toUpperCase() === "#0064FF") {
+    return {
+      atmo: { c1: "#001a44", c2: "#000d24", c3: "#00040d" },
+      body: { c1: "#002a6e", c2: "#001a44", c3: "#000d24", c4: "#00030a" },
+      stroke: { s1: "#FFFFFF", s2: "#BAE6FD", s3: "#38BDF8", s4: "#0284C7", s5: "#7DD3FC", s6: "#FFFFFF" },
+      sheen: { c1: "#FFFFFF", c2: "#BAE6FD" },
+      bounce: { c1: "#0284C7", c2: "#7DD3FC" }
+    };
+  }
+
+  if (key.includes("rai") || accent.toUpperCase() === "#1C6DFF" || accent.toUpperCase() === "#0066CC") {
+    return {
+      atmo: { c1: "#002047", c2: "#001026", c3: "#00050f" },
+      body: { c1: "#003575", c2: "#002047", c3: "#001026", c4: "#00040a" },
+      stroke: { s1: "#FFFFFF", s2: "#BAE6FD", s3: "#38BDF8", s4: "#0369A1", s5: "#7DD3FC", s6: "#FFFFFF" },
+      sheen: { c1: "#FFFFFF", c2: "#BAE6FD" },
+      bounce: { c1: "#0284C7", c2: "#7DD3FC" }
+    };
+  }
+
+  if (key.includes("infinity") || key.includes("mediaset") || accent.toUpperCase() === "#00A3E0") {
+    return {
+      atmo: { c1: "#002538", c2: "#00121d", c3: "#00060b" },
+      body: { c1: "#003d5c", c2: "#002538", c3: "#00121d", c4: "#000508" },
+      stroke: { s1: "#FFFFFF", s2: "#BAE6FD", s3: "#38BDF8", s4: "#0284C7", s5: "#7DD3FC", s6: "#FFFFFF" },
+      sheen: { c1: "#FFFFFF", c2: "#BAE6FD" },
+      bounce: { c1: "#0284C7", c2: "#7DD3FC" }
+    };
+  }
+
+  // Generic calculated from accent RGB
+  const rgb = hexToRgb(accent);
+  const r1 = Math.round(rgb.r * 0.35), g1 = Math.round(rgb.g * 0.35), b1 = Math.round(rgb.b * 0.35);
+  const r2 = Math.round(rgb.r * 0.18), g2 = Math.round(rgb.g * 0.18), b2 = Math.round(rgb.b * 0.18);
+  const r3 = Math.round(rgb.r * 0.05), g3 = Math.round(rgb.g * 0.05), b3 = Math.round(rgb.b * 0.05);
+
+  return {
+    atmo: { c1: `rgb(${r1},${g1},${b1})`, c2: `rgb(${r2},${g2},${b2})`, c3: `rgb(${r3},${g3},${b3})` },
+    body: { c1: `rgb(${Math.round(rgb.r * 0.5)},${Math.round(rgb.g * 0.5)},${Math.round(rgb.b * 0.5)})`, c2: `rgb(${r1},${g1},${b1})`, c3: `rgb(${r2},${g2},${b2})`, c4: `rgb(${r3},${g3},${b3})` },
+    stroke: { s1: "#FFFFFF", s2: "#E0E7FF", s3: accent, s4: `rgb(${r1},${g1},${b1})`, s5: "#C7D2FE", s6: "#FFFFFF" },
+    sheen: { c1: "#FFFFFF", c2: "#E0E7FF" },
+    bounce: { c1: accent, c2: "#FFFFFF" }
+  };
+}
+
+function generateGlassBackground(width, height, mode = "stremio", accent = "#8C75FF", catalogKey = "") {
+  if (mode === "black" || mode === "nero") {
     return Buffer.from(`
       <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
         <rect width="${width}" height="${height}" fill="#000000"/>
       </svg>
     `);
   }
+  if (mode === "transparent") {
+    return Buffer.from(`
+      <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg"/>
+    `);
+  }
 
-  // Stremio 3D Liquid Glass container
+  const isProvider = mode === "provider" || mode === "brand";
+  const pal = isProvider ? getBrandPalette(accent, catalogKey) : {
+    atmo: { c1: "#2e2569", c2: "#1b1642", c3: "#0a081c" },
+    body: { c1: "#483896", c2: "#322673", c3: "#1d1647", c4: "#050410" },
+    stroke: { s1: "#FFFFFF", s2: "#E0E7FF", s3: "#A5B4FC", s4: "#6366F1", s5: "#C7D2FE", s6: "#FFFFFF" },
+    sheen: { c1: "#FFFFFF", c2: "#C7D2FE" },
+    bounce: { c1: "#818CF8", c2: "#C7D2FE" }
+  };
+
   const pad = 12;
   const rw = width - pad * 2;
   const rh = height - pad * 2;
@@ -151,40 +272,40 @@ function generateGlassBackground(width, height, isStremio = true) {
   return Buffer.from(`
     <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
       <defs>
-        <!-- Canvas Stremio Deep Ambient Atmosphere -->
-        <radialGradient id="stremioAtmosphere" cx="50%" cy="25%" r="75%">
-          <stop offset="0%" stop-color="#2e2569"/>
-          <stop offset="42%" stop-color="#1b1642"/>
-          <stop offset="100%" stop-color="#0a081c"/>
+        <!-- Canvas Ambient Atmosphere -->
+        <radialGradient id="glassAtmosphere" cx="50%" cy="25%" r="75%">
+          <stop offset="0%" stop-color="${pal.atmo.c1}"/>
+          <stop offset="42%" stop-color="${pal.atmo.c2}"/>
+          <stop offset="100%" stop-color="${pal.atmo.c3}"/>
         </radialGradient>
 
-        <!-- Liquid Glass Card Interior: Strong vibrant top gradient flowing into ultra-deep dark bottom -->
+        <!-- Liquid Glass Card Interior: Strong top gradient flowing into ultra-deep dark bottom -->
         <linearGradient id="glassBodyGrad" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="#483896" stop-opacity="0.95"/>
-          <stop offset="20%" stop-color="#322673" stop-opacity="0.92"/>
-          <stop offset="50%" stop-color="#1d1647" stop-opacity="0.95"/>
-          <stop offset="80%" stop-color="#0d0a24" stop-opacity="0.98"/>
-          <stop offset="100%" stop-color="#050410" stop-opacity="1.0"/>
+          <stop offset="0%" stop-color="${pal.body.c1}" stop-opacity="0.95"/>
+          <stop offset="20%" stop-color="${pal.body.c2}" stop-opacity="0.92"/>
+          <stop offset="50%" stop-color="${pal.body.c3}" stop-opacity="0.95"/>
+          <stop offset="80%" stop-color="${pal.atmo.c3}" stop-opacity="0.98"/>
+          <stop offset="100%" stop-color="${pal.body.c4}" stop-opacity="1.0"/>
         </linearGradient>
 
-        <!-- Top Internal Glass Light Sheen / Curvature Refraction -->
+        <!-- Top Internal Glass Light Sheen -->
         <linearGradient id="innerGlassSheen" x1="0" y1="0" x2="0.8" y2="0.6">
-          <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.28"/>
-          <stop offset="35%" stop-color="#C7D2FE" stop-opacity="0.10"/>
-          <stop offset="100%" stop-color="#6366F1" stop-opacity="0"/>
+          <stop offset="0%" stop-color="${pal.sheen.c1}" stop-opacity="0.28"/>
+          <stop offset="35%" stop-color="${pal.sheen.c2}" stop-opacity="0.10"/>
+          <stop offset="100%" stop-color="${pal.bounce.c1}" stop-opacity="0"/>
         </linearGradient>
 
-        <!-- High-Contrast 3D Liquid Glass Border: Luminous Specular Rim -->
+        <!-- 3D Liquid Glass Border Rim -->
         <linearGradient id="glassStrokeGrad" x1="0" y1="0" x2="0.75" y2="1">
-          <stop offset="0%" stop-color="#FFFFFF" stop-opacity="1.0"/>
-          <stop offset="16%" stop-color="#E0E7FF" stop-opacity="0.90"/>
-          <stop offset="40%" stop-color="#A5B4FC" stop-opacity="0.55"/>
-          <stop offset="70%" stop-color="#6366F1" stop-opacity="0.38"/>
-          <stop offset="88%" stop-color="#C7D2FE" stop-opacity="0.70"/>
-          <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0.90"/>
+          <stop offset="0%" stop-color="${pal.stroke.s1}" stop-opacity="1.0"/>
+          <stop offset="16%" stop-color="${pal.stroke.s2}" stop-opacity="0.90"/>
+          <stop offset="40%" stop-color="${pal.stroke.s3}" stop-opacity="0.55"/>
+          <stop offset="70%" stop-color="${pal.stroke.s4}" stop-opacity="0.38"/>
+          <stop offset="88%" stop-color="${pal.stroke.s5}" stop-opacity="0.70"/>
+          <stop offset="100%" stop-color="${pal.stroke.s6}" stop-opacity="0.90"/>
         </linearGradient>
 
-        <!-- Inner Bevel Stroke (Dual Rim 3D Glass Effect) -->
+        <!-- Inner Bevel Stroke -->
         <linearGradient id="innerBevelGrad" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.60"/>
           <stop offset="25%" stop-color="#FFFFFF" stop-opacity="0.12"/>
@@ -203,25 +324,24 @@ function generateGlassBackground(width, height, isStremio = true) {
 
         <!-- Bottom Rim Light Bounce -->
         <linearGradient id="bottomRimFlare" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0%" stop-color="#818CF8" stop-opacity="0"/>
-          <stop offset="30%" stop-color="#C7D2FE" stop-opacity="0.60"/>
+          <stop offset="0%" stop-color="${pal.bounce.c1}" stop-opacity="0"/>
+          <stop offset="30%" stop-color="${pal.bounce.c2}" stop-opacity="0.60"/>
           <stop offset="50%" stop-color="#FFFFFF" stop-opacity="0.85"/>
-          <stop offset="70%" stop-color="#C7D2FE" stop-opacity="0.60"/>
-          <stop offset="100%" stop-color="#818CF8" stop-opacity="0"/>
+          <stop offset="70%" stop-color="${pal.bounce.c2}" stop-opacity="0.60"/>
+          <stop offset="100%" stop-color="${pal.bounce.c1}" stop-opacity="0"/>
         </linearGradient>
 
-        <!-- Heavy Outer Drop Shadow -->
+        <!-- Outer Drop Shadow -->
         <filter id="glassShadow" x="-15%" y="-15%" width="130%" height="130%">
-          <feDropShadow dx="0" dy="12" stdDeviation="22" flood-color="#030208" flood-opacity="0.92"/>
+          <feDropShadow dx="0" dy="12" stdDeviation="22" flood-color="#020105" flood-opacity="0.94"/>
         </filter>
       </defs>
 
-      <!-- Base Canvas Atmosphere -->
-      <rect width="${width}" height="${height}" fill="url(#stremioAtmosphere)"/>
+      <!-- Atmosphere Fill -->
+      <rect width="${width}" height="${height}" fill="url(#glassAtmosphere)"/>
 
-      <!-- Liquid Glass Card with Shadow & Border -->
+      <!-- Liquid Glass Container -->
       <g filter="url(#glassShadow)">
-        <!-- Base Body Fill -->
         <rect
           x="${pad}"
           y="${pad}"
@@ -233,7 +353,6 @@ function generateGlassBackground(width, height, isStremio = true) {
           stroke="url(#glassStrokeGrad)"
           stroke-width="${strokeW}"
         />
-        <!-- Inner Specular Light Wash -->
         <rect
           x="${pad + 1.5}"
           y="${pad + 1.5}"
@@ -247,7 +366,7 @@ function generateGlassBackground(width, height, isStremio = true) {
         />
       </g>
 
-      <!-- Prominent Top Specular Rim Lip -->
+      <!-- Top Lip -->
       <path
         d="M ${pad + rx + 8} ${pad + 2} Q ${width / 2} ${pad + 1.2} ${width - pad - rx - 8} ${pad + 2}"
         stroke="url(#topFlare)"
@@ -256,7 +375,7 @@ function generateGlassBackground(width, height, isStremio = true) {
         fill="none"
       />
 
-      <!-- Bottom Specular Rim Reflection -->
+      <!-- Bottom Lip -->
       <path
         d="M ${pad + rx + 14} ${height - pad - 2} Q ${width / 2} ${height - pad - 1.2} ${width - pad - rx - 14} ${height - pad - 2}"
         stroke="url(#bottomRimFlare)"
@@ -268,7 +387,7 @@ function generateGlassBackground(width, height, isStremio = true) {
   `);
 }
 
-function numberSvg(rank, layout, accent, genre = "", rating = "") {
+function numberSvg(rank, layout, accent, genre = "", rating = "", canvasBackground = "transparent") {
   const { canvas, card, number } = layout;
   const isDouble = String(rank).length > 1;
   const fontSize = isDouble ? number.sizeDouble : number.sizeSingle;
@@ -278,6 +397,7 @@ function numberSvg(rank, layout, accent, genre = "", rating = "") {
   const y = centerY + fontSize * 0.34 + number.opticalDrop;
 
   const strokeWidth = layout === LAYOUTS.poster ? 10 : 11;
+  const isProvider = canvasBackground === "provider" || canvasBackground === "brand";
 
   const escapedGenre = escapeXml(cleanGenre(genre));
   const ratingVal = formatRating(rating);
@@ -327,30 +447,60 @@ function numberSvg(rank, layout, accent, genre = "", rating = "") {
     }
   }
 
+  let defsFilterAndStroke;
+  if (isProvider) {
+    // Pure Crystal Glass Number (transparent, no colored neon glow)
+    defsFilterAndStroke = `
+      <linearGradient id="crystalGlassStroke" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.95"/>
+        <stop offset="30%" stop-color="#FFFFFF" stop-opacity="0.80"/>
+        <stop offset="65%" stop-color="#E2E8F0" stop-opacity="0.45"/>
+        <stop offset="100%" stop-color="#CBD5E1" stop-opacity="0.85"/>
+      </linearGradient>
+      <filter id="numFilter" x="-60%" y="-60%" width="220%" height="220%">
+        <feDropShadow dx="0" dy="6" stdDeviation="12" flood-color="#000000" flood-opacity="0.95"/>
+        <feGaussianBlur in="SourceAlpha" stdDeviation="4" result="whiteGlow"/>
+        <feFlood flood-color="#FFFFFF" flood-opacity="0.40" result="whiteColor"/>
+        <feComposite in="whiteColor" in2="whiteGlow" operator="in" result="glassRim"/>
+        <feMerge>
+          <feMergeNode in="glassRim"/>
+          <feMergeNode in="SourceGraphic"/>
+        </feMerge>
+      </filter>
+    `;
+  } else {
+    // Standard Neon Glow with brand accent
+    defsFilterAndStroke = `
+      <linearGradient id="strokeGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#FFFFFF" stop-opacity=".98"/>
+        <stop offset="48%" stop-color="#F1F2F4" stop-opacity=".94"/>
+        <stop offset="100%" stop-color="#C9CDD3" stop-opacity=".86"/>
+      </linearGradient>
+
+      <filter id="numFilter" x="-120%" y="-120%" width="340%" height="340%">
+        <feGaussianBlur stdDeviation="30" result="bigBlur"/>
+        <feFlood flood-color="${accent}" flood-opacity=".72" result="brandColor"/>
+        <feComposite in="brandColor" in2="bigBlur" operator="in" result="bigGlow"/>
+
+        <feGaussianBlur in="SourceAlpha" stdDeviation="11" result="midBlur"/>
+        <feFlood flood-color="${accent}" flood-opacity=".52" result="midColor"/>
+        <feComposite in="midColor" in2="midBlur" operator="in" result="midGlow"/>
+
+        <feMerge>
+          <feMergeNode in="bigGlow"/>
+          <feMergeNode in="midGlow"/>
+          <feMergeNode in="SourceGraphic"/>
+        </feMerge>
+      </filter>
+    `;
+  }
+
+  const strokeUrl = isProvider ? "url(#crystalGlassStroke)" : "url(#strokeGrad)";
+
   return Buffer.from(`
     <svg width="${canvas.width}" height="${canvas.height}" xmlns="http://www.w3.org/2000/svg">
       <defs>
-        <linearGradient id="strokeGrad" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="#FFFFFF" stop-opacity=".98"/>
-          <stop offset="48%" stop-color="#F1F2F4" stop-opacity=".94"/>
-          <stop offset="100%" stop-color="#C9CDD3" stop-opacity=".86"/>
-        </linearGradient>
-
-        <filter id="brandGlow" x="-120%" y="-120%" width="340%" height="340%">
-          <feGaussianBlur stdDeviation="30" result="bigBlur"/>
-          <feFlood flood-color="${accent}" flood-opacity=".72" result="brandColor"/>
-          <feComposite in="brandColor" in2="bigBlur" operator="in" result="bigGlow"/>
-
-          <feGaussianBlur in="SourceAlpha" stdDeviation="11" result="midBlur"/>
-          <feFlood flood-color="${accent}" flood-opacity=".52" result="midColor"/>
-          <feComposite in="midColor" in2="midBlur" operator="in" result="midGlow"/>
-
-          <feMerge>
-            <feMergeNode in="bigGlow"/>
-            <feMergeNode in="midGlow"/>
-            <feMergeNode in="SourceGraphic"/>
-          </feMerge>
-        </filter>
+        ${defsFilterAndStroke}
 
         <filter id="metaShadow" x="-30%" y="-30%" width="160%" height="160%">
           <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#000000" flood-opacity="0.95"/>
@@ -365,11 +515,11 @@ function numberSvg(rank, layout, accent, genre = "", rating = "") {
         font-weight="800"
         letter-spacing="-16"
         fill="none"
-        stroke="url(#strokeGrad)"
+        stroke="${strokeUrl}"
         stroke-width="${strokeWidth}"
         stroke-linejoin="round"
         paint-order="stroke"
-        filter="url(#brandGlow)"
+        filter="url(#numFilter)"
       >${rank}</text>
 
       ${metaXml}
@@ -560,7 +710,8 @@ export async function createTopCover({
   accent = "#FFFFFF",
   canvasBackground = "transparent",
   genre = "",
-  rating = ""
+  rating = "",
+  catalogId = ""
 }) {
   if (!artworkUrl) throw new Error("artworkUrl mancante.");
 
@@ -576,35 +727,39 @@ export async function createTopCover({
   ]);
 
   const { canvas, card } = layout;
+  const bgLower = String(canvasBackground || "").toLowerCase().trim();
+  const isProvider = bgLower === "provider" || bgLower === "brand";
+  const isStremio = bgLower === "stremio" || bgLower === "stremio-navy" || bgLower === "rgb(26,23,62)" || bgLower === "rgb(26, 23, 62)" || bgLower === "#1a173e" || bgLower === "1a173e";
 
-  const composites = [
-    // Soft brand tint around the number area.
-    { input: ambient, left: 0, top: 0 },
+  const composites = [];
 
-    // Number and metadata go behind the card.
-    { input: numberSvg(rank, layout, accent, genre, rating), left: 0, top: 0 },
+  // Soft brand tint around the number area (only for standard/neon modes)
+  if (!isProvider) {
+    composites.push({ input: ambient, left: 0, top: 0 });
+  }
 
+  // Number and metadata go behind the card.
+  composites.push(
+    { input: numberSvg(rank, layout, accent, genre, rating, canvasBackground), left: 0, top: 0 },
     // Card shadow.
     {
       input: shadow,
       left: card.x - 60,
       top: card.y - 46 + 16
     },
-
     // Backdrop/poster.
     {
       input: art,
       left: card.x,
       top: card.y
     }
-  ];
-
-  const bgLower = String(canvasBackground || "").toLowerCase().trim();
-  const isStremio = bgLower === "stremio" || bgLower === "stremio-navy" || bgLower === "rgb(26,23,62)" || bgLower === "rgb(26, 23, 62)" || bgLower === "#1a173e" || bgLower === "1a173e";
+  );
 
   let baseSharp;
-  if (isStremio) {
-    baseSharp = sharp(generateGlassBackground(canvas.width, canvas.height, true));
+  if (isProvider) {
+    baseSharp = sharp(generateGlassBackground(canvas.width, canvas.height, "provider", accent, catalogId));
+  } else if (isStremio) {
+    baseSharp = sharp(generateGlassBackground(canvas.width, canvas.height, "stremio", accent, catalogId));
   } else {
     baseSharp = sharp({
       create: {

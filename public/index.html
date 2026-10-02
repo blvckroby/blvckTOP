@@ -209,11 +209,12 @@
     .g-land, .g-port { display: block; border: 1.25px solid currentColor; border-radius: 2px; }
     .g-land { width: 14px; height: 8px; }
     .g-port { width: 8px; height: 14px; }
-    .g-tr, .g-bk, .g-stremio { display: block; width: 11px; height: 11px; border-radius: 50%; box-shadow: 0 0 0 1px rgba(255,255,255,.4); }
+    .g-tr, .g-bk, .g-stremio, .g-provider { display: block; width: 11px; height: 11px; border-radius: 50%; box-shadow: 0 0 0 1px rgba(255,255,255,.4); }
     .g-tr { background: conic-gradient(#555a64 25%, #a5aab4 0 50%, #555a64 0 75%, #a5aab4 0) 0 0 / 4px 4px; }
     .g-stremio { background: rgb(26, 23, 62); }
     .g-bk { background: #000; }
-    .o.on .g-tr, .o.on .g-bk, .o.on .g-stremio { box-shadow: 0 0 0 1.5px var(--accent); }
+    .g-provider { background: linear-gradient(135deg, #e50914, #00a8e1 50%, #00e575 100%); }
+    .o.on .g-tr, .o.on .g-bk, .o.on .g-stremio, .o.on .g-provider { box-shadow: 0 0 0 1.5px var(--accent); }
     .g-meta-on, .g-meta-off { display: inline-flex; align-items: center; justify-content: center; font-size: 11px; line-height: 1; font-style: normal; }
     .g-meta-on::before { content: "★"; color: #FFB800; font-size: 11px; }
     .g-meta-off::before { content: "⊘"; color: var(--dim); font-size: 11px; }
@@ -415,6 +416,11 @@
       background: #000000;
       border: 1px solid rgba(255,255,255,.18);
     }
+    .preview-card.provider {
+      background: radial-gradient(circle at 50% 30%, var(--brand, #38060a), #080309 85%);
+      border: 1px solid rgba(255,255,255,.28);
+      box-shadow: 0 4px 16px rgba(0,0,0,.7), inset 0 1px 2px rgba(255,255,255,.3);
+    }
     .preview-card img {
       width: 100%;
       height: 100%;
@@ -555,7 +561,8 @@
           <span class="grp"><em>SFONDO:</em>
             <button class="o on" type="button" data-bulk="bg" data-v="transparent"><i class="g-tr"></i>Trasparente</button>
             <button class="o" type="button" data-bulk="bg" data-v="black"><i class="g-bk"></i>Nuvio</button>
-            <button class="o" type="button" data-bulk="bg" data-v="stremio"><i class="g-stremio"></i>Stremio</button></span>
+            <button class="o" type="button" data-bulk="bg" data-v="stremio"><i class="g-stremio"></i>Stremio</button>
+            <button class="o" type="button" data-bulk="bg" data-v="provider"><i class="g-provider"></i>Brand Glass</button></span>
           <span class="grp"><em>GENERE &amp; VOTO:</em>
             <button class="o on" type="button" data-bulk="meta" data-v="true"><i class="g-meta-on"></i>Mostra</button>
             <button class="o" type="button" data-bulk="meta" data-v="false"><i class="g-meta-off"></i>Nascondi</button></span>
@@ -881,7 +888,7 @@
                 const isZoomed = card.classList.contains("zoomed");
                 card.className = `preview-card ${i.shape} ${i.canvasBackground}${isZoomed ? " zoomed" : ""}`;
                 const showMeta = i.showMeta !== false && i.showMeta !== "false";
-                img.src = `/top-cover?catalogId=${encodeURIComponent(i.id)}&type=${encodeURIComponent(i.type)}&shape=${i.shape}&canvasBackground=${i.canvasBackground}&showMeta=${showMeta}&rank=${rank}&v=7.2.8`;
+                img.src = `/top-cover?catalogId=${encodeURIComponent(i.id)}&type=${encodeURIComponent(i.type)}&shape=${i.shape}&canvasBackground=${i.canvasBackground}&showMeta=${showMeta}&rank=${rank}&v=7.2.9`;
               };
 
               card.addEventListener("click", (e) => {
@@ -910,7 +917,8 @@
             line.append(sep,
               optBtn(i, "canvasBackground", "transparent", "Trasparente", "g-tr", line, onConfigChange),
               optBtn(i, "canvasBackground", "black", "Nuvio", "g-bk", line, onConfigChange),
-              optBtn(i, "canvasBackground", "stremio", "Stremio", "g-stremio", line, onConfigChange));
+              optBtn(i, "canvasBackground", "stremio", "Stremio", "g-stremio", line, onConfigChange),
+              optBtn(i, "canvasBackground", "provider", "Brand Glass", "g-provider", line, onConfigChange));
             const sep2 = document.createElement("span"); sep2.className = "sep";
             line.append(sep2,
               optBtn(i, "showMeta", "true", "Info ON", "g-meta-on", line, onConfigChange),
@@ -1075,7 +1083,7 @@
       const base = "/top-cover";
       const ids = [1423191, 1377237, 1283515, 977942];
       $("covers").innerHTML = ids.map((id, i) =>
-        `<div class="cv"><span class="poster"><img src="${base}?rank=${i + 1}&type=movie&tmdbId=${id}&v=7.2.8" alt="" decoding="async" referrerpolicy="no-referrer" onerror="this.remove()" /></span></div>`
+        `<div class="cv"><span class="poster"><img src="${base}?rank=${i + 1}&type=movie&tmdbId=${id}&v=7.2.9" alt="" decoding="async" referrerpolicy="no-referrer" onerror="this.remove()" /></span></div>`
       ).join("");
     })();
 
