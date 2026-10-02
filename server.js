@@ -163,7 +163,11 @@ async function buildCoverUrl(
         type: type === "series" ? "tv" : type,
         tmdbId,
         shape,
-        catalogId: catalog.id
+        catalogId: catalog.id,
+        canvasBackground:
+          catalog.canvasBackground === "black"
+            ? "black"
+            : "transparent"
       });
 
       return `${publicBase(req)}/c/${token}/top-cover?${qs}`;
@@ -182,7 +186,11 @@ async function buildCoverUrl(
     rank: String(rank),
     artwork: fallbackArtwork,
     shape,
-    catalogId: catalog.id
+    catalogId: catalog.id,
+    canvasBackground:
+      catalog.canvasBackground === "black"
+        ? "black"
+        : "transparent"
   });
 
   return `${publicBase(req)}/c/${token}/top-cover?${qs}`;
@@ -252,7 +260,11 @@ app.post("/api/generate", async (req, res) => {
           id: sourceCatalog.id,
           type: sourceCatalog.type,
           name: sourceCatalog.name || sourceCatalog.id,
-          shape: normalizeShape(requestedCatalog.shape)
+          shape: normalizeShape(requestedCatalog.shape),
+          canvasBackground:
+            requestedCatalog.canvasBackground === "black"
+              ? "black"
+              : "transparent"
         };
       })
       .filter(Boolean);
@@ -320,7 +332,6 @@ app.get("/c/:token/manifest.json", async (req, res) => {
       version: "2.0.0",
       name: "blvckTOP",
       description: "Top 10 personalizzate con cover numerate",
-      logo: "https://tudumext.com/projects/top-10/Top10Badge.svg",
       catalogs,
       resources: Array.from(
         new Set([...(source.resources || []), "catalog", "meta"])
@@ -429,6 +440,11 @@ app.get("/c/:token/top-cover", async (req, res) => {
       ? String(req.query.catalogId)
       : "";
 
+    const canvasBackground =
+      req.query.canvasBackground === "black"
+        ? "black"
+        : "transparent";
+
     let artworkUrl = req.query.artwork
       ? String(req.query.artwork)
       : null;
@@ -449,6 +465,7 @@ app.get("/c/:token/top-cover", async (req, res) => {
       shape,
       tmdbId || "",
       catalogId,
+      canvasBackground,
       artworkUrl || "",
       logoUrl || ""
     ].join("|");
@@ -511,7 +528,8 @@ app.get("/c/:token/top-cover", async (req, res) => {
         artworkUrl,
         logoUrl,
         shape,
-        accent
+        accent,
+        canvasBackground
       });
 
       setMemoryCache(

@@ -1,4 +1,4 @@
-# blvckTOP v7.1
+# blvckTOP v7.2
 
 Addon configurabile per Nuvio/Stremio con Top 10 numerate.
 
@@ -118,3 +118,13 @@ Il numero ora è:
 - stroke leggermente più spesso per mantenere leggibilità su TV.
 
 Il fill del numero è quindi completamente vuoto.
+
+
+## Sfondo cover configurabile
+
+Ogni catalogo può scegliere anche il background del canvas:
+
+- Trasparente
+- Nero #000
+
+La scelta viene salvata nel token insieme a formato e catalogo.

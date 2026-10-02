@@ -351,7 +351,8 @@ export async function createTopCover({
   artworkUrl,
   logoUrl = null,
   shape = "landscape",
-  accent = "#FFFFFF"
+  accent = "#FFFFFF",
+  canvasBackground = "transparent"
 }) {
   if (!artworkUrl) throw new Error("artworkUrl mancante.");
 
@@ -411,12 +412,17 @@ export async function createTopCover({
     }
   }
 
+  const background =
+    canvasBackground === "black"
+      ? { r: 0, g: 0, b: 0, alpha: 1 }
+      : { r: 0, g: 0, b: 0, alpha: 0 };
+
   return sharp({
     create: {
       width: canvas.width,
       height: canvas.height,
       channels: 4,
-      background: { r: 0, g: 0, b: 0, alpha: 0 }
+      background
     }
   })
     .composite(composites)
