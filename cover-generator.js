@@ -5,14 +5,27 @@ import { fileURLToPath } from "url";
 import { getAssetBuffer, saveAssetBuffer } from "./db.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const NETWORKS_DIR = path.join(__dirname, "public", "networks");
 const ICONS_DIR = path.join(__dirname, "public", "icons");
 const ICON_CACHE = new Map();
 
-function loadSvg(filename) {
-  if (ICON_CACHE.has(filename)) return ICON_CACHE.get(filename);
+function loadSvg(filename, fromNetworks = false) {
+  const dir = fromNetworks ? NETWORKS_DIR : ICONS_DIR;
+  const key = `${fromNetworks ? 'net:' : 'icon:'}${filename}`;
+  if (ICON_CACHE.has(key)) return ICON_CACHE.get(key);
   try {
-    const content = fs.readFileSync(path.join(ICONS_DIR, filename), "utf8");
-    ICON_CACHE.set(filename, content);
+    const filePath = path.join(dir, filename);
+    if (!fs.existsSync(filePath)) {
+      const fallbackPath = path.join(fromNetworks ? ICONS_DIR : NETWORKS_DIR, filename);
+      if (fs.existsSync(fallbackPath)) {
+        const content = fs.readFileSync(fallbackPath, "utf8");
+        ICON_CACHE.set(key, content);
+        return content;
+      }
+      return null;
+    }
+    const content = fs.readFileSync(filePath, "utf8");
+    ICON_CACHE.set(key, content);
     return content;
   } catch {
     return null;
@@ -406,68 +419,87 @@ function generateGlassBackground(width, height, mode = "stremio", accent = "#8C7
 }
 
 export function getProviderLogoSvg(catalogKey = "") {
-  const key = String(catalogKey || "").toLowerCase();
+  const key = String(catalogKey || "").toLowerCase().trim();
 
+  // 1. Netflix (N ribbon from Pictorium)
   if (key.includes("netflix")) {
-    const svg = loadSvg("netflix.svg");
-    return svg ? { width: 24, height: 24, svg } : null;
+    const svg = loadSvg("Netflix_2016_N_logo.svg", true) || loadSvg("netflix.svg");
+    return svg ? { width: 14, height: 26, svg } : null;
   }
 
+  // 2. Prime Video (2024 logo from Pictorium)
   if (key.includes("prime") || key.includes("amazon")) {
-    const svg = loadSvg("prime-logo.svg");
-    return svg ? { width: 26, height: 26, svg } : null;
+    const svg = loadSvg("Prime_Video_logo_(2024).svg", true) || loadSvg("prime-logo.svg");
+    return svg ? { width: 78, height: 24, svg } : null;
   }
 
+  // 3. Disney+ (from Pictorium)
   if (key.includes("disney")) {
-    const svg = loadSvg("disney.svg");
-    return svg ? { width: 46, height: 25, svg } : null;
+    const svg = loadSvg("Disney+_logo.svg", true) || loadSvg("disney.svg");
+    return svg ? { width: 48, height: 26, svg } : null;
   }
 
+  // 4. Apple TV+ (from Pictorium)
   if (key.includes("apple")) {
-    const svg = loadSvg("apple.svg");
-    return svg ? { width: 24, height: 24, svg } : null;
+    const svg = loadSvg("Apple_TV_logo.svg", true) || loadSvg("apple.svg");
+    return svg ? { width: 48, height: 24, svg } : null;
   }
 
+  // 5. HBO / Max (from Pictorium)
   if (key.includes("hbo") || key.includes("max")) {
-    const svg = loadSvg("hbomax.svg");
-    return svg ? { width: 35, height: 25, svg } : null;
+    const svg = loadSvg("HBO_logo.svg", true) || loadSvg("hbomax.svg");
+    return svg ? { width: 58, height: 24, svg } : null;
   }
 
+  // 6. Paramount+ (from Pictorium)
   if (key.includes("paramount")) {
-    const svg = loadSvg("paramount.svg");
-    return svg ? { width: 24, height: 24, svg } : null;
+    const svg = loadSvg("Paramount_Plus.svg", true) || loadSvg("paramount.svg");
+    return svg ? { width: 42, height: 26, svg } : null;
   }
 
+  // 7. NOW / Sky (from Pictorium)
   if (key.includes("now") || key.includes("sky")) {
-    const svg = loadSvg("now.svg");
+    const svg = loadSvg("Now_logo.svg", true) || loadSvg("now.svg");
     return svg ? { width: 71, height: 22, svg } : null;
   }
 
+  // 8. RaiPlay / RAI (from Pictorium)
   if (key.includes("rai")) {
-    const svg = loadSvg("raiplay.svg");
-    return svg ? { width: 56, height: 24, svg } : null;
+    const svg = loadSvg("Logo_of_RAI_(2016).svg", true) || loadSvg("raiplay.svg");
+    return svg ? { width: 44, height: 24, svg } : null;
   }
 
+  // 9. Mediaset Infinity (from Pictorium)
   if (key.includes("infinity") || key.includes("mediaset")) {
-    const svg = loadSvg("infinity.svg");
+    const svg = loadSvg("Mediaset_Infinity_logo.svg", true) || loadSvg("infinity.svg");
     return svg ? { width: 52, height: 25, svg } : null;
   }
 
+  // 10. TIMVISION (from local /icons/tim.svg)
   if (key.includes("timvision") || key.includes("tim")) {
     const svg = loadSvg("tim.svg");
     return svg ? { width: 86, height: 20, svg } : null;
   }
 
+  // 11. Discovery+ (from local /icons/discovery_plus.svg)
   if (key.includes("discovery")) {
     const svg = loadSvg("discovery_plus.svg");
     return svg ? { width: 30, height: 25, svg } : null;
   }
 
+  // 12. Crunchyroll (from Pictorium)
   if (key.includes("crunchyroll")) {
-    const svg = loadSvg("crunchyroll.svg");
-    return svg ? { width: 24, height: 24, svg } : null;
+    const svg = loadSvg("cr_logo_noTagline.svg", true) || loadSvg("crunchyroll.svg");
+    return svg ? { width: 80, height: 16, svg } : null;
   }
 
+  // 13. Hulu (from Pictorium)
+  if (key.includes("hulu")) {
+    const svg = loadSvg("Hulu_logo_(2018).svg", true);
+    return svg ? { width: 60, height: 20, svg } : null;
+  }
+
+  // 14. Rakuten TV (from local /icons/rakuten.svg)
   if (key.includes("rakuten")) {
     const svg = loadSvg("rakuten.svg");
     return svg ? { width: 80, height: 18, svg } : null;
