@@ -1,4 +1,5 @@
 import crypto from "node:crypto";
+import zlib from "node:zlib";
 
 function getKey() {
   const secret = process.env.APP_SECRET;
@@ -15,8 +16,9 @@ export function encryptConfig(config) {
   const iv = crypto.randomBytes(12);
   const cipher = crypto.createCipheriv("aes-256-gcm", key, iv);
 
-  const plain = Buffer.from(JSON.stringify(config), "utf8");
-  const encrypted = Buffer.concat([cipher.update(plain), cipher.final()]);
+  const jsonBuf = Buffer.from(JSON.stringify(config), "utf8");
+  const compressed = zlib.deflateRawSync(jsonBuf);
+  const encrypted = Buffer.concat([cipher.update(compressed), cipher.final()]);
   const tag = cipher.getAuthTag();
 
   return Buffer.concat([iv, tag, encrypted]).toString("base64url");
@@ -36,12 +38,19 @@ export function decryptConfig(token) {
     const decipher = crypto.createDecipheriv("aes-256-gcm", key, iv);
     decipher.setAuthTag(tag);
 
-    const plain = Buffer.concat([
+    const decrypted = Buffer.concat([
       decipher.update(encrypted),
       decipher.final()
     ]);
 
-    const parsed = JSON.parse(plain.toString("utf8"));
+    let plainStr;
+    try {
+      plainStr = zlib.inflateRawSync(decrypted).toString("utf8");
+    } catch {
+      plainStr = decrypted.toString("utf8");
+    }
+
+    const parsed = JSON.parse(plainStr);
 
     if (!Array.isArray(parsed.catalogs)) {
       throw new Error("Configurazione incompleta");

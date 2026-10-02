@@ -56,6 +56,12 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 app.set("trust proxy", true);
+app.use((_req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Headers", "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+  next();
+});
 app.use(express.json({ limit: "32kb" }));
 app.use(express.static(path.join(__dirname, "public"), {
   setHeaders: (res, filePath) => {
@@ -313,6 +319,41 @@ app.get("/api/stats", (_req, res) => {
   res.json(getDbStats());
 });
 
+app.get("/manifest.json", async (_req, res) => {
+  try {
+    const source = await fetchJson(SOURCE_MANIFEST_URL);
+    const catalogs = (source.catalogs || [])
+      .filter(c => {
+        const id = String(c.id || "").toLowerCase();
+        const name = String(c.name || "").toLowerCase();
+        if (id.includes("last-video") || id.includes("calendar-video")) return false;
+        if (name.includes("last video") || name.includes("calendar video")) return false;
+        return true;
+      });
+
+    const manifest = {
+      id: "com.blvcktop.default",
+      version: "7.2.0",
+      name: "blvckTOP",
+      description: "Classifiche Top 10 con cover numerate HD per Nuvio & Stremio",
+      logo: "https://raw.githubusercontent.com/blvckroby/MusicDB/refs/heads/main/loghi/Top10Badge.svg",
+      types: ["movie", "series"],
+      resources: ["catalog", "meta"],
+      idPrefixes: ["tt", "tmdb"],
+      catalogs,
+      behaviorHints: {
+        configurable: true,
+        configurationRequired: false
+      }
+    };
+
+    res.setHeader("Cache-Control", "public, max-age=300");
+    res.json(manifest);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 /* ---------------- Generated addon ---------------- */
 
 app.get("/c/:token/manifest.json", async (req, res) => {
@@ -335,17 +376,19 @@ app.get("/c/:token/manifest.json", async (req, res) => {
     const idSuffix = shortConfigId(req.params.token);
 
     const manifest = {
-      ...source,
       id: `com.blvcktop.${idSuffix}`,
       version: "7.2.0",
       name: "blvckTOP",
-      description: "Top 10 personalizzate con cover numerate HD",
+      description: "Classifiche Top 10 con cover numerate HD per Nuvio & Stremio",
       logo: "https://raw.githubusercontent.com/blvckroby/MusicDB/refs/heads/main/loghi/Top10Badge.svg",
-      icon: "https://raw.githubusercontent.com/blvckroby/MusicDB/refs/heads/main/loghi/Top10Badge.svg",
+      types: ["movie", "series"],
+      resources: ["catalog", "meta"],
+      idPrefixes: ["tt", "tmdb"],
       catalogs,
-      resources: Array.from(
-        new Set([...(source.resources || []), "catalog", "meta"])
-      )
+      behaviorHints: {
+        configurable: true,
+        configurationRequired: false
+      }
     };
 
     res.setHeader("Cache-Control", "public, max-age=300");
