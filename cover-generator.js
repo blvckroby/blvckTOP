@@ -132,6 +132,90 @@ function cleanGenre(raw) {
   return g.toUpperCase();
 }
 
+function generateGlassBackground(width, height, isStremio = true) {
+  if (!isStremio) {
+    return Buffer.from(`
+      <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
+        <rect width="${width}" height="${height}" fill="#000000"/>
+      </svg>
+    `);
+  }
+
+  // Stremio 3D Liquid Glass container
+  const pad = 12;
+  const rw = width - pad * 2;
+  const rh = height - pad * 2;
+  const rx = Math.round(width * 0.032);
+
+  return Buffer.from(`
+    <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <!-- Stremio deep atmosphere gradient (darker to lighter to deep purple) -->
+        <radialGradient id="stremioAtmosphere" cx="50%" cy="32%" r="65%">
+          <stop offset="0%" stop-color="#2a235c"/>
+          <stop offset="45%" stop-color="#1d1945"/>
+          <stop offset="100%" stop-color="#120f2e"/>
+        </radialGradient>
+
+        <!-- Liquid Glass Fill: Translucent frosted depth with light refraction -->
+        <linearGradient id="glassBodyGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.10"/>
+          <stop offset="35%" stop-color="#FFFFFF" stop-opacity="0.03"/>
+          <stop offset="70%" stop-color="#1A153E" stop-opacity="0.25"/>
+          <stop offset="100%" stop-color="#0F0C24" stop-opacity="0.55"/>
+        </linearGradient>
+
+        <!-- 3D Liquid Glass Specular Border: Bright light on top/left, soft refractive rim on bottom -->
+        <linearGradient id="glassStrokeGrad" x1="0" y1="0" x2="0.6" y2="1">
+          <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.55"/>
+          <stop offset="25%" stop-color="#A5B4FC" stop-opacity="0.30"/>
+          <stop offset="55%" stop-color="#818CF8" stop-opacity="0.12"/>
+          <stop offset="85%" stop-color="#FFFFFF" stop-opacity="0.22"/>
+          <stop offset="100%" stop-color="#4F46E5" stop-opacity="0.35"/>
+        </linearGradient>
+
+        <!-- Inner Glass Specular Bevel (Top Light Highlight) -->
+        <linearGradient id="topLightSheen" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.45"/>
+          <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
+        </linearGradient>
+
+        <!-- Outer Glass Drop Shadow -->
+        <filter id="glassShadow" x="-10%" y="-10%" width="120%" height="120%">
+          <feDropShadow dx="0" dy="8" stdDeviation="16" flood-color="#070614" flood-opacity="0.75"/>
+        </filter>
+      </defs>
+
+      <!-- Base Stremio canvas background -->
+      <rect width="${width}" height="${height}" fill="url(#stremioAtmosphere)"/>
+
+      <!-- Liquid Glass Elevated Card Container -->
+      <g filter="url(#glassShadow)">
+        <rect
+          x="${pad}"
+          y="${pad}"
+          width="${rw}"
+          height="${rh}"
+          rx="${rx}"
+          ry="${rx}"
+          fill="url(#glassBodyGrad)"
+          stroke="url(#glassStrokeGrad)"
+          stroke-width="2.5"
+        />
+      </g>
+
+      <!-- Glass Top Specular Lip (3D Curved Highlight) -->
+      <path
+        d="M ${pad + rx + 10} ${pad + 2} Q ${width / 2} ${pad + 1} ${width - pad - rx - 10} ${pad + 2}"
+        stroke="url(#topLightSheen)"
+        stroke-width="2"
+        stroke-linecap="round"
+        fill="none"
+      />
+    </svg>
+  `);
+}
+
 function numberSvg(rank, layout, accent, genre = "", rating = "") {
   const { canvas, card, number } = layout;
   const isDouble = String(rank).length > 1;
@@ -170,19 +254,24 @@ function numberSvg(rank, layout, accent, genre = "", rating = "") {
     }
   } else {
     // Poster / Portrait
-    // Exact center of whole canvas background (0..1000) -> metaX = 500, in bottom space (1260..1500)
+    // Exact center of whole canvas background (0..1000) -> metaX = 500, in bottom space (1260..1500) -> metaY = 1380
     const metaX = 500;
+    const metaY = 1380;
 
     if (escapedGenre && ratingVal) {
-      const gSize = escapedGenre.length > 14 ? 36 : (escapedGenre.length > 10 ? 42 : 48);
+      const gSize = escapedGenre.length > 14 ? 44 : (escapedGenre.length > 10 ? 48 : 52);
       metaXml = `
-        <text x="${metaX}" y="1335" text-anchor="middle" font-family="Inter, -apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="${gSize}" font-weight="900" letter-spacing="3" fill="#F1F5F9" filter="url(#metaShadow)">${escapedGenre}</text>
-        <text x="${metaX}" y="1420" text-anchor="middle" font-family="Inter, -apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="64" font-weight="900" filter="url(#metaShadow)"><tspan fill="#FFB800">★ </tspan><tspan fill="#FFFFFF">${ratingVal}</tspan></text>
+        <text x="${metaX}" y="${metaY}" text-anchor="middle" font-family="Inter, -apple-system, BlinkMacSystemFont, Arial, sans-serif" filter="url(#metaShadow)">
+          <tspan fill="#F1F5F9" font-size="${gSize}" font-weight="900" letter-spacing="3">${escapedGenre}</tspan>
+          <tspan fill="#94A3B8" font-size="38" font-weight="800">   •   </tspan>
+          <tspan fill="#FFB800" font-size="64" font-weight="900">★ </tspan>
+          <tspan fill="#FFFFFF" font-size="64" font-weight="900">${ratingVal}</tspan>
+        </text>
       `;
     } else if (escapedGenre) {
-      metaXml = `<text x="${metaX}" y="1375" text-anchor="middle" font-family="Inter, -apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="48" font-weight="900" letter-spacing="3" fill="#F1F5F9" filter="url(#metaShadow)">${escapedGenre}</text>`;
+      metaXml = `<text x="${metaX}" y="${metaY}" text-anchor="middle" font-family="Inter, -apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="52" font-weight="900" letter-spacing="3" fill="#F1F5F9" filter="url(#metaShadow)">${escapedGenre}</text>`;
     } else if (ratingVal) {
-      metaXml = `<text x="${metaX}" y="1375" text-anchor="middle" font-family="Inter, -apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="64" font-weight="900" filter="url(#metaShadow)"><tspan fill="#FFB800">★ </tspan><tspan fill="#FFFFFF">${ratingVal}</tspan></text>`;
+      metaXml = `<text x="${metaX}" y="${metaY}" text-anchor="middle" font-family="Inter, -apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="64" font-weight="900" filter="url(#metaShadow)"><tspan fill="#FFB800">★ </tspan><tspan fill="#FFFFFF">${ratingVal}</tspan></text>`;
     }
   }
 
@@ -458,16 +547,24 @@ export async function createTopCover({
     }
   ];
 
-  const background = parseBackgroundColor(canvasBackground);
+  const bgLower = String(canvasBackground || "").toLowerCase().trim();
+  const isStremio = bgLower === "stremio" || bgLower === "stremio-navy" || bgLower === "rgb(26,23,62)" || bgLower === "rgb(26, 23, 62)" || bgLower === "#1a173e" || bgLower === "1a173e";
 
-  return sharp({
-    create: {
-      width: canvas.width,
-      height: canvas.height,
-      channels: 4,
-      background
-    }
-  })
+  let baseSharp;
+  if (isStremio) {
+    baseSharp = sharp(generateGlassBackground(canvas.width, canvas.height, true));
+  } else {
+    baseSharp = sharp({
+      create: {
+        width: canvas.width,
+        height: canvas.height,
+        channels: 4,
+        background: parseBackgroundColor(canvasBackground)
+      }
+    });
+  }
+
+  return baseSharp
     .composite(composites)
     .png({
       compressionLevel: 8,
