@@ -154,24 +154,24 @@ function numberSvg(rank, layout, accent, genre = "", rating = "") {
 
     if (escapedGenre) {
       const gSize = escapedGenre.length > 12 ? 18 : (escapedGenre.length > 9 ? 20 : 22);
-      metaXml += `<text x="${metaX}" y="${currentY}" font-family="Inter, -apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="${gSize}" font-weight="700" letter-spacing="2" fill="#A0AEC0" filter="url(#metaShadow)">${escapedGenre}</text>`;
+      metaXml += `<text x="${metaX}" y="${currentY}" font-family="Inter, -apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="${gSize}" font-weight="700" letter-spacing="2" fill="#CBD5E1" filter="url(#metaShadow)">${escapedGenre}</text>`;
       currentY += 44;
     }
     if (ratingVal) {
-      metaXml += `<text x="${metaX}" y="${currentY}" font-family="Inter, -apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="28" font-weight="800" filter="url(#metaShadow)"><tspan fill="#F59E0B">★ </tspan><tspan fill="#FFFFFF">${ratingVal}</tspan></text>`;
+      metaXml += `<text x="${metaX}" y="${currentY}" font-family="Inter, -apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="28" font-weight="800" filter="url(#metaShadow)"><tspan fill="#FFB800">★ </tspan><tspan fill="#FFFFFF">${ratingVal}</tspan></text>`;
     }
   } else {
     // Poster / Portrait
-    const metaX = 24;
-    let currentY = isDouble ? 940 : 965;
+    const metaX = 28;
+    let currentY = isDouble ? 945 : 970;
 
     if (escapedGenre) {
       const gSize = escapedGenre.length > 11 ? 17 : (escapedGenre.length > 8 ? 19 : 22);
-      metaXml += `<text x="${metaX}" y="${currentY}" font-family="Inter, -apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="${gSize}" font-weight="700" letter-spacing="1.5" fill="#A0AEC0" filter="url(#metaShadow)">${escapedGenre}</text>`;
+      metaXml += `<text x="${metaX}" y="${currentY}" font-family="Inter, -apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="${gSize}" font-weight="700" letter-spacing="1.5" fill="#CBD5E1" filter="url(#metaShadow)">${escapedGenre}</text>`;
       currentY += 48;
     }
     if (ratingVal) {
-      metaXml += `<text x="${metaX}" y="${currentY}" font-family="Inter, -apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="30" font-weight="800" filter="url(#metaShadow)"><tspan fill="#F59E0B">★ </tspan><tspan fill="#FFFFFF">${ratingVal}</tspan></text>`;
+      metaXml += `<text x="${metaX}" y="${currentY}" font-family="Inter, -apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="30" font-weight="800" filter="url(#metaShadow)"><tspan fill="#FFB800">★ </tspan><tspan fill="#FFFFFF">${ratingVal}</tspan></text>`;
     }
   }
 
@@ -200,8 +200,8 @@ function numberSvg(rank, layout, accent, genre = "", rating = "") {
           </feMerge>
         </filter>
 
-        <filter id="metaShadow" x="-20%" y="-20%" width="140%" height="140%">
-          <feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="#000000" flood-opacity="0.85"/>
+        <filter id="metaShadow" x="-30%" y="-30%" width="160%" height="160%">
+          <feDropShadow dx="0" dy="2" stdDeviation="2.5" flood-color="#000000" flood-opacity="0.85"/>
         </filter>
       </defs>
 
