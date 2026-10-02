@@ -46,7 +46,7 @@ const LAYOUTS = {
       sizeSingle: 405,
       sizeDouble: 335,
       opticalDrop: 22
-    }
+    },
     logo: {
       maxWidth: 350,
       maxHeight: 145,
