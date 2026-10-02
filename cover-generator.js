@@ -149,43 +149,40 @@ function numberSvg(rank, layout, accent, genre = "", rating = "") {
   let metaXml = "";
 
   if (layout === LAYOUTS.landscape) {
-    // Center horizontally in the left region (0..300) -> metaX = 150
-    const metaX = 150;
-    let genreY = 580;
-    let ratingY = 640;
+    // Under the card (300..1200) -> metaX = 750, in the bottom space (613..720) -> metaY = 668
+    const metaX = 750;
+    const metaY = 668;
 
-    if (escapedGenre && !ratingVal) {
-      genreY = 610;
-    } else if (!escapedGenre && ratingVal) {
-      ratingY = 610;
-    }
-
-    if (escapedGenre) {
-      const gSize = escapedGenre.length > 15 ? 22 : (escapedGenre.length > 11 ? 26 : 30);
-      metaXml += `<text x="${metaX}" y="${genreY}" text-anchor="middle" font-family="Inter, -apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="${gSize}" font-weight="900" letter-spacing="2" fill="#F1F5F9" filter="url(#metaShadow)">${escapedGenre}</text>`;
-    }
-    if (ratingVal) {
-      metaXml += `<text x="${metaX}" y="${ratingY}" text-anchor="middle" font-family="Inter, -apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="42" font-weight="900" filter="url(#metaShadow)"><tspan fill="#FFB800">★ </tspan><tspan fill="#FFFFFF">${ratingVal}</tspan></text>`;
+    if (escapedGenre && ratingVal) {
+      const gSize = escapedGenre.length > 15 ? 24 : (escapedGenre.length > 11 ? 27 : 31);
+      metaXml = `
+        <text x="${metaX}" y="${metaY}" text-anchor="middle" font-family="Inter, -apple-system, BlinkMacSystemFont, Arial, sans-serif" filter="url(#metaShadow)">
+          <tspan fill="#F1F5F9" font-size="${gSize}" font-weight="900" letter-spacing="2">${escapedGenre}</tspan>
+          <tspan fill="#64748B" font-size="24" font-weight="800">   •   </tspan>
+          <tspan fill="#FFB800" font-size="36" font-weight="900">★ </tspan>
+          <tspan fill="#FFFFFF" font-size="36" font-weight="900">${ratingVal}</tspan>
+        </text>
+      `;
+    } else if (escapedGenre) {
+      metaXml = `<text x="${metaX}" y="${metaY}" text-anchor="middle" font-family="Inter, -apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="31" font-weight="900" letter-spacing="2" fill="#F1F5F9" filter="url(#metaShadow)">${escapedGenre}</text>`;
+    } else if (ratingVal) {
+      metaXml = `<text x="${metaX}" y="${metaY}" text-anchor="middle" font-family="Inter, -apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="36" font-weight="900" filter="url(#metaShadow)"><tspan fill="#FFB800">★ </tspan><tspan fill="#FFFFFF">${ratingVal}</tspan></text>`;
     }
   } else {
     // Poster / Portrait
-    // Center horizontally in the left region (0..210) -> metaX = 105
-    const metaX = 105;
-    let genreY = 1000;
-    let ratingY = 1065;
+    // Under the poster card (210..940) -> metaX = 575, in the bottom space (1260..1500)
+    const metaX = 575;
 
-    if (escapedGenre && !ratingVal) {
-      genreY = 1030;
-    } else if (!escapedGenre && ratingVal) {
-      ratingY = 1030;
-    }
-
-    if (escapedGenre) {
-      const gSize = escapedGenre.length > 15 ? 18 : (escapedGenre.length > 12 ? 22 : 25);
-      metaXml += `<text x="${metaX}" y="${genreY}" text-anchor="middle" font-family="Inter, -apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="${gSize}" font-weight="900" letter-spacing="1.8" fill="#F1F5F9" filter="url(#metaShadow)">${escapedGenre}</text>`;
-    }
-    if (ratingVal) {
-      metaXml += `<text x="${metaX}" y="${ratingY}" text-anchor="middle" font-family="Inter, -apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="40" font-weight="900" filter="url(#metaShadow)"><tspan fill="#FFB800">★ </tspan><tspan fill="#FFFFFF">${ratingVal}</tspan></text>`;
+    if (escapedGenre && ratingVal) {
+      const gSize = escapedGenre.length > 15 ? 26 : (escapedGenre.length > 11 ? 30 : 34);
+      metaXml = `
+        <text x="${metaX}" y="1342" text-anchor="middle" font-family="Inter, -apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="${gSize}" font-weight="900" letter-spacing="2.5" fill="#F1F5F9" filter="url(#metaShadow)">${escapedGenre}</text>
+        <text x="${metaX}" y="1415" text-anchor="middle" font-family="Inter, -apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="48" font-weight="900" filter="url(#metaShadow)"><tspan fill="#FFB800">★ </tspan><tspan fill="#FFFFFF">${ratingVal}</tspan></text>
+      `;
+    } else if (escapedGenre) {
+      metaXml = `<text x="${metaX}" y="1380" text-anchor="middle" font-family="Inter, -apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="34" font-weight="900" letter-spacing="2.5" fill="#F1F5F9" filter="url(#metaShadow)">${escapedGenre}</text>`;
+    } else if (ratingVal) {
+      metaXml = `<text x="${metaX}" y="1380" text-anchor="middle" font-family="Inter, -apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="48" font-weight="900" filter="url(#metaShadow)"><tspan fill="#FFB800">★ </tspan><tspan fill="#FFFFFF">${ratingVal}</tspan></text>`;
     }
   }
 

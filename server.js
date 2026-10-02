@@ -184,7 +184,7 @@ async function buildCoverUrl(
             : "transparent",
         genre: genre || "",
         rating: rating || "",
-        v: "7.2.3"
+        v: "7.2.4"
       });
 
       return `${publicBase(req)}/c/${token}/top-cover?${qs}`;
@@ -210,7 +210,7 @@ async function buildCoverUrl(
         : "transparent",
     genre: genre || "",
     rating: rating || "",
-    v: "7.2.3"
+    v: "7.2.4"
   });
 
   return `${publicBase(req)}/c/${token}/top-cover?${qs}`;
