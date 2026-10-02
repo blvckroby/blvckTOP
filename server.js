@@ -154,6 +154,8 @@ async function buildCoverUrl(
   catalog
 ) {
   const shape = normalizeShape(catalog.shape);
+  const genre = Array.isArray(meta?.genres) && meta.genres.length > 0 ? meta.genres[0] : (meta?.genre || "");
+  const rating = meta?.imdbRating || meta?.rating || "";
 
   try {
     const tmdbId = await resolveTmdbId(
@@ -173,6 +175,8 @@ async function buildCoverUrl(
           catalog.canvasBackground === "black"
             ? "black"
             : "transparent",
+        genre: genre || "",
+        rating: rating || "",
         v: "4"
       });
 
@@ -196,7 +200,10 @@ async function buildCoverUrl(
     canvasBackground:
       catalog.canvasBackground === "black"
         ? "black"
-        : "transparent"
+        : "transparent",
+    genre: genre || "",
+    rating: rating || "",
+    v: "4"
   });
 
   return `${publicBase(req)}/c/${token}/top-cover?${qs}`;
@@ -448,13 +455,15 @@ app.get(["/c/:token/top-cover", "/top-cover"], async (req, res) => {
 
     let artworkUrl = req.query.artwork ? String(req.query.artwork) : null;
     let resolvedTmdbId = tmdbId;
+    let genre = req.query.genre ? String(req.query.genre) : "";
+    let rating = req.query.rating ? String(req.query.rating) : "";
 
     const catalog = config?.catalogs?.find(c => c.id === catalogId) || { id: catalogId };
     const accent = catalogAccent(catalog);
     const effectiveType = type === "series" || type === "tv" ? "tv" : "movie";
 
-    // If artworkUrl is not provided and no tmdbId is passed, resolve from the catalogId
-    if (!artworkUrl && !resolvedTmdbId && catalogId) {
+    // If artworkUrl, tmdbId, genre, or rating are missing, resolve from catalog
+    if ((!artworkUrl && !resolvedTmdbId && catalogId) || (!genre && catalogId) || (!rating && catalogId)) {
       try {
         const catType = type === "series" || type === "tv" ? "series" : "movie";
         const sourceUrl = `${sourceBaseUrl()}/catalog/${encodeURIComponent(catType)}/${encodeURIComponent(catalogId)}.json`;
@@ -462,9 +471,13 @@ app.get(["/c/:token/top-cover", "/top-cover"], async (req, res) => {
         const metas = Array.isArray(catData?.metas) ? catData.metas : [];
         const item = metas[rank - 1] || metas[0];
         if (item) {
-          resolvedTmdbId = await resolveTmdbId(catType, item.id || item.tmdbId, DEFAULT_TMDB_KEY);
+          if (!genre) genre = Array.isArray(item.genres) && item.genres.length > 0 ? item.genres[0] : (item.genre || "");
+          if (!rating) rating = item.imdbRating || item.rating || "";
           if (!resolvedTmdbId) {
-            artworkUrl = shape === "poster" ? (item.poster || item.background) : (item.background || item.poster);
+            resolvedTmdbId = await resolveTmdbId(catType, item.id || item.tmdbId, DEFAULT_TMDB_KEY);
+            if (!resolvedTmdbId && !artworkUrl) {
+              artworkUrl = shape === "poster" ? (item.poster || item.background) : (item.background || item.poster);
+            }
           }
         }
       } catch (catErr) {
@@ -496,7 +509,9 @@ app.get(["/c/:token/top-cover", "/top-cover"], async (req, res) => {
       catalogId,
       canvasBackground,
       accent,
-      artworkUrl
+      artworkUrl,
+      genre,
+      rating
     });
 
     // 1. Check persistent disk cache (instant response via sendFile)
@@ -523,7 +538,9 @@ app.get(["/c/:token/top-cover", "/top-cover"], async (req, res) => {
         artworkUrl,
         shape,
         accent,
-        canvasBackground
+        canvasBackground,
+        genre,
+        rating
       });
 
       // Persist to disk and DB

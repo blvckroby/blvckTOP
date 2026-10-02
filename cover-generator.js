@@ -107,7 +107,32 @@ function hexToRgb(hex) {
   };
 }
 
-function numberSvg(rank, layout, accent) {
+function escapeXml(str) {
+  if (!str) return "";
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&apos;");
+}
+
+function formatRating(raw) {
+  if (!raw) return "";
+  const num = parseFloat(String(raw).replace(",", "."));
+  if (isNaN(num) || num <= 0) return "";
+  return num.toFixed(1);
+}
+
+function cleanGenre(raw) {
+  if (!raw) return "";
+  let g = String(raw).trim();
+  if (g.includes(",")) g = g.split(",")[0].trim();
+  if (g.includes("/")) g = g.split("/")[0].trim();
+  return g.toUpperCase();
+}
+
+function numberSvg(rank, layout, accent, genre = "", rating = "") {
   const { canvas, card, number } = layout;
   const isDouble = String(rank).length > 1;
   const fontSize = isDouble ? number.sizeDouble : number.sizeSingle;
@@ -117,6 +142,38 @@ function numberSvg(rank, layout, accent) {
   const y = centerY + fontSize * 0.34 + number.opticalDrop;
 
   const strokeWidth = layout === LAYOUTS.poster ? 10 : 11;
+
+  const escapedGenre = escapeXml(cleanGenre(genre));
+  const ratingVal = formatRating(rating);
+
+  let metaXml = "";
+
+  if (layout === LAYOUTS.landscape) {
+    const metaX = isDouble ? 34 : 64;
+    let currentY = isDouble ? 560 : 575;
+
+    if (escapedGenre) {
+      const gSize = escapedGenre.length > 12 ? 18 : (escapedGenre.length > 9 ? 20 : 22);
+      metaXml += `<text x="${metaX}" y="${currentY}" font-family="Inter, -apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="${gSize}" font-weight="700" letter-spacing="2" fill="#A0AEC0" filter="url(#metaShadow)">${escapedGenre}</text>`;
+      currentY += 44;
+    }
+    if (ratingVal) {
+      metaXml += `<text x="${metaX}" y="${currentY}" font-family="Inter, -apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="28" font-weight="800" filter="url(#metaShadow)"><tspan fill="#F59E0B">★ </tspan><tspan fill="#FFFFFF">${ratingVal}</tspan></text>`;
+    }
+  } else {
+    // Poster / Portrait
+    const metaX = 24;
+    let currentY = isDouble ? 940 : 965;
+
+    if (escapedGenre) {
+      const gSize = escapedGenre.length > 11 ? 17 : (escapedGenre.length > 8 ? 19 : 22);
+      metaXml += `<text x="${metaX}" y="${currentY}" font-family="Inter, -apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="${gSize}" font-weight="700" letter-spacing="1.5" fill="#A0AEC0" filter="url(#metaShadow)">${escapedGenre}</text>`;
+      currentY += 48;
+    }
+    if (ratingVal) {
+      metaXml += `<text x="${metaX}" y="${currentY}" font-family="Inter, -apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="30" font-weight="800" filter="url(#metaShadow)"><tspan fill="#F59E0B">★ </tspan><tspan fill="#FFFFFF">${ratingVal}</tspan></text>`;
+    }
+  }
 
   return Buffer.from(`
     <svg width="${canvas.width}" height="${canvas.height}" xmlns="http://www.w3.org/2000/svg">
@@ -142,6 +199,10 @@ function numberSvg(rank, layout, accent) {
             <feMergeNode in="SourceGraphic"/>
           </feMerge>
         </filter>
+
+        <filter id="metaShadow" x="-20%" y="-20%" width="140%" height="140%">
+          <feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="#000000" flood-opacity="0.85"/>
+        </filter>
       </defs>
 
       <text
@@ -158,6 +219,8 @@ function numberSvg(rank, layout, accent) {
         paint-order="stroke"
         filter="url(#brandGlow)"
       >${rank}</text>
+
+      ${metaXml}
     </svg>
   `);
 }
@@ -325,7 +388,9 @@ export async function createTopCover({
   artworkUrl,
   shape = "landscape",
   accent = "#FFFFFF",
-  canvasBackground = "transparent"
+  canvasBackground = "transparent",
+  genre = "",
+  rating = ""
 }) {
   if (!artworkUrl) throw new Error("artworkUrl mancante.");
 
@@ -346,8 +411,8 @@ export async function createTopCover({
     // Soft brand tint around the number area.
     { input: ambient, left: 0, top: 0 },
 
-    // Number goes behind the card.
-    { input: numberSvg(rank, layout, accent), left: 0, top: 0 },
+    // Number and metadata go behind the card.
+    { input: numberSvg(rank, layout, accent, genre, rating), left: 0, top: 0 },
 
     // Card shadow.
     {

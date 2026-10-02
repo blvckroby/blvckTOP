@@ -46,7 +46,9 @@ export function computeCoverKey({
   catalogId,
   canvasBackground,
   accent,
-  artworkUrl
+  artworkUrl,
+  genre,
+  rating
 }) {
   return [
     rank,
@@ -56,7 +58,9 @@ export function computeCoverKey({
     catalogId || "",
     canvasBackground || "transparent",
     accent || "#FFFFFF",
-    artworkUrl || ""
+    artworkUrl || "",
+    genre || "",
+    rating || ""
   ].join("|");
 }
 
@@ -78,6 +82,8 @@ export async function preloadAllCatalogs(sourceManifestUrl, options = {}) {
     if (!manifestResponse.ok) {
       throw new Error(`Manifest sorgente non raggiungibile (${manifestResponse.status})`);
     }
+
+    const sourceManifest = await manifestResponse.json();
 
     const catalogs = (Array.isArray(sourceManifest.catalogs) ? sourceManifest.catalogs : [])
       .filter(c => {
@@ -111,6 +117,8 @@ export async function preloadAllCatalogs(sourceManifestUrl, options = {}) {
         for (let i = 0; i < metas.length; i++) {
           const meta = metas[i];
           const rank = i + 1;
+          const genre = Array.isArray(meta.genres) && meta.genres.length > 0 ? meta.genres[0] : (meta.genre || "");
+          const rating = meta.imdbRating || meta.rating || "";
 
           try {
             const tmdbId = await resolveTmdbId(type, meta.id || meta.tmdbId, DEFAULT_TMDB_KEY);
@@ -136,7 +144,9 @@ export async function preloadAllCatalogs(sourceManifestUrl, options = {}) {
                   catalogId: catId,
                   canvasBackground,
                   accent,
-                  artworkUrl
+                  artworkUrl,
+                  genre,
+                  rating
                 });
 
                 const existing = getCoverFilePath(coverKey);
@@ -151,7 +161,9 @@ export async function preloadAllCatalogs(sourceManifestUrl, options = {}) {
                     artworkUrl,
                     shape,
                     accent,
-                    canvasBackground
+                    canvasBackground,
+                    genre,
+                    rating
                   });
 
                   saveCoverBuffer(coverKey, pngBuffer);

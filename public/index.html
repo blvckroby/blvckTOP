@@ -50,14 +50,20 @@
     button:disabled { opacity: .5; cursor: wait; }
 
     /* ---------- hero ---------- */
-    .hero { text-align: center; padding: 10px 0 48px; }
+    .hero { 
+      display: flex; 
+      flex-direction: column; 
+      align-items: center; 
+      text-align: center; 
+      padding: 24px 0 48px; 
+    }
     .hero-badge {
       display: inline-flex; align-items: center; gap: 8px;
-      padding: 4px 14px; border-radius: 999px;
+      padding: 5px 16px; border-radius: 999px;
       background: rgba(255, 255, 255, 0.04);
       border: 1px solid var(--line2);
       font-family: var(--font-mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase;
-      color: var(--muted); margin-bottom: 20px;
+      color: var(--muted); margin-bottom: 24px;
     }
     .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--good); box-shadow: 0 0 8px var(--good); animation: pulse 2s infinite; }
     @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: .4; transform: scale(.85); } }
@@ -473,7 +479,6 @@
 <body>
   <main class="page">
     <header class="hero">
-      <div class="hero-badge"><span class="dot"></span>ENGINE v7.2 // LIVE SYNC 09:00 &amp; 18:00</div>
       <h1 class="elastic-title" aria-label="BLVCK//TOP 10">
         <span class="word">
           <span class="char">B</span><span class="char">L</span><span class="char">V</span><span class="char">C</span><span class="char">K</span>
@@ -492,6 +497,8 @@
       <div class="hero-badge-wrap">
         <img src="https://raw.githubusercontent.com/blvckroby/MusicDB/refs/heads/main/loghi/Top10Badge.svg" alt="BLVCK TOP 10 Badge" class="top10-badge-img" />
       </div>
+
+      <div class="hero-badge"><span class="dot"></span>ENGINE v7.2 // LIVE SYNC 09:00 &amp; 18:00</div>
 
       <p class="lede">Classifiche ufficiali dei tuoi servizi streaming con cover numerate in alta definizione per <b>Nuvio</b> e <b>Stremio</b>.</p>
       <div class="cta">
