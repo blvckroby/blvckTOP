@@ -172,7 +172,8 @@ async function buildCoverUrl(
         canvasBackground:
           catalog.canvasBackground === "black"
             ? "black"
-            : "transparent"
+            : "transparent",
+        v: "4"
       });
 
       return `${publicBase(req)}/c/${token}/top-cover?${qs}`;
@@ -492,7 +493,7 @@ app.get(["/c/:token/top-cover", "/top-cover"], async (req, res) => {
     const existingFilePath = getCoverFilePath(coverKey);
     if (existingFilePath) {
       res.setHeader("X-Cover-Cache", "HIT-DISK");
-      res.setHeader("Cache-Control", "public, max-age=86400, immutable");
+      res.setHeader("Cache-Control", "public, max-age=3600");
       return res.sendFile(existingFilePath);
     }
 
@@ -500,7 +501,7 @@ app.get(["/c/:token/top-cover", "/top-cover"], async (req, res) => {
     if (pendingCovers.has(coverKey)) {
       const png = await pendingCovers.get(coverKey);
       res.setHeader("Content-Type", "image/png");
-      res.setHeader("Cache-Control", "public, max-age=86400, immutable");
+      res.setHeader("Cache-Control", "public, max-age=3600");
       res.setHeader("X-Cover-Cache", "SHARED");
       return res.send(png);
     }
@@ -525,7 +526,7 @@ app.get(["/c/:token/top-cover", "/top-cover"], async (req, res) => {
     try {
       const png = await generationPromise;
       res.setHeader("Content-Type", "image/png");
-      res.setHeader("Cache-Control", "public, max-age=86400, immutable");
+      res.setHeader("Cache-Control", "public, max-age=3600");
       res.setHeader("X-Cover-Cache", "GENERATED");
       res.send(png);
     } finally {
