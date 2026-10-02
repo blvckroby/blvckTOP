@@ -332,6 +332,8 @@ app.get("/c/:token/manifest.json", async (req, res) => {
       version: "7.2.0",
       name: "blvckTOP",
       description: "Top 10 personalizzate con cover numerate HD",
+      logo: "https://raw.githubusercontent.com/blvckroby/MusicDB/refs/heads/main/loghi/Top10Badge.svg",
+      icon: "https://raw.githubusercontent.com/blvckroby/MusicDB/refs/heads/main/loghi/Top10Badge.svg",
       catalogs,
       resources: Array.from(
         new Set([...(source.resources || []), "catalog", "meta"])
