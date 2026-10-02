@@ -1,6 +1,18 @@
 import express from "express";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { setGlobalDispatcher, ProxyAgent } from "undici";
+
+if (process.env.HTTPS_PROXY || process.env.HTTP_PROXY) {
+  const proxyUrl = process.env.HTTPS_PROXY || process.env.HTTP_PROXY;
+  try {
+    const dispatcher = new ProxyAgent(proxyUrl);
+    setGlobalDispatcher(dispatcher);
+    console.log(`[Proxy] Attivato proxy globale: ${proxyUrl.replace(/:[^:@]+@/, ":***@")}`);
+  } catch (err) {
+    console.error(`[Proxy] Errore configurazione proxy:`, err.message);
+  }
+}
 
 import {
   encryptConfig,
@@ -65,17 +77,23 @@ async function fetchJson(url, ttl = JSON_TTL) {
 
   const response = await fetch(url, {
     headers: {
-      "User-Agent": "blvckTOP/7.2"
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+      "Accept": "application/json, text/plain, */*"
     }
   });
 
   if (!response.ok) {
-    throw new Error(`Sorgente HTTP ${response.status}`);
+    throw new Error(`Sorgente HTTP ${response.status} (${response.statusText})`);
   }
 
-  const data = await response.json();
-  setCachedJson(url, data, ttl);
-  return data;
+  const text = await response.text();
+  try {
+    const data = JSON.parse(text);
+    setCachedJson(url, data, ttl);
+    return data;
+  } catch {
+    throw new Error(`La sorgente non ha restituito JSON valido: ${text.slice(0, 80)}`);
+  }
 }
 
 function catalogKey(type, id) {
@@ -189,9 +207,9 @@ app.get("/api/catalogs", async (_req, res) => {
     res.setHeader("Cache-Control", "public, max-age=300");
     res.json({ catalogs });
   } catch (err) {
-    console.error(err);
+    console.error("Errore /api/catalogs:", err.message);
     res.status(502).json({
-      error: "Impossibile caricare i cataloghi."
+      error: `Impossibile caricare i cataloghi: ${err.message}`
     });
   }
 });
