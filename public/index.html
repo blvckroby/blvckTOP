@@ -624,44 +624,46 @@
           countEl = $("count");
 
     /* ---------- loghi ---------- */
+    const ICON_CDN = "/icons/";
+    const svgUri = (w, h, body) => "data:image/svg+xml;utf8," + encodeURIComponent(
+      `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}"><g fill="#fff" font-family="Arial Black, Arial, Helvetica, sans-serif" font-weight="900">${body}</g></svg>`);
     const LOGO = {
-      netflix:     "/icons/netflix.svg",
-      disney:      "/icons/disney-plus.svg",
-      prime:       "/icons/prime-video.svg",
-      now:         "/icons/now.svg",
-      infinity:    "/icons/infinity.svg",
-      tim:         "/icons/timvision.svg",
-      raiplay:     "/icons/raiplay.svg",
-      apple:       "/icons/apple-tv-plus.svg",
-      hbo:         "/icons/hbo-max.svg",
-      paramount:   "/icons/paramount-plus.svg",
-      discovery:   "/icons/discovery.svg",
-      crunchyroll: "/icons/crunchyroll.svg",
-      rakuten:     "/icons/rakuten.svg",
-      plex:        "/icons/plex.svg",
-      stremio:     "/icons/stremio.svg",
-      nuvio:       "https://nuvio.tv/assets/nuvio-app-logo-wordmark.webp",
-      tmdb:        "/icons/tmdb.svg",
-      trakt:       "/icons/trakt.svg"
+      prime:     "/icons/prime-logo.svg",
+      discovery: "/icons/discovery_plus.svg",
+      infinity:  "/icons/infinity.svg",
+      tim:       "/icons/tim.svg",
+      stremio:   "/icons/stremio.svg",
+      nuvio:     "https://nuvio.tv/assets/nuvio-app-logo-wordmark.webp",
+      hbomax:    "/icons/hbomax.svg",
+      rakuten:   "/icons/rakuten.svg",
+      chili:     svgUri(120, 48, '<text x="60" y="36" font-size="34" text-anchor="middle" letter-spacing="1">CHILI</text>'),
+      tmdb:      "/icons/tmdb.svg",
+      disney:    "/icons/disney.svg",
+      now:       "/icons/now.svg",
+      raiplay:   "/icons/raiplay.svg"
     };
 
     const BRANDS = [
-      [/netflix/i,             { url: LOGO.netflix, color: "#E50914" }],
+      [/netflix/i,             { id: "netflix", color: "#E50914" }],
       [/disney/i,              { url: LOGO.disney, wide: true, color: "#155EEF" }],
       [/rai\s?play|\brai\b/i,  { url: LOGO.raiplay, wide: true, color: "#0066CC" }],
       [/\bnow\b|now ?tv|sky/i, { url: LOGO.now, wide: true, color: "#00E575" }],
-      [/prime|amazon/i,        { url: LOGO.prime, wide: true, color: "#00A8E1" }],
+      [/prime|amazon/i,        { url: LOGO.prime, big: true, color: "#00A8E1" }],
       [/tim\s?vision|\btim\b/i,{ url: LOGO.tim, wide: true, color: "#003399" }],
-      [/discovery/i,           { url: LOGO.discovery, wide: true, color: "#003399" }],
-      [/hbo|\bmax\b/i,         { url: LOGO.hbo, wide: true, color: "#7D57FF" }],
-      [/apple/i,               { url: LOGO.apple, wide: true, color: "#F4F5F7" }],
-      [/paramount/i,           { url: LOGO.paramount, color: "#0064FF" }],
-      [/infinity|mediaset/i,   { url: LOGO.infinity, wide: true, color: "#00A3E0" }],
-      [/crunchyroll/i,         { url: LOGO.crunchyroll, color: "#F47521" }],
-      [/rakuten/i,             { url: LOGO.rakuten, wide: true, color: "#BF0000" }],
-      [/plex/i,                { url: LOGO.plex, color: "#E5A00D" }],
+      [/discovery/i,           { url: LOGO.discovery, big: true, native: true, color: "#003399" }],
+      [/hbo|\bmax\b/i,         { url: LOGO.hbomax, wide: true, color: "#7D57FF" }],
+      [/rakuten/i,             { url: LOGO.rakuten, color: "#BF0000" }],
+      [/chili/i,               { url: LOGO.chili, wide: true, color: "#FF5A1F" }],
+      [/apple/i,               { id: "apple", color: "#F4F5F7" }],
+      [/paramount/i,           { id: "paramount", color: "#0064FF" }],
+      [/crunchyroll/i,         { id: "crunchyroll", color: "#F47521" }],
+      [/youtube/i,             { id: "youtube", color: "#FF0000" }],
+      [/dazn/i,                { id: "dazn", color: "#F3F3F3" }],
+      [/infinity|mediaset|canale ?5/i, { url: LOGO.infinity, wide: true, color: "#00A3E0" }],
+      [/plex/i,                { id: "plex", color: "#E5A00D" }],
       [/tmdb|themoviedb/i,     { url: LOGO.tmdb, wide: true, color: "#01B4E4" }],
-      [/trakt/i,               { url: LOGO.trakt, color: "#ED1C24" }]
+      [/imdb/i,                { id: "imdb", color: "#F5C518" }],
+      [/trakt/i,               { id: "trakt", color: "#ED1C24" }]
     ];
 
     const brandFor = name => {
@@ -685,13 +687,20 @@
 
       const brandColor = brand.color || "#8C75FF";
 
-      if (brand.url) {
+      if (brand.id) {
+        const icon = document.createElement("div");
+        icon.className = "brand-icon";
+        icon.style.setProperty("--icon-url", `url('${ICON_CDN}${brand.id}.svg')`);
+        box.append(icon);
+      } else if (brand.url) {
         if (brand.wide) box.classList.add("wide");
         if (brand.big) box.classList.add("big");
+        if (brand.native) box.classList.add("native");
         const img = new Image();
         img.alt = ""; 
-        img.loading = "lazy";
-        img.decoding = "async";
+        img.loading = "lazy"; 
+        img.decoding = "async"; 
+        img.referrerPolicy = "no-referrer";
         img.src = brand.url;
         img.onerror = () => { img.remove(); monogram(); };
         box.append(img);
@@ -1098,7 +1107,8 @@
 
     /* ---------- banda loghi ---------- */
     (function () {
-      const items = [LOGO.netflix, LOGO.disney, LOGO.prime, LOGO.now, LOGO.hbo, LOGO.raiplay, LOGO.apple, LOGO.infinity, LOGO.tim, LOGO.discovery, LOGO.paramount, LOGO.crunchyroll, LOGO.rakuten];
+      const items = ["netflix", LOGO.disney, LOGO.prime, LOGO.now, LOGO.hbomax, LOGO.raiplay, "apple",
+        LOGO.infinity, LOGO.tim, LOGO.discovery, "paramount", LOGO.rakuten, LOGO.chili];
       const row = items.map(src => {
         const url = /^(https?:|data:|\/)/.test(src) ? src : `${ICON_CDN}${src}.svg`;
         return `<span class="brand"><img src="${url}" alt="" referrerpolicy="no-referrer" onerror="this.parentNode.remove()" /></span>`;

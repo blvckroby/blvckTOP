@@ -410,32 +410,32 @@ export function getProviderLogoSvg(catalogKey = "") {
 
   if (key.includes("netflix")) {
     const svg = loadSvg("netflix.svg");
-    return svg ? { width: 14, height: 26, svg } : null;
+    return svg ? { width: 24, height: 24, svg } : null;
   }
 
   if (key.includes("prime") || key.includes("amazon")) {
-    const svg = loadSvg("prime-video.svg");
-    return svg ? { width: 78, height: 24, svg } : null;
+    const svg = loadSvg("prime-logo.svg");
+    return svg ? { width: 26, height: 26, svg } : null;
   }
 
   if (key.includes("disney")) {
-    const svg = loadSvg("disney-plus.svg");
-    return svg ? { width: 44, height: 32, svg } : null;
+    const svg = loadSvg("disney.svg");
+    return svg ? { width: 46, height: 25, svg } : null;
   }
 
   if (key.includes("apple")) {
-    const svg = loadSvg("apple-tv-plus.svg");
-    return svg ? { width: 58, height: 22, svg } : null;
+    const svg = loadSvg("apple.svg");
+    return svg ? { width: 24, height: 24, svg } : null;
   }
 
   if (key.includes("hbo") || key.includes("max")) {
-    const svg = loadSvg("hbo-max.svg");
-    return svg ? { width: 73, height: 20, svg } : null;
+    const svg = loadSvg("hbomax.svg");
+    return svg ? { width: 35, height: 25, svg } : null;
   }
 
   if (key.includes("paramount")) {
-    const svg = loadSvg("paramount-plus.svg");
-    return svg ? { width: 28, height: 28, svg } : null;
+    const svg = loadSvg("paramount.svg");
+    return svg ? { width: 24, height: 24, svg } : null;
   }
 
   if (key.includes("now") || key.includes("sky")) {
@@ -450,22 +450,22 @@ export function getProviderLogoSvg(catalogKey = "") {
 
   if (key.includes("infinity") || key.includes("mediaset")) {
     const svg = loadSvg("infinity.svg");
-    return svg ? { width: 53, height: 24, svg } : null;
+    return svg ? { width: 52, height: 25, svg } : null;
   }
 
   if (key.includes("timvision") || key.includes("tim")) {
-    const svg = loadSvg("timvision.svg");
-    return svg ? { width: 52, height: 24, svg } : null;
+    const svg = loadSvg("tim.svg");
+    return svg ? { width: 86, height: 20, svg } : null;
   }
 
   if (key.includes("discovery")) {
-    const svg = loadSvg("discovery.svg");
-    return svg ? { width: 99, height: 20, svg } : null;
+    const svg = loadSvg("discovery_plus.svg");
+    return svg ? { width: 30, height: 25, svg } : null;
   }
 
   if (key.includes("crunchyroll")) {
     const svg = loadSvg("crunchyroll.svg");
-    return svg ? { width: 26, height: 26, svg } : null;
+    return svg ? { width: 24, height: 24, svg } : null;
   }
 
   if (key.includes("rakuten")) {
