@@ -89,9 +89,8 @@
       line-height: .95;
       letter-spacing: -.03em;
       color: #fff;
-      transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.25s ease, text-shadow 0.25s ease;
-      will-change: transform;
-      transform-origin: center bottom;
+      transition: color 0.25s ease, text-shadow 0.25s ease;
+      cursor: default;
     }
     .elastic-title .char.slash {
       color: var(--accent);
@@ -101,20 +100,9 @@
       color: #fff;
       text-shadow: 0 0 25px rgba(0,255,157,.25);
     }
-    .elastic-title .char:hover,
-    .elastic-title .char.bouncing {
+    .elastic-title .char:hover {
       color: var(--accent) !important;
       text-shadow: 0 0 25px rgba(0, 255, 157, 0.95), 0 0 50px rgba(0, 255, 157, 0.5);
-      animation: elasticBounce 0.75s cubic-bezier(0.2, 0.8, 0.2, 1.2);
-    }
-
-    @keyframes elasticBounce {
-      0% { transform: scale(1, 1); }
-      20% { transform: scale(1.3, 0.7) translateY(-14px); }
-      40% { transform: scale(0.75, 1.25) translateY(4px); }
-      60% { transform: scale(1.15, 0.85) translateY(-4px); }
-      80% { transform: scale(0.95, 1.05) translateY(1px); }
-      100% { transform: scale(1, 1); }
     }
 
     .hero-badge-wrap {
@@ -369,20 +357,37 @@
     }
     .preview-row {
       display: flex;
-      gap: 12px;
+      gap: 14px;
       flex-wrap: wrap;
       align-items: center;
+      padding: 10px 4px;
     }
     .preview-card {
       position: relative;
       border-radius: 6px;
       overflow: hidden;
-      transition: width .3s var(--ease), aspect-ratio .3s var(--ease), transform .2s ease;
+      transition: width .3s var(--ease), aspect-ratio .3s var(--ease), transform .25s var(--ease), box-shadow .25s var(--ease), border-color .25s;
       box-shadow: 0 4px 16px rgba(0,0,0,.5);
       background: #0f1014;
+      cursor: pointer;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      transform-origin: center center;
     }
     .preview-card:hover {
-      transform: translateY(-2px);
+      transform: translateY(-3px) scale(1.06);
+      box-shadow: 0 8px 24px rgba(0,0,0,.7), 0 0 16px rgba(0,255,157,.25);
+      z-index: 10;
+    }
+    .preview-card.zoomed {
+      transform: scale(1.5) translateY(-4px) !important;
+      z-index: 50 !important;
+      box-shadow: 0 20px 50px rgba(0,0,0,.92), 0 0 35px rgba(0,255,157,.45) !important;
+      border: 1px solid var(--accent) !important;
+    }
+    .preview-card.zoomed .preview-rank {
+      transform: scale(0.85);
+      transform-origin: top left;
     }
     .preview-card.landscape {
       width: clamp(140px, 28vw, 190px);
@@ -837,6 +842,7 @@
             const cards = ranks.map(rank => {
               const card = document.createElement("div");
               card.className = `preview-card ${i.shape} ${i.canvasBackground}`;
+              card.title = "Clicca per ingrandire / rimpicciolire l'anteprima";
 
               const badge = document.createElement("span");
               badge.className = "preview-rank";
@@ -848,9 +854,19 @@
               img.alt = `Top ${rank}`;
 
               const updateImg = () => {
-                card.className = `preview-card ${i.shape} ${i.canvasBackground}`;
+                const isZoomed = card.classList.contains("zoomed");
+                card.className = `preview-card ${i.shape} ${i.canvasBackground}${isZoomed ? " zoomed" : ""}`;
                 img.src = `/top-cover?catalogId=${encodeURIComponent(i.id)}&type=${encodeURIComponent(i.type)}&shape=${i.shape}&canvasBackground=${i.canvasBackground}&rank=${rank}&v=4`;
               };
+
+              card.addEventListener("click", (e) => {
+                e.stopPropagation();
+                const wasZoomed = card.classList.contains("zoomed");
+                document.querySelectorAll(".preview-card.zoomed").forEach(c => {
+                  if (c !== card) c.classList.remove("zoomed");
+                });
+                card.classList.toggle("zoomed", !wasZoomed);
+              });
 
               updateImg();
               card.append(badge, img);
@@ -1004,16 +1020,11 @@
       ).join("");
     })();
 
-    /* ---------- elastic letters hover ---------- */
-    document.querySelectorAll(".elastic-title .char").forEach(c => {
-      c.addEventListener("mouseenter", () => {
-        c.classList.remove("bouncing");
-        void c.offsetWidth;
-        c.classList.add("bouncing");
-      });
-      c.addEventListener("animationend", () => {
-        c.classList.remove("bouncing");
-      });
+    /* ---------- dismiss zoom on outside click ---------- */
+    document.addEventListener("click", (e) => {
+      if (!e.target.closest(".preview-card")) {
+        document.querySelectorAll(".preview-card.zoomed").forEach(c => c.classList.remove("zoomed"));
+      }
     });
 
     loadCatalogs();
