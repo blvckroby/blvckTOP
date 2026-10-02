@@ -4,6 +4,10 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { getAssetBuffer, saveAssetBuffer } from "./db.js";
 
+// Limit Sharp to 1 worker thread and constrain in-memory cache to prevent CPU/RAM saturation
+sharp.concurrency(1);
+sharp.cache({ memory: 32, items: 50 });
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const NETWORKS_DIR = path.join(__dirname, "public", "networks");
 const ICONS_DIR = path.join(__dirname, "public", "icons");

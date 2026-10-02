@@ -3,7 +3,8 @@ import {
   getCachedJson,
   setCachedJson,
   getCoverFilePath,
-  saveCoverBuffer
+  saveCoverBuffer,
+  pruneStaleCovers
 } from "./db.js";
 import {
   resolveTmdbId,
@@ -13,6 +14,8 @@ import {
   DEFAULT_TMDB_KEY
 } from "./tmdb.js";
 import { createTopCover } from "./cover-generator.js";
+
+const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 function sourceBaseUrl(sourceManifestUrl) {
   return sourceManifestUrl.replace(/\/manifest\.json(?:\?.*)?$/i, "");
@@ -78,6 +81,7 @@ export async function preloadAllCatalogs(sourceManifestUrl, options = {}) {
   let newCoversGenerated = 0;
   let skippedCovers = 0;
   let catalogCount = 0;
+  const activeTuples = new Set();
 
   try {
     const manifestResponse = await fetch(sourceManifestUrl, {
@@ -119,7 +123,7 @@ export async function preloadAllCatalogs(sourceManifestUrl, options = {}) {
 
         const metas = Array.isArray(catData.metas) ? catData.metas : [];
 
-        for (let i = 0; i < metas.length; i++) {
+        for (let i = 0; i < Math.min(metas.length, 10); i++) {
           const meta = metas[i];
           const rank = i + 1;
           const genre = Array.isArray(meta.genres) && meta.genres.length > 0 ? meta.genres[0] : (meta.genre || "");
@@ -129,13 +133,17 @@ export async function preloadAllCatalogs(sourceManifestUrl, options = {}) {
             const tmdbId = await resolveTmdbId(type, meta.id || meta.tmdbId, DEFAULT_TMDB_KEY);
             if (!tmdbId) continue;
 
+            const normType = type === "series" ? "tv" : type;
+            activeTuples.add(`${catId}|${type}|${rank}|${tmdbId}`);
+            activeTuples.add(`${catId}|${normType}|${rank}|${tmdbId}`);
+
             const images = await getTmdbImages(type, tmdbId, DEFAULT_TMDB_KEY);
 
-            // Pre-generate for standard combinations
+            // Pre-generate standard configurations
             const shapes = ["landscape", "poster"];
             const backgrounds = ["transparent", "black", "stremio", "provider"];
-            const metaFlags = [true, false];
-            const logoFlags = [true, false];
+            const metaFlags = [true];
+            const logoFlags = [true];
 
             for (const shape of shapes) {
               const artworkUrl = shape === "poster"
@@ -150,7 +158,7 @@ export async function preloadAllCatalogs(sourceManifestUrl, options = {}) {
 
                     const coverKey = computeCoverKey({
                       rank,
-                      type: type === "series" ? "tv" : type,
+                      type: normType,
                       shape,
                       tmdbId,
                       catalogId: catId,
@@ -162,6 +170,7 @@ export async function preloadAllCatalogs(sourceManifestUrl, options = {}) {
                       showLogo
                     });
 
+                    // Se il film/serie è rimasto alla stessa posizione, non lo rifare!
                     const existing = getCoverFilePath(coverKey);
                     if (existing) {
                       skippedCovers++;
@@ -183,6 +192,9 @@ export async function preloadAllCatalogs(sourceManifestUrl, options = {}) {
 
                       saveCoverBuffer(coverKey, pngBuffer);
                       newCoversGenerated++;
+
+                      // Throttle execution to avoid 100% CPU lockup
+                      await sleep(35);
                     } catch (coverErr) {
                       console.warn(`[Preload] Errore generazione cover ${meta.name || tmdbId} #${rank}:`, coverErr.message);
                     }
@@ -199,10 +211,13 @@ export async function preloadAllCatalogs(sourceManifestUrl, options = {}) {
       }
     }
 
+    // Cancella i rendering di film/serie che non sono più in classifica!
+    const prunedCount = pruneStaleCovers(activeTuples, COVER_VERSION);
+
     const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
     console.log(
       `[Preload] Completato con successo in ${elapsed}s! ` +
-      `Cataloghi: ${catalogCount}, Nuove cover: ${newCoversGenerated}, In cache: ${skippedCovers}`
+      `Cataloghi: ${catalogCount}, Nuove cover: ${newCoversGenerated}, In cache (invariate): ${skippedCovers}, Rimosse non più in classifica: ${prunedCount}`
     );
   } catch (err) {
     console.error(`[Preload] Errore generale durante il preload:`, err.message);

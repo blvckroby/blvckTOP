@@ -232,6 +232,88 @@ export function cleanExpiredCache() {
   stmts.cleanJsonCache.run(Date.now());
 }
 
+export function pruneStaleCovers(activeTuples, currentVersion = "v7.5.0") {
+  if (!activeTuples || !(activeTuples instanceof Set)) {
+    return 0;
+  }
+
+  const allRows = db.prepare("SELECT cover_key, filename FROM covers").all();
+  let deletedCount = 0;
+  const toDelete = [];
+
+  for (const row of allRows) {
+    const parts = row.cover_key.split("|");
+    if (parts.length < 6) {
+      toDelete.push(row);
+      continue;
+    }
+
+    const [version, rank, type, _shape, tmdbId, catalogId] = parts;
+
+    // 1. Purge older versions
+    if (version !== currentVersion) {
+      toDelete.push(row);
+      continue;
+    }
+
+    // 2. Purge items that are no longer at this rank in this catalog
+    const normType = type === "series" || type === "tv" ? "tv" : "movie";
+    const tupleKey1 = `${catalogId}|${type}|${rank}|${tmdbId}`;
+    const tupleKey2 = `${catalogId}|${normType}|${rank}|${tmdbId}`;
+
+    if (!activeTuples.has(tupleKey1) && !activeTuples.has(tupleKey2)) {
+      toDelete.push(row);
+    }
+  }
+
+  if (toDelete.length > 0) {
+    const deleteStmt = db.prepare("DELETE FROM covers WHERE cover_key = ?");
+    const deleteTransaction = db.transaction((rows) => {
+      for (const r of rows) {
+        deleteStmt.run(r.cover_key);
+      }
+    });
+
+    try {
+      deleteTransaction(toDelete);
+    } catch (err) {
+      console.warn(`[Cleanup] Errore DB transaction eliminazione covers:`, err.message);
+    }
+
+    for (const row of toDelete) {
+      try {
+        const filePath = path.join(COVERS_DIR, row.filename);
+        if (fs.existsSync(filePath)) {
+          fs.unlinkSync(filePath);
+        }
+        deletedCount++;
+      } catch (fileErr) {
+        console.warn(`[Cleanup] Errore rimozione file cover ${row.filename}:`, fileErr.message);
+      }
+    }
+  }
+
+  // Also clean unreferenced/old assets (> 14 days old)
+  try {
+    const fourteenDaysAgo = Date.now() - (14 * 24 * 60 * 60 * 1000);
+    const staleAssets = db.prepare("SELECT url, filename FROM assets WHERE updated_at < ?").all(fourteenDaysAgo);
+    if (staleAssets.length > 0) {
+      const delAsset = db.prepare("DELETE FROM assets WHERE url = ?");
+      for (const a of staleAssets) {
+        delAsset.run(a.url);
+        try {
+          const aPath = path.join(ASSETS_DIR, a.filename);
+          if (fs.existsSync(aPath)) fs.unlinkSync(aPath);
+        } catch {}
+      }
+    }
+  } catch (assetErr) {
+    console.warn(`[Cleanup] Errore pulizia asset obsoleti:`, assetErr.message);
+  }
+
+  return deletedCount;
+}
+
 export function getDbStats() {
   const coversCount = stmts.countCovers.get()?.count || 0;
   const assetsCount = stmts.countAssets.get()?.count || 0;
@@ -245,3 +327,4 @@ export function getDbStats() {
 }
 
 export { DATA_DIR, COVERS_DIR, ASSETS_DIR };
+
