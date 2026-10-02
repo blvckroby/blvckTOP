@@ -371,6 +371,7 @@
           <span class="chip">Landscape: backdrop 16:9 + numero</span>
           <span class="chip">Portrait: poster verticale + numero</span>
           <span class="chip">Glow automatico in base alla piattaforma</span>
+          <span class="chip">Sfondo trasparente oppure nero #000</span>
         </div>
       </div>
 
@@ -449,13 +450,15 @@
       return catalogCards().flatMap(card => {
         const checkbox = card.querySelector(".catalog-check");
         const select = card.querySelector(".shape-select");
+        const backgroundSelect = card.querySelector(".background-select");
 
         if (!checkbox.checked) return [];
 
         return [{
           id: checkbox.dataset.id,
           type: checkbox.dataset.type,
-          shape: select.value
+          shape: select.value,
+          canvasBackground: backgroundSelect.value
         }];
       });
     }
@@ -517,11 +520,32 @@
           select.append(landscape, portrait);
           formatRow.append(formatLabel, select);
 
+          const bgRow = document.createElement("div");
+          bgRow.className = "format-row";
+
+          const bgLabel = document.createElement("span");
+          bgLabel.className = "format-label";
+          bgLabel.textContent = "Sfondo";
+
+          const bgSelect = document.createElement("select");
+          bgSelect.className = "background-select";
+
+          const transparent = document.createElement("option");
+          transparent.value = "transparent";
+          transparent.textContent = "Trasparente";
+
+          const black = document.createElement("option");
+          black.value = "black";
+          black.textContent = "Nero #000";
+
+          bgSelect.append(transparent, black);
+          bgRow.append(bgLabel, bgSelect);
+
           checkbox.addEventListener("change", () => {
             updateCardState(card);
           });
 
-          card.append(checkbox, main, formatRow);
+          card.append(checkbox, main, formatRow, bgRow);
           catalogsEl.append(card);
         });
       } catch (err) {
