@@ -320,6 +320,7 @@ app.get("/c/:token/manifest.json", async (req, res) => {
       version: "2.0.0",
       name: "blvckTOP",
       description: "Top 10 personalizzate con cover numerate",
+      logo: "https://tudumext.com/projects/top-10/Top10Badge.svg",
       catalogs,
       resources: Array.from(
         new Set([...(source.resources || []), "catalog", "meta"])

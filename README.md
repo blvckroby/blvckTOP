@@ -1,8 +1,8 @@
-# blvckTOP v7
+# blvckTOP v7.1
 
 Addon configurabile per Nuvio/Stremio con Top 10 numerate.
 
-## Novità v7
+## Novità v7.1
 
 Ogni utente può scegliere **per ogni catalogo**:
 
@@ -92,3 +92,29 @@ La v7 continua a interpretare i vecchi token senza `shape` come `landscape`.
 
 Per usare la nuova modalità portrait, gli utenti devono generare un nuovo manifest
 dalla home.
+
+
+## Ritocchi grafici v7.1
+
+### Portrait più grande
+
+La card portrait passa a:
+
+```js
+width: 680
+height: 1020
+```
+
+con canvas 1000×1500, così riempie meglio lo spazio.
+
+### Numero outline
+
+Il numero ora è:
+
+- interno trasparente;
+- solo bordo;
+- bordo sfumato bianco → grigio chiaro;
+- glow colorato dietro in base alla piattaforma;
+- stroke leggermente più spesso per mantenere leggibilità su TV.
+
+Il fill del numero è quindi completamente vuoto.

@@ -34,24 +34,24 @@ const LAYOUTS = {
   poster: {
     canvas: { width: 1000, height: 1500 },
     card: {
-      x: 270,
-      y: 235,
-      width: 620,
-      height: 930,
-      radius: 34
+      x: 235,
+      y: 190,
+      width: 680,
+      height: 1020,
+      radius: 36
     },
     number: {
-      xSingle: 34,
-      xDouble: 8,
-      sizeSingle: 350,
-      sizeDouble: 285,
+      xSingle: 28,
+      xDouble: 4,
+      sizeSingle: 330,
+      sizeDouble: 270,
       opticalDrop: 14
     },
     logo: {
-      maxWidth: 320,
-      maxHeight: 130,
-      left: 38,
-      bottom: 40
+      maxWidth: 350,
+      maxHeight: 145,
+      left: 40,
+      bottom: 42
     }
   }
 };
@@ -142,24 +142,29 @@ function numberSvg(rank, layout, accent) {
   const centerY = card.y + card.height / 2;
   const y = centerY + fontSize * 0.34 + number.opticalDrop;
 
+  const strokeWidth = layout === LAYOUTS.poster ? 10 : 11;
+
   return Buffer.from(`
     <svg width="${canvas.width}" height="${canvas.height}" xmlns="http://www.w3.org/2000/svg">
       <defs>
-        <linearGradient id="numberFill" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="#FFFFFF" stop-opacity="1"/>
-          <stop offset="100%" stop-color="#D7D9DE" stop-opacity=".88"/>
+        <linearGradient id="strokeGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#FFFFFF" stop-opacity=".98"/>
+          <stop offset="48%" stop-color="#F1F2F4" stop-opacity=".94"/>
+          <stop offset="100%" stop-color="#C9CDD3" stop-opacity=".86"/>
         </linearGradient>
 
-        <filter id="brandGlow" x="-100%" y="-100%" width="300%" height="300%">
-          <feGaussianBlur stdDeviation="24" result="blur"/>
-          <feFlood flood-color="${accent}" flood-opacity=".72" result="glowColor"/>
-          <feComposite in="glowColor" in2="blur" operator="in" result="coloredGlow"/>
-          <feGaussianBlur in="SourceAlpha" stdDeviation="6" result="softShadow"/>
-          <feFlood flood-color="${accent}" flood-opacity=".48" result="softColor"/>
-          <feComposite in="softColor" in2="softShadow" operator="in" result="softGlow"/>
+        <filter id="brandGlow" x="-120%" y="-120%" width="340%" height="340%">
+          <feGaussianBlur stdDeviation="30" result="bigBlur"/>
+          <feFlood flood-color="${accent}" flood-opacity=".72" result="brandColor"/>
+          <feComposite in="brandColor" in2="bigBlur" operator="in" result="bigGlow"/>
+
+          <feGaussianBlur in="SourceAlpha" stdDeviation="11" result="midBlur"/>
+          <feFlood flood-color="${accent}" flood-opacity=".52" result="midColor"/>
+          <feComposite in="midColor" in2="midBlur" operator="in" result="midGlow"/>
+
           <feMerge>
-            <feMergeNode in="coloredGlow"/>
-            <feMergeNode in="softGlow"/>
+            <feMergeNode in="bigGlow"/>
+            <feMergeNode in="midGlow"/>
             <feMergeNode in="SourceGraphic"/>
           </feMerge>
         </filter>
@@ -172,7 +177,11 @@ function numberSvg(rank, layout, accent) {
         font-size="${fontSize}"
         font-weight="800"
         letter-spacing="-16"
-        fill="url(#numberFill)"
+        fill="none"
+        stroke="url(#strokeGrad)"
+        stroke-width="${strokeWidth}"
+        stroke-linejoin="round"
+        paint-order="stroke"
         filter="url(#brandGlow)"
       >${rank}</text>
     </svg>
