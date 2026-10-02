@@ -48,7 +48,8 @@ export function computeCoverKey({
   accent,
   artworkUrl,
   genre,
-  rating
+  rating,
+  showLogo
 }) {
   return [
     rank,
@@ -60,7 +61,8 @@ export function computeCoverKey({
     accent || "#FFFFFF",
     artworkUrl || "",
     genre || "",
-    rating || ""
+    rating || "",
+    showLogo !== false && showLogo !== "false" ? "1" : "0"
   ].join("|");
 }
 
@@ -76,7 +78,7 @@ export async function preloadAllCatalogs(sourceManifestUrl, options = {}) {
 
   try {
     const manifestResponse = await fetch(sourceManifestUrl, {
-      headers: { "User-Agent": "blvckTOP/7.2" }
+      headers: { "User-Agent": "blvckTOP/7.3" }
     });
 
     if (!manifestResponse.ok) {
@@ -104,7 +106,7 @@ export async function preloadAllCatalogs(sourceManifestUrl, options = {}) {
 
       try {
         const catRes = await fetch(catalogUrl, {
-          headers: { "User-Agent": "blvckTOP/7.2" }
+          headers: { "User-Agent": "blvckTOP/7.3" }
         });
 
         if (!catRes.ok) continue;
@@ -126,10 +128,11 @@ export async function preloadAllCatalogs(sourceManifestUrl, options = {}) {
 
             const images = await getTmdbImages(type, tmdbId, DEFAULT_TMDB_KEY);
 
-            // Pre-generate for standard combinations (both with and without metadata)
+            // Pre-generate for standard combinations
             const shapes = ["landscape", "poster"];
             const backgrounds = ["transparent", "black", "stremio", "provider"];
             const metaFlags = [true, false];
+            const logoFlags = [true, false];
 
             for (const shape of shapes) {
               const artworkUrl = shape === "poster"
@@ -138,44 +141,48 @@ export async function preloadAllCatalogs(sourceManifestUrl, options = {}) {
 
               for (const canvasBackground of backgrounds) {
                 for (const showMeta of metaFlags) {
-                  const effectiveGenre = showMeta ? genre : "";
-                  const effectiveRating = showMeta ? rating : "";
+                  for (const showLogo of logoFlags) {
+                    const effectiveGenre = showMeta ? genre : "";
+                    const effectiveRating = showMeta ? rating : "";
 
-                  const coverKey = computeCoverKey({
-                    rank,
-                    type: type === "series" ? "tv" : type,
-                    shape,
-                    tmdbId,
-                    catalogId: catId,
-                    canvasBackground,
-                    accent,
-                    artworkUrl,
-                    genre: effectiveGenre,
-                    rating: effectiveRating
-                  });
-
-                  const existing = getCoverFilePath(coverKey);
-                  if (existing) {
-                    skippedCovers++;
-                    continue;
-                  }
-
-                  try {
-                    const pngBuffer = await createTopCover({
+                    const coverKey = computeCoverKey({
                       rank,
-                      artworkUrl,
+                      type: type === "series" ? "tv" : type,
                       shape,
-                      accent,
+                      tmdbId,
+                      catalogId: catId,
                       canvasBackground,
+                      accent,
+                      artworkUrl,
                       genre: effectiveGenre,
                       rating: effectiveRating,
-                      catalogId: catId
+                      showLogo
                     });
 
-                    saveCoverBuffer(coverKey, pngBuffer);
-                    newCoversGenerated++;
-                  } catch (coverErr) {
-                    console.warn(`[Preload] Errore generazione cover ${meta.name || tmdbId} #${rank}:`, coverErr.message);
+                    const existing = getCoverFilePath(coverKey);
+                    if (existing) {
+                      skippedCovers++;
+                      continue;
+                    }
+
+                    try {
+                      const pngBuffer = await createTopCover({
+                        rank,
+                        artworkUrl,
+                        shape,
+                        accent,
+                        canvasBackground,
+                        genre: effectiveGenre,
+                        rating: effectiveRating,
+                        catalogId: catId,
+                        showLogo
+                      });
+
+                      saveCoverBuffer(coverKey, pngBuffer);
+                      newCoversGenerated++;
+                    } catch (coverErr) {
+                      console.warn(`[Preload] Errore generazione cover ${meta.name || tmdbId} #${rank}:`, coverErr.message);
+                    }
                   }
                 }
               }

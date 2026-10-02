@@ -177,6 +177,7 @@ async function buildCoverUrl(
   const shape = normalizeShape(catalog.shape);
   const canvasBackground = normalizeCanvasBackground(catalog.canvasBackground);
   const showMeta = catalog.showMeta !== false && catalog.showMeta !== "false";
+  const showLogo = catalog.showLogo !== false && catalog.showLogo !== "false";
   const genre = showMeta ? (Array.isArray(meta?.genres) && meta.genres.length > 0 ? meta.genres[0] : (meta?.genre || "")) : "";
   const rating = showMeta ? (meta?.imdbRating || meta?.rating || "") : "";
 
@@ -196,9 +197,10 @@ async function buildCoverUrl(
         catalogId: catalog.id || "",
         canvasBackground,
         showMeta: String(showMeta),
+        showLogo: String(showLogo),
         genre: genre || "",
         rating: rating || "",
-        v: "7.2.9"
+        v: "7.3.0"
       });
 
       return `${publicBase(req)}/c/${token}/top-cover?${qs}`;
@@ -220,9 +222,10 @@ async function buildCoverUrl(
     catalogId: catalog.id || "",
     canvasBackground,
     showMeta: String(showMeta),
+    showLogo: String(showLogo),
     genre: genre || "",
     rating: rating || "",
-    v: "7.2.9"
+    v: "7.3.0"
   });
 
   return `${publicBase(req)}/c/${token}/top-cover?${qs}`;
@@ -293,7 +296,8 @@ app.post("/api/generate", async (req, res) => {
           name: sourceCatalog.name || sourceCatalog.id,
           shape: normalizeShape(requestedCatalog.shape),
           canvasBackground: normalizeCanvasBackground(requestedCatalog.canvasBackground),
-          showMeta: requestedCatalog.showMeta !== false && requestedCatalog.showMeta !== "false"
+          showMeta: requestedCatalog.showMeta !== false && requestedCatalog.showMeta !== "false",
+          showLogo: requestedCatalog.showLogo !== false && requestedCatalog.showLogo !== "false"
         };
       })
       .filter(Boolean);
@@ -523,10 +527,14 @@ app.get(["/c/:token/top-cover", "/top-cover"], async (req, res) => {
     const canvasBackground = normalizeCanvasBackground(req.query.canvasBackground);
 
     const showMetaParam = req.query.showMeta;
+    const showLogoParam = req.query.showLogo;
     const catalog = config?.catalogs?.find(c => c.id === catalogId) || { id: catalogId };
     const showMeta = showMetaParam !== undefined
       ? (showMetaParam !== "false" && showMetaParam !== "0" && showMetaParam !== false)
       : (catalog.showMeta !== false && catalog.showMeta !== "false");
+    const showLogo = showLogoParam !== undefined
+      ? (showLogoParam !== "false" && showLogoParam !== "0" && showLogoParam !== false)
+      : (catalog.showLogo !== false && catalog.showLogo !== "false");
 
     let artworkUrl = req.query.artwork ? String(req.query.artwork) : null;
     let resolvedTmdbId = tmdbId;
@@ -598,7 +606,8 @@ app.get(["/c/:token/top-cover", "/top-cover"], async (req, res) => {
       accent,
       artworkUrl,
       genre,
-      rating
+      rating,
+      showLogo
     });
 
     // 1. Check persistent disk cache (instant response via sendFile)
@@ -628,7 +637,8 @@ app.get(["/c/:token/top-cover", "/top-cover"], async (req, res) => {
         canvasBackground,
         genre,
         rating,
-        catalogId
+        catalogId,
+        showLogo
       });
 
       // Persist to disk and DB
