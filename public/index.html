@@ -58,15 +58,22 @@
       color: #cdd2db; font-size: 12px; margin-bottom: 22px;
     }
     .badge b { width: 7px; height: 7px; border-radius: 50%; background: var(--good); box-shadow: 0 0 10px var(--good); }
-    h1 { font-size: clamp(40px, 9vw, 84px); line-height: .96; letter-spacing: -.06em; margin: 0 0 20px; font-weight: 800; }
-    .hero p { color: var(--muted); font-size: clamp(15px, 2.4vw, 18px); line-height: 1.65; margin: 0 auto; max-width: 600px; }
-    .cta { display: flex; justify-content: center; gap: 10px; margin-top: 26px; flex-wrap: wrap; }
+    h1 { font-size: clamp(44px, 10vw, 96px); line-height: .94; letter-spacing: -.065em; margin: 0 0 22px; font-weight: 800; }
+    .hero p { color: var(--muted); font-size: clamp(15px, 2.4vw, 18px); line-height: 1.65; margin: 0 auto; max-width: 640px; }
+    .cta a svg { width: 18px; height: 18px; margin-left: 8px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+    .flow { list-style: none; display: flex; justify-content: center; gap: 10px; margin: 30px 0 0; padding: 0; flex-wrap: wrap; }
+    .flow li { display: inline-flex; align-items: center; gap: 9px; padding: 8px 15px 8px 8px; border-radius: 999px; font-size: 13px; font-weight: 600; color: #dfe3ea;
+      background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.025)); border: 1px solid rgba(255,255,255,.1); }
+    .flow li b { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; font-size: 12px; color: #fff; background: var(--grad); }
+    .target img.wm { width: auto; height: 14px; max-width: 70px; object-fit: contain; filter: brightness(0) invert(1); }
+    .install a img.wm { width: auto; height: 16px; max-width: 80px; }
+    .cta { display: flex; justify-content: center; gap: 10px; margin-top: 28px; flex-wrap: wrap; }
     .cta a { display: inline-flex; align-items: center; justify-content: center; height: 48px; padding: 0 22px; border-radius: 999px;
       font-weight: 700; font-size: 15px; text-decoration: none; transition: transform .25s var(--ease), background .2s; }
     .cta .solid { background: #f4f5f7; color: #07090c; }
     .cta .line { color: #e4e7ec; border: 1px solid var(--border); background: rgba(255,255,255,.04); }
     .cta a:hover { transform: translateY(-2px); }
-    .targets { display: flex; justify-content: center; gap: 8px; margin-top: 22px; flex-wrap: wrap; }
+    .targets { display: flex; justify-content: center; gap: 8px; margin-top: 18px; flex-wrap: wrap; }
     .target {
       display: inline-flex; align-items: center; gap: 8px; padding: 7px 13px;
       border-radius: 999px; border: 1px solid var(--border); background: rgba(255,255,255,.04);
@@ -101,11 +108,15 @@
     .search { flex: 1 1 200px; min-width: 0; }
     .counter { margin-left: auto; font-size: 13px; color: var(--muted); }
     .counter b { color: #fff; }
-    .seg { display: inline-flex; padding: 3px; border-radius: 12px; background: rgba(0,0,0,.3); border: 1px solid var(--border); }
-    .seg button { background: transparent; color: var(--muted); padding: 7px 12px; border-radius: 9px; font-size: 13px; }
-    .seg button.on { background: rgba(255,255,255,.12); color: #fff; }
+    :root { --ctl-h: 42px; --ctl-r: 13px; }
+    .seg { display: inline-flex; align-items: stretch; height: var(--ctl-h); padding: 3px; border-radius: var(--ctl-r); background: rgba(255,255,255,.045); border: 1px solid var(--border); }
+    .seg button { display: inline-flex; align-items: center; background: transparent; color: var(--muted); padding: 0 14px; border-radius: calc(var(--ctl-r) - 4px); font-size: 13px; font-weight: 700; }
+    .seg button.on { background: rgba(255,255,255,.14); color: #fff; }
 
-    .ghost { border: 1px solid var(--border); background: rgba(255,255,255,.045); color: #dce0e7; }
+    .ghost { display: inline-flex; align-items: center; justify-content: center; height: var(--ctl-h); padding: 0 16px !important;
+      font-size: 13px !important; font-weight: 700; border-radius: var(--ctl-r); border: 1px solid var(--border); background: rgba(255,255,255,.045); color: #dce0e7; }
+    .ghost:hover { background: rgba(255,255,255,.09); border-color: rgba(255,255,255,.2); }
+    .toolbar .search { height: var(--ctl-h); padding-top: 0; padding-bottom: 0; border-radius: var(--ctl-r); }
 
     .catalogs { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; }
     .catalog {
@@ -123,15 +134,25 @@
     .catalog > * { position: relative; }
     .catalog-head { display: flex; gap: 13px; align-items: center; cursor: pointer; }
     .catalog-head input { position: absolute; opacity: 0; pointer-events: none; }
-    .opts { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .opts { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .opt { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
     .opt > span { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
-    .opt .seg { display: flex; }
-    .opt .seg button { flex: 1; padding: 7px 6px; font-size: 12px; }
+    .picks { display: flex; gap: 8px; }
+    .pick { flex: 1; display: grid; place-items: center; height: 46px; padding: 0 !important; border-radius: 12px;
+      background: rgba(0,0,0,.28); border: 1px solid var(--border); color: #7d8594; }
+    .pick:hover { color: #fff; border-color: rgba(255,255,255,.25); }
+    .pick.on { color: #fff; background: rgba(255,255,255,.1); border-color: var(--brand); box-shadow: 0 0 0 1px var(--brand), 0 6px 18px color-mix(in srgb, var(--brand) 30%, transparent); }
+    .shape-ic { display: block; border: 2px solid currentColor; border-radius: 4px; }
+    .shape-ic.land { width: 30px; height: 17px; }
+    .shape-ic.port { width: 17px; height: 28px; }
+    .dot { display: block; width: 26px; height: 26px; border-radius: 50%; border: 2px solid rgba(255,255,255,.45); }
+    .dot.tr { background: conic-gradient(#4a4f5a 25%, #9aa0ac 0 50%, #4a4f5a 0 75%, #9aa0ac 0) 0 0 / 12px 12px; }
+    .dot.bk { background: #000; }
+    .pick.on .dot { border-color: #fff; }
     .catalog:not(:has(.catalog-head input:checked)) .opts { opacity: .4; pointer-events: none; }
     .bulk { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 14px; }
     .bulk > span { font-size: 12px; color: var(--muted); font-weight: 700; margin-right: 2px; }
-    .bulk .ghost { padding: 8px 12px; font-size: 13px; }
+
     .logo {
       width: 52px; height: 52px; aspect-ratio: 1; flex: 0 0 auto; display: grid; place-items: center;
       border-radius: 14px; box-shadow: 0 6px 18px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.25);
@@ -303,18 +324,26 @@
   <main class="page">
     <header class="hero">
       <span class="badge"><b></b> Addon per Nuvio &amp; Stremio</span>
-      <h1>Crea il tuo <span>Top&nbsp;10</span>.</h1>
+      <h1>Crea il tuo <span>Top&nbsp;10</span></h1>
       <p>
-        Scegli le classifiche dei tuoi servizi, collega la tua chiave TMDB e genera
-        un manifest personale con cover landscape o portrait, sfondo trasparente o nero, pronto da installare.
+        Le classifiche dei tuoi servizi in streaming, con cover personalizzate:
+        landscape o portrait, sfondo trasparente o nero. Collega la tua chiave TMDB
+        e genera il manifest da installare.
       </p>
       <div class="cta">
-        <a class="solid" href="#start">Inizia ora</a>
+        <a class="solid" href="#start">Inizia ora
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M6 13l6 6 6-6"/></svg></a>
+        <a class="line" href="#key">Ho già la chiave TMDB</a>
       </div>
+      <ol class="flow" aria-label="Come funziona">
+        <li><b>1</b>Scegli le classifiche</li>
+        <li><b>2</b>Collega TMDB</li>
+        <li><b>3</b>Installa l'addon</li>
+      </ol>
       <div class="targets">
-        <span class="target"><img data-slug="stremio" alt="" />Stremio</span>
-        <span class="target">▶ Nuvio</span>
-        <span class="target"><img class="tmdb-pill" data-slug="tmdb" alt="TMDB" />Powered by TMDB</span>
+        <span class="target"><img data-logo="stremio" alt="" />Stremio</span>
+        <span class="target"><img class="wm" data-logo="nuvio" alt="Nuvio" /></span>
+        <span class="target"><img class="tmdb-pill" data-logo="tmdb" alt="TMDB" />Powered by TMDB</span>
       </div>
     </header>
 
@@ -354,11 +383,11 @@
       </div>
 
       <!-- STEP 2 -->
-      <div class="step">
+      <div class="step" id="key">
         <div class="step-title"><span class="eyebrow">Chiave TMDB</span><h2>Collega il tuo account</h2></div>
 
         <div class="key-row">
-          <img class="tmdb-logo" data-slug="tmdb" alt="TMDB" />
+          <img class="tmdb-logo" data-logo="tmdb" alt="TMDB" />
           <p>Chiave gratuita, usata solo per backdrop e logo dei titoli.</p>
           <a href="https://www.themoviedb.org/settings/api" target="_blank" rel="noopener noreferrer">Ottieni la chiave
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg></a>
@@ -409,8 +438,8 @@
             <button id="copyBtn" type="button">Copia</button>
           </div>
           <div class="install">
-            <a id="stremioBtn" class="stremio" href="#"><img data-slug="stremio" data-white="1" alt="" />Installa su Stremio</a>
-            <a id="nuvioBtn" class="nuvio" href="#">▶ Installa su Nuvio</a>
+            <a id="stremioBtn" class="stremio" href="#"><img data-logo="stremio" alt="" />Installa su Stremio</a>
+            <a id="nuvioBtn" class="nuvio" href="#"><img class="wm" data-logo="nuvio" data-white="1" alt="" />Installa su Nuvio</a>
           </div>
           <p class="hint">
             In Nuvio: <b>Impostazioni → Addon → Aggiungi</b> e incolla l'URL se il pulsante non si apre.
@@ -437,6 +466,12 @@
     const svgUri = (w, h, body) => "data:image/svg+xml;utf8," + encodeURIComponent(
       `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}"><g fill="#fff" font-family="Arial Black, Arial, Helvetica, sans-serif" font-weight="900">${body}</g></svg>`);
     const LOGO = {
+      prime:   "https://upload.wikimedia.org/wikipedia/commons/c/ca/Amazon_Prime_Video_logo_%282024%29.svg",
+      infinity:"https://upload.wikimedia.org/wikipedia/commons/2/2f/Mediaset_Infinity_logo.svg",
+      tim:     "https://upload.wikimedia.org/wikipedia/commons/a/a3/TIMvision_logo_%282026-present%29.svg",
+      discovery:"https://static.wikia.nocookie.net/logopedia/images/e/e9/Discovery_plus_ico.svg/revision/latest/scale-to-width-down/250?cb=20210726040631",
+      stremio: "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/stremio.svg",
+      nuvio:   "https://nuvio.tv/assets/nuvio-app-logo-wordmark.webp",
       hbomax:  "https://upload.wikimedia.org/wikipedia/commons/b/b3/HBO_Max_%282025%29.svg",
       rakuten: "https://upload.wikimedia.org/wikipedia/commons/e/e5/Rakuten_TV_logo.svg",
       chili:   svgUri(120, 48, '<text x="60" y="36" font-size="34" text-anchor="middle" letter-spacing="1">CHILI</text>'),
@@ -451,7 +486,9 @@
       [/disney/i,             { url: LOGO.disney },  "113CCF"],
       [/rai\s?play|\brai\b/i, { url: LOGO.raiplay }, "0094D9"],
       [/\bnow\b|now ?tv/i,   { url: LOGO.now },     "00D1B2"],
-      [/prime|amazon/i,       "primevideo",      "00A8E1"],
+      [/prime|amazon/i,       { url: LOGO.prime },   "00A8E1"],
+      [/tim\s?vision|\btim\b/i, { url: LOGO.tim },    "1B3FA0"],
+      [/discovery/i,          { url: LOGO.discovery }, "2175D9"],
       [/hbo|\bmax\b/i,        { url: LOGO.hbomax },  "5822B4"],
       [/rakuten/i,            { url: LOGO.rakuten }, "BF0000"],
       [/chili/i,              { url: LOGO.chili },   "E4002B"],
@@ -463,7 +500,7 @@
       [/youtube/i,            "youtube",         "FF0000"],
       [/sky/i,                "sky",             "0072C9"],
       [/dazn/i,               "dazn",            "F8F8F5"],
-      [/mediaset|canale ?5|infinity/i, "mediaset", "FFD500"],
+      [/infinity|mediaset|canale ?5/i, { url: LOGO.infinity }, "15171d"],
       [/plex/i,               "plex",            "E5A00D"],
       [/tmdb|themoviedb/i,    { url: LOGO.tmdb },    "01B4E4"],
       [/imdb/i,               "imdb",            "F5C518"],
@@ -509,14 +546,15 @@
       return { box, color: brand.color };
     }
 
-    // loghi statici (Stremio / TMDB) nell'header e nei pulsanti
-    document.querySelectorAll("img[data-slug]").forEach(img => {
-      img.src = img.dataset.slug === "tmdb" ? LOGO.tmdb : `${ICON_CDN}${img.dataset.slug}.svg`;
+    // loghi statici (Stremio / Nuvio / TMDB) nell'header e nei pulsanti
+    document.querySelectorAll("img[data-logo]").forEach(img => {
+      img.src = LOGO[img.dataset.logo];
       img.referrerPolicy = "no-referrer";
-      if (img.dataset.white) img.style.filter = "invert(1) brightness(2)";
-      else if (img.dataset.slug !== "tmdb" && img.closest(".target")) img.style.filter = "invert(1) brightness(2)";
+      if (img.dataset.white) img.style.filter = "brightness(0) invert(1)";
       img.onerror = () => {
+        const t = img.closest(".target, .install a");
         img.remove();
+        if (t && !t.textContent.trim()) t.textContent = "Nuvio";
       };
     });
 
@@ -545,27 +583,30 @@
       }));
     }
 
-    function makeSeg(title, c, prop, options) {
+    function makePick(title, c, prop, options) {
       const wrap = document.createElement("div");
       wrap.className = "opt";
       const span = document.createElement("span");
       span.textContent = title;
-      const seg = document.createElement("div");
-      seg.className = "seg";
-      seg.setAttribute("role", "group");
-      seg.setAttribute("aria-label", title);
-      options.forEach(([value, text]) => {
+      const row = document.createElement("div");
+      row.className = "picks";
+      row.setAttribute("role", "group");
+      row.setAttribute("aria-label", title);
+      options.forEach(([value, text, icon]) => {
         const b = document.createElement("button");
         b.type = "button";
-        b.textContent = text;
+        b.title = text;
+        b.setAttribute("aria-label", text);
+        b.innerHTML = `<i class="${icon}"></i>`;
+        b.classList.add("pick");
         b.classList.toggle("on", c[prop] === value);
         b.addEventListener("click", () => {
           c[prop] = value;
-          seg.querySelectorAll("button").forEach(x => x.classList.toggle("on", x === b));
+          row.querySelectorAll("button").forEach(x => x.classList.toggle("on", x === b));
         });
-        seg.append(b);
+        row.append(b);
       });
-      wrap.append(span, seg);
+      wrap.append(span, row);
       return wrap;
     }
 
@@ -614,8 +655,8 @@
         const opts = document.createElement("div");
         opts.className = "opts";
         opts.append(
-          makeSeg("Formato", c, "shape", [["landscape", "Landscape"], ["poster", "Portrait"]]),
-          makeSeg("Sfondo", c, "canvasBackground", [["transparent", "Trasparente"], ["black", "Nero"]])
+          makePick("Formato", c, "shape", [["landscape", "Landscape (orizzontale)", "shape-ic land"], ["poster", "Portrait (verticale)", "shape-ic port"]]),
+          makePick("Sfondo", c, "canvasBackground", [["transparent", "Sfondo trasparente", "dot tr"], ["black", "Sfondo nero", "dot bk"]])
         );
 
         card.append(label, opts);
@@ -741,8 +782,8 @@
 
     /* ---------- v3: marquee loghi + spotlight ---------- */
     (function () {
-      const items = ["netflix", LOGO.disney, "primevideo", LOGO.now, LOGO.hbomax, LOGO.raiplay, "appletv",
-        "paramountplus", "crunchyroll", LOGO.rakuten, LOGO.chili, "stremio", LOGO.tmdb];
+      const items = ["netflix", LOGO.disney, LOGO.prime, LOGO.now, LOGO.hbomax, LOGO.raiplay, "appletv",
+        LOGO.infinity, LOGO.tim, LOGO.discovery, "paramountplus", LOGO.rakuten, LOGO.chili, LOGO.stremio, LOGO.nuvio, LOGO.tmdb];
       const row = items.map(src => {
         const custom = src.startsWith("http") || src.startsWith("data:");
         const url = custom ? src : `${ICON_CDN}${src}.svg`;
