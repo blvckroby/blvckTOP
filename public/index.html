@@ -625,7 +625,7 @@
       [/prime|amazon/i,        { url: LOGO.prime, big: true, color: "#00A8E1" }],
       [/tim\s?vision|\btim\b/i,{ url: LOGO.tim, wide: true, color: "#003399" }],
       [/discovery/i,           { url: LOGO.discovery, big: true, native: true, color: "#003399" }],
-      [/hbo|\bmax\b/i,         { id: "max", color: "#7D57FF" }],
+      [/hbo|\bmax\b/i,         { id: "hbo", color: "#7D57FF" }],
       [/rakuten/i,             { id: "rakuten", color: "#BF0000" }],
       [/chili/i,               { url: LOGO.chili, wide: true, color: "#FF5A1F" }],
       [/apple/i,               { id: "appletv", color: "#F4F5F7" }],
@@ -1002,7 +1002,7 @@
 
     /* ---------- banda loghi ---------- */
     (function () {
-      const items = ["netflix", LOGO.disney, LOGO.prime, LOGO.now, LOGO.hbomax, LOGO.raiplay, "appletv",
+      const items = ["netflix", LOGO.disney, LOGO.prime, LOGO.now, "hbo", LOGO.raiplay, "appletv",
         LOGO.infinity, LOGO.tim, LOGO.discovery, "paramountplus", LOGO.rakuten, LOGO.chili];
       const row = items.map(src => {
         const url = /^(https?:|data:)/.test(src) ? src : `${ICON_CDN}${src}.svg`;
@@ -1016,7 +1016,7 @@
       const base = "/top-cover";
       const ids = [1423191, 1377237, 1283515, 977942];
       $("covers").innerHTML = ids.map((id, i) =>
-        `<div class="cv"><span class="poster"><img src="${base}?rank=${i + 1}&type=movie&tmdbId=${id}&v=7.2.2" alt="" decoding="async" referrerpolicy="no-referrer" onerror="this.remove()" /></span></div>`
+        `<div class="cv"><span class="poster"><img src="${base}?rank=${i + 1}&type=movie&tmdbId=${id}&v=7.2.4" alt="" decoding="async" referrerpolicy="no-referrer" onerror="this.remove()" /></span></div>`
       ).join("");
     })();
 
