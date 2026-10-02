@@ -16,3 +16,4 @@ services:
       - NODE_ENV=production
     volumes:
       - ./data:/app/data
+      - ./public:/app/public

@@ -57,7 +57,15 @@ const __dirname = path.dirname(__filename);
 
 app.set("trust proxy", true);
 app.use(express.json({ limit: "32kb" }));
-app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static(path.join(__dirname, "public"), {
+  setHeaders: (res, filePath) => {
+    if (filePath.endsWith(".html")) {
+      res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+      res.setHeader("Pragma", "no-cache");
+      res.setHeader("Expires", "0");
+    }
+  }
+}));
 
 const pendingCovers = new Map();
 const JSON_TTL = 15 * 60 * 1000; // 15 minuti cache per i JSON
