@@ -200,7 +200,7 @@ async function buildCoverUrl(
         showLogo: String(showLogo),
         genre: genre || "",
         rating: rating || "",
-        v: "7.3.0"
+        v: "7.4.0"
       });
 
       return `${publicBase(req)}/c/${token}/top-cover?${qs}`;
@@ -225,7 +225,7 @@ async function buildCoverUrl(
     showLogo: String(showLogo),
     genre: genre || "",
     rating: rating || "",
-    v: "7.3.0"
+    v: "7.4.0"
   });
 
   return `${publicBase(req)}/c/${token}/top-cover?${qs}`;

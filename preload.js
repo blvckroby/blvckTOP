@@ -38,6 +38,8 @@ function catalogAccent(catalog = {}) {
   return "#8C75FF";
 }
 
+export const COVER_VERSION = "v7.4.0";
+
 export function computeCoverKey({
   rank,
   type,
@@ -52,6 +54,7 @@ export function computeCoverKey({
   showLogo
 }) {
   return [
+    COVER_VERSION,
     rank,
     type,
     shape,
