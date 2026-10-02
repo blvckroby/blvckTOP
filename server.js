@@ -22,6 +22,7 @@ import {
 
 import {
   getTmdbImages,
+  getTmdbDetails,
   chooseBackdrop,
   choosePoster,
   resolveTmdbId,
@@ -177,7 +178,7 @@ async function buildCoverUrl(
             : "transparent",
         genre: genre || "",
         rating: rating || "",
-        v: "4"
+        v: "7.2.1"
       });
 
       return `${publicBase(req)}/c/${token}/top-cover?${qs}`;
@@ -203,7 +204,7 @@ async function buildCoverUrl(
         : "transparent",
     genre: genre || "",
     rating: rating || "",
-    v: "4"
+    v: "7.2.1"
   });
 
   return `${publicBase(req)}/c/${token}/top-cover?${qs}`;
@@ -482,6 +483,19 @@ app.get(["/c/:token/top-cover", "/top-cover"], async (req, res) => {
         }
       } catch (catErr) {
         console.warn(`[top-cover] Errore lookup catalogId ${catalogId} rank ${rank}:`, catErr.message);
+      }
+    }
+
+    // If genre or rating are still missing, but tmdbId is resolved, fetch TMDB details
+    if (resolvedTmdbId && (!genre || !rating)) {
+      try {
+        const details = await getTmdbDetails(effectiveType, resolvedTmdbId, DEFAULT_TMDB_KEY);
+        if (details) {
+          if (!genre && details.genre) genre = details.genre;
+          if (!rating && details.rating) rating = details.rating;
+        }
+      } catch (detErr) {
+        console.warn(`Errore fetch details TMDB ${resolvedTmdbId}:`, detErr.message);
       }
     }
 

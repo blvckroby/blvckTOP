@@ -51,6 +51,23 @@ export async function getTmdbImages(type, tmdbId, apiKey = DEFAULT_TMDB_KEY) {
   return data;
 }
 
+export async function getTmdbDetails(type, tmdbId, apiKey = DEFAULT_TMDB_KEY) {
+  if (!tmdbId) return null;
+  const mediaType = type === "series" || type === "tv" ? "tv" : "movie";
+  try {
+    const data = await tmdbFetch(
+      `/${mediaType}/${encodeURIComponent(tmdbId)}?language=it-IT`,
+      apiKey
+    );
+    const genre = data.genres?.[0]?.name || "";
+    const rating = data.vote_average && data.vote_average > 0 ? String(data.vote_average.toFixed(1)) : "";
+    return { genre, rating, title: data.title || data.name };
+  } catch (err) {
+    console.warn(`TMDB details fallito per ${mediaType} ${tmdbId}:`, err.message);
+    return null;
+  }
+}
+
 export async function resolveTmdbId(type, rawId, apiKey = DEFAULT_TMDB_KEY) {
   if (!rawId) return null;
 

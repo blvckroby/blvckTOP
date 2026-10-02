@@ -856,7 +856,7 @@
               const updateImg = () => {
                 const isZoomed = card.classList.contains("zoomed");
                 card.className = `preview-card ${i.shape} ${i.canvasBackground}${isZoomed ? " zoomed" : ""}`;
-                img.src = `/top-cover?catalogId=${encodeURIComponent(i.id)}&type=${encodeURIComponent(i.type)}&shape=${i.shape}&canvasBackground=${i.canvasBackground}&rank=${rank}&v=4`;
+                img.src = `/top-cover?catalogId=${encodeURIComponent(i.id)}&type=${encodeURIComponent(i.type)}&shape=${i.shape}&canvasBackground=${i.canvasBackground}&rank=${rank}&v=7.2.1`;
               };
 
               card.addEventListener("click", (e) => {
@@ -1016,7 +1016,7 @@
       const base = "/top-cover";
       const ids = [1423191, 1377237, 1283515, 977942];
       $("covers").innerHTML = ids.map((id, i) =>
-        `<div class="cv"><span class="poster"><img src="${base}?rank=${i + 1}&type=movie&tmdbId=${id}&v=4" alt="" decoding="async" referrerpolicy="no-referrer" onerror="this.remove()" /></span></div>`
+        `<div class="cv"><span class="poster"><img src="${base}?rank=${i + 1}&type=movie&tmdbId=${id}&v=7.2.1" alt="" decoding="async" referrerpolicy="no-referrer" onerror="this.remove()" /></span></div>`
       ).join("");
     })();
 
