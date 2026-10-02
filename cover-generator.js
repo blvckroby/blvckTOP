@@ -365,7 +365,8 @@ export async function createTopCover({
     }
   ];
 
-  if (logoUrl) {
+  // Only composite logo in landscape mode (posters already contain title)
+  if (normalized === "landscape" && logoUrl) {
     try {
       const logoBuffer = await fetchBuffer(logoUrl);
       const logo = await prepareLogo(logoBuffer, layout);

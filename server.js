@@ -440,13 +440,15 @@ app.get(["/c/:token/top-cover", "/top-cover"], async (req, res) => {
           ? choosePoster(images)
           : chooseBackdrop(images);
 
-        if (!logoUrl) {
+        // Official vertical posters already have the title embedded.
+        // We only add the transparent logo PNG for landscape backdrops!
+        if (shape === "landscape" && !logoUrl) {
           logoUrl = chooseLogo(images);
         }
       } catch (tmdbErr) {
         console.warn(`Errore fetch immagini TMDB ${tmdbId}:`, tmdbErr.message);
       }
-    } else if (tmdbId && !logoUrl) {
+    } else if (shape === "landscape" && tmdbId && !logoUrl) {
       try {
         const images = await getTmdbImages(type, tmdbId, DEFAULT_TMDB_KEY);
         logoUrl = chooseLogo(images);

@@ -125,7 +125,7 @@ export async function preloadAllCatalogs(sourceManifestUrl, options = {}) {
                 ? choosePoster(images)
                 : chooseBackdrop(images);
 
-              if (!artworkUrl) continue;
+              const itemLogoUrl = shape === "landscape" ? logoUrl : null;
 
               for (const canvasBackground of backgrounds) {
                 const coverKey = computeCoverKey({
@@ -137,7 +137,7 @@ export async function preloadAllCatalogs(sourceManifestUrl, options = {}) {
                   canvasBackground,
                   accent,
                   artworkUrl,
-                  logoUrl
+                  logoUrl: itemLogoUrl
                 });
 
                 const existing = getCoverFilePath(coverKey);
@@ -150,7 +150,7 @@ export async function preloadAllCatalogs(sourceManifestUrl, options = {}) {
                   const pngBuffer = await createTopCover({
                     rank,
                     artworkUrl,
-                    logoUrl,
+                    logoUrl: itemLogoUrl,
                     shape,
                     accent,
                     canvasBackground

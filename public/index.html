@@ -413,6 +413,22 @@
         const name = document.createElement("div");
         name.className = "row-name";
         name.textContent = g.name;
+        name.style.cursor = "pointer";
+        name.title = "Clicca per selezionare/deselezionare tutto il servizio";
+
+        const logoEl = makeLogo(g.name);
+        logoEl.style.cursor = "pointer";
+        logoEl.title = "Clicca per selezionare/deselezionare tutto il servizio";
+
+        const toggleGroup = () => {
+          const anyUnchecked = g.items.some(i => !i.checked);
+          g.items.forEach(i => { i.checked = anyUnchecked; });
+          renderCatalogs();
+        };
+
+        name.addEventListener("click", toggleGroup);
+        logoEl.addEventListener("click", toggleGroup);
+
         const chips = document.createElement("div");
         chips.className = "chips";
         const cfg = document.createElement("div");
@@ -420,7 +436,8 @@
 
         const drawCfg = () => {
           cfg.innerHTML = "";
-          g.items.filter(i => i.checked).forEach(i => {
+          const checkedItems = g.items.filter(i => i.checked);
+          checkedItems.forEach(i => {
             const line = document.createElement("div");
             line.className = "cfg-line";
             const label = document.createElement("b");
@@ -434,25 +451,28 @@
               optBtn(i, "canvasBackground", "black", "Nero", "g-bk", line));
             cfg.append(line);
           });
-          cfg.hidden = !cfg.children.length;
+          cfg.hidden = checkedItems.length === 0;
         };
 
         g.items.forEach(i => {
           const chip = document.createElement("button");
           chip.type = "button";
           chip.className = "chip" + (i.checked ? " on" : "");
-          chip.textContent = typeLabel(i.type);
+          chip.textContent = `${i.checked ? "✓ " : ""}${typeLabel(i.type)}`;
           chip.setAttribute("aria-pressed", i.checked);
-          chip.addEventListener("click", () => {
+          chip.addEventListener("click", (e) => {
+            e.stopPropagation();
             i.checked = !i.checked;
             chip.classList.toggle("on", i.checked);
+            chip.textContent = `${i.checked ? "✓ " : ""}${typeLabel(i.type)}`;
             chip.setAttribute("aria-pressed", i.checked);
-            drawCfg(); updateSummary();
+            drawCfg();
+            updateSummary();
           });
           chips.append(chip);
         });
 
-        main.append(makeLogo(g.name), name, chips);
+        main.append(logoEl, name, chips);
         row.append(main, cfg);
         drawCfg();
         catalogsEl.append(row);
