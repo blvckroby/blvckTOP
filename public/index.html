@@ -4,804 +4,97 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <meta name="color-scheme" content="dark" />
-  <meta name="theme-color" content="#05070b" />
-  <title>Top 10 Custom Covers · Configuratore Nuvio / Stremio</title>
+  <meta name="theme-color" content="#08090b" />
+  <title>blvckTOP · Top 10 per Nuvio e Stremio</title>
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
   <style>
     * { box-sizing: border-box; }
     :root {
-      --bg: #05070b;
-      --panel: rgba(255,255,255,.05);
-      --panel2: rgba(255,255,255,.035);
-      --border: rgba(255,255,255,.10);
-      --text: #f7f8fa;
-      --muted: #98a0ad;
-      --tmdb: #01b4e4;
-      --tmdb2: #90cea1;
-      --good: #56db7c;
-      --bad: #ff7171;
+      --bg: #08090b;
+      --line: rgba(255,255,255,.08);
+      --line2: rgba(255,255,255,.16);
+      --text: #f4f5f7;
+      --muted: #8b919d;
+      --dim: #5d636e;
+      --good: #6fd69a;
+      --bad: #ff7b7b;
       --ease: cubic-bezier(.22,1,.36,1);
-      --grad: linear-gradient(135deg, #7c5cff 0%, #2f8bff 50%, #01b4e4 100%);
+      --h: 40px;
+      --serif: "Instrument Serif", "Iowan Old Style", Georgia, serif;
     }
-    html { scroll-padding-top: 16px; scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+    html { scroll-behavior: smooth; scroll-padding-top: 24px; -webkit-text-size-adjust: 100%; overflow-x: hidden; }
     body {
-      margin: 0;
-      min-height: 100vh;
-      color: var(--text);
+      margin: 0; min-height: 100vh; color: var(--text); overflow-x: hidden;
       font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: var(--bg);
-      overflow-x: hidden;
+      font-size: 15px; -webkit-font-smoothing: antialiased;
+      background: radial-gradient(900px 480px at 50% -120px, rgba(255,255,255,.07), transparent 70%), var(--bg);
     }
-    /* sfondo statico: nessun blur animato (pesante su GPU deboli) */
-    .aurora { position: fixed; inset: 0; z-index: -1; pointer-events: none;
-      background:
-        radial-gradient(640px 520px at 8% -4%, rgba(47,91,255,.30), transparent 70%),
-        radial-gradient(560px 480px at 96% 100%, rgba(124,58,255,.26), transparent 70%),
-        radial-gradient(460px 400px at 62% 44%, rgba(1,180,228,.10), transparent 70%); }
-    .grain {
-      position: fixed; inset: 0; z-index: -1; pointer-events: none;
-      background-image: radial-gradient(rgba(255,255,255,.05) 1px, transparent 1px);
-      background-size: 26px 26px; opacity: .7;
-    }
+    .page { width: min(920px, calc(100% - 40px)); margin: 0 auto; padding: 72px 0 96px; }
+    button { font: inherit; color: inherit; border: 0; background: none; cursor: pointer; padding: 0; }
+    button:disabled { opacity: .5; cursor: wait; }
 
-    .page { width: min(1120px, calc(100% - 40px)); margin: 0 auto; padding: 56px 0 80px; }
-    html { overflow-x: hidden; }
+    /* ---------- hero ---------- */
+    .hero { text-align: center; padding: 20px 0 52px; }
+    .eyebrow { font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    h1 { margin: 22px 0 22px; font-family: var(--serif); font-weight: 400; font-size: clamp(54px, 11vw, 112px); line-height: .92; letter-spacing: -.035em; }
+    h1 em { font-style: italic; color: #fff; }
+    h1 span { color: #a3a8b3; }
+    .lede { max-width: 520px; margin: 0 auto; color: var(--muted); font-size: 17px; line-height: 1.65; }
+    .cta { display: flex; justify-content: center; align-items: center; gap: 26px; margin-top: 34px; flex-wrap: wrap; }
+    .btn { display: inline-flex; align-items: center; gap: 10px; height: 46px; padding: 0 24px; border-radius: 999px; background: #f4f5f7; color: #0a0b0d; font-weight: 600; font-size: 14px; text-decoration: none; transition: transform .3s var(--ease), background .2s; }
+    .btn:hover { background: #fff; transform: translateY(-1px); }
+    .btn svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .link { color: var(--muted); font-size: 14px; text-decoration: none; border-bottom: 1px solid var(--line2); padding-bottom: 2px; transition: color .2s, border-color .2s; }
+    .link:hover { color: #fff; border-color: #fff; }
+    .targets { display: flex; justify-content: center; align-items: center; gap: 28px; margin-top: 44px; flex-wrap: wrap; color: var(--dim); font-size: 12px; letter-spacing: .04em; }
+    .targets span { display: inline-flex; align-items: center; gap: 8px; }
+    .targets img { height: 16px; width: auto; max-width: 84px; object-fit: contain; opacity: .8; }
+    .targets img.wm { filter: brightness(0) invert(1); opacity: .65; }
 
-    /* hero */
-    .hero { position: relative; text-align: center; margin-bottom: 30px; padding-top: 8px; }
-    .hero::before { content: ""; position: absolute; left: 50%; top: -40px; width: min(900px, 120%); height: 420px; transform: translateX(-50%);
-      background: radial-gradient(closest-side, rgba(99,102,255,.22), transparent); pointer-events: none; z-index: -1; }
-    .badge {
-      display: inline-flex; align-items: center; gap: 8px;
-      padding: 7px 14px; border: 1px solid var(--border);
-      background: rgba(255,255,255,.05); border-radius: 999px;
-      color: #cdd2db; font-size: 12px; margin-bottom: 22px;
-    }
-    .badge b { width: 7px; height: 7px; border-radius: 50%; background: var(--good); box-shadow: 0 0 10px var(--good); }
-    h1 { font-size: clamp(44px, 10vw, 96px); line-height: .94; letter-spacing: -.065em; margin: 0 0 22px; font-weight: 800; }
-    .hero p { color: var(--muted); font-size: clamp(15px, 2.4vw, 18px); line-height: 1.65; margin: 0 auto; max-width: 640px; }
-    .cta a svg { width: 18px; height: 18px; margin-left: 8px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
-    .flow { list-style: none; display: flex; justify-content: center; gap: 10px; margin: 30px 0 0; padding: 0; flex-wrap: wrap; }
-    .flow li { display: inline-flex; align-items: center; gap: 9px; padding: 8px 15px 8px 8px; border-radius: 999px; font-size: 13px; font-weight: 600; color: #dfe3ea;
-      background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.025)); border: 1px solid rgba(255,255,255,.1); }
-    .flow li b { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; font-size: 12px; color: #fff; background: var(--grad); }
-    .target img.wm { width: auto; height: 14px; max-width: 70px; object-fit: contain; filter: brightness(0) invert(1); }
-    .install a img.wm { width: auto; height: 16px; max-width: 80px; }
-    .cta { display: flex; justify-content: center; gap: 10px; margin-top: 28px; flex-wrap: wrap; }
-    .cta a { display: inline-flex; align-items: center; justify-content: center; height: 48px; padding: 0 22px; border-radius: 999px;
-      font-weight: 700; font-size: 15px; text-decoration: none; transition: transform .25s var(--ease), background .2s; }
-    .cta .solid { background: #f4f5f7; color: #07090c; }
-    .cta .line { color: #e4e7ec; border: 1px solid var(--border); background: rgba(255,255,255,.04); }
-    .cta a:hover { transform: translateY(-2px); }
-    .targets { display: flex; justify-content: center; gap: 8px; margin-top: 18px; flex-wrap: wrap; }
-    .target {
-      display: inline-flex; align-items: center; gap: 8px; padding: 7px 13px;
-      border-radius: 999px; border: 1px solid var(--border); background: rgba(255,255,255,.04);
-      font-size: 12.5px; font-weight: 700; color: #e4e7ec;
-    }
-    .target img { width: 15px; height: 15px; }
+    .band { position: relative; overflow: hidden; margin: 0 0 56px; padding: 22px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
+      -webkit-mask-image: linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent); mask-image: linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent); }
+    .track { display: flex; align-items: center; gap: 64px; width: max-content; animation: scroll 60s linear infinite; }
+    @keyframes scroll { to { transform: translateX(-50%); } }
+    .brand { display: flex; align-items: center; height: 24px; }
+    .brand img { height: 22px; width: auto; max-width: 100px; filter: brightness(0) invert(1); opacity: .42; }
 
-    /* cover in stile addon: numero a destra, dietro la card */
-    .covers { display: flex; justify-content: center; gap: 62px; margin: 6px 0 36px; padding-right: 50px; }
-    .cv { position: relative; flex: 0 0 auto; width: 196px; }
-    .cv .n { position: absolute; z-index: 1; right: -50px; bottom: -20px; font-weight: 900; font-size: 150px; line-height: 1;
-      letter-spacing: -.06em; color: transparent; -webkit-text-stroke: 3px rgba(255,255,255,.34); pointer-events: none; }
-    .cv .poster { position: relative; z-index: 2; display: block; aspect-ratio: 16/9; border-radius: 12px; overflow: hidden;
-      border: 1px solid rgba(255,255,255,.16); box-shadow: 0 18px 40px rgba(0,0,0,.55); transition: transform .3s var(--ease); }
-    .cv:hover .poster { transform: translateY(-6px); }
-    .poster img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
-    .poster b { position: absolute; z-index: 1; left: 11px; bottom: 9px; right: 10px; font-size: 14px; font-weight: 800; letter-spacing: -.01em; line-height: 1.15; text-shadow: 0 2px 8px rgba(0,0,0,.5); }
-    .poster i { position: absolute; z-index: 1; left: 10px; top: 9px; font-style: normal; font-size: 9px; font-weight: 800; letter-spacing: .14em; padding: 3px 6px; border-radius: 5px; background: rgba(0,0,0,.35); }
+    .covers { display: flex; justify-content: center; gap: 18px; margin: 0 0 80px; }
+    .cv { flex: 0 1 200px; min-width: 0; }
+    .poster { display: block; aspect-ratio: 16/9; border-radius: 10px; overflow: hidden; background: rgba(255,255,255,.03); border: 1px solid var(--line); transition: transform .4s var(--ease); }
+    .cv:hover .poster { transform: translateY(-4px); }
+    .poster img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
-    /* pannello */
-    .panel {
-      border: 1px solid var(--border); background: rgba(14,17,24,.82);
-      border-radius: 24px; padding: clamp(18px, 3.5vw, 36px); box-shadow: 0 30px 80px rgba(0,0,0,.4);
-    }
-    .step + .step { margin-top: 34px; padding-top: 30px; border-top: 1px solid rgba(255,255,255,.07); }
-    .step-title { margin-bottom: 14px; }
-    .eyebrow { display: block; font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--tmdb); font-weight: 700; margin-bottom: 6px; }
-    h2 { margin: 0; font-size: 21px; letter-spacing: -.025em; font-weight: 700; }
+    /* ---------- sezioni ---------- */
+    .step { padding: 44px 0; border-top: 1px solid var(--line); }
+    .step-head { display: flex; align-items: baseline; gap: 18px; margin-bottom: 26px; }
+    .step-n { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; color: var(--dim); letter-spacing: .08em; }
+    h2 { margin: 0; font-family: var(--serif); font-weight: 400; font-size: clamp(28px, 4vw, 36px); letter-spacing: -.02em; }
     .sub { margin: 6px 0 0; color: var(--muted); font-size: 14px; }
 
-    .toolbar { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; align-items: center; }
-    .search { flex: 1 1 200px; min-width: 0; }
-    .counter { margin-left: auto; font-size: 13px; color: var(--muted); }
-    .counter b { color: #fff; }
-    :root { --ctl-h: 42px; --ctl-r: 13px; }
-    .seg { display: inline-flex; align-items: stretch; height: var(--ctl-h); padding: 3px; border-radius: var(--ctl-r); background: rgba(255,255,255,.045); border: 1px solid var(--border); }
-    .seg button { display: inline-flex; align-items: center; background: transparent; color: var(--muted); padding: 0 14px; border-radius: calc(var(--ctl-r) - 4px); font-size: 13px; font-weight: 700; }
-    .seg button.on { background: rgba(255,255,255,.14); color: #fff; }
-
-    .ghost { display: inline-flex; align-items: center; justify-content: center; height: var(--ctl-h); padding: 0 16px !important;
-      font-size: 13px !important; font-weight: 700; border-radius: var(--ctl-r); border: 1px solid var(--border); background: rgba(255,255,255,.045); color: #dce0e7; }
-    .ghost:hover { background: rgba(255,255,255,.09); border-color: rgba(255,255,255,.2); }
-    .toolbar .search { height: var(--ctl-h); padding-top: 0; padding-bottom: 0; border-radius: var(--ctl-r); }
-
-    .catalogs { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; }
-    .catalog {
-      position: relative; display: flex; flex-direction: column; gap: 12px; padding: 14px;
-      border: 1px solid rgba(255,255,255,.08); border-radius: 18px; background: var(--panel2); transition: transform .25s var(--ease), border-color .2s, background .2s; overflow: hidden; --brand: #7c8cff;
-      contain: layout paint;
-    }
-    .catalog::before {
-      content: ""; position: absolute; inset: 0; opacity: 0; transition: opacity .2s;
-      background: radial-gradient(circle at 0% 50%, color-mix(in srgb, var(--brand) 28%, transparent), transparent 70%);
-    }
-    .catalog:hover { border-color: rgba(255,255,255,.22); transform: translateY(-2px); }
-    .catalog:has(.catalog-head input:checked) { border-color: color-mix(in srgb, var(--brand) 70%, #fff 0%); background: rgba(255,255,255,.07); }
-    .catalog:has(.catalog-head input:checked)::before { opacity: 1; }
-    .catalog > * { position: relative; }
-    .catalog-head { display: flex; gap: 13px; align-items: center; cursor: pointer; }
-    .catalog-head input { position: absolute; opacity: 0; pointer-events: none; }
-    .opts { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    .opt { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
-    .opt > span { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
-    .picks { display: flex; gap: 8px; }
-    .pick { flex: 1; display: grid; place-items: center; height: 46px; padding: 0 !important; border-radius: 12px;
-      background: rgba(0,0,0,.28); border: 1px solid var(--border); color: #7d8594; }
-    .pick:hover { color: #fff; border-color: rgba(255,255,255,.25); }
-    .pick.on { color: #fff; background: rgba(255,255,255,.1); border-color: var(--brand); box-shadow: 0 0 0 1px var(--brand), 0 6px 18px color-mix(in srgb, var(--brand) 30%, transparent); }
-    .shape-ic { display: block; border: 2px solid currentColor; border-radius: 4px; }
-    .shape-ic.land { width: 30px; height: 17px; }
-    .shape-ic.port { width: 17px; height: 28px; }
-    .dot { display: block; width: 26px; height: 26px; border-radius: 50%; border: 2px solid rgba(255,255,255,.45); }
-    .dot.tr { background: conic-gradient(#4a4f5a 25%, #9aa0ac 0 50%, #4a4f5a 0 75%, #9aa0ac 0) 0 0 / 12px 12px; }
-    .dot.bk { background: #000; }
-    .pick.on .dot { border-color: #fff; }
-    .catalog:not(:has(.catalog-head input:checked)) .opts { opacity: .4; pointer-events: none; }
-    .bulk { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 14px; }
-    .bulk > span { font-size: 12px; color: var(--muted); font-weight: 700; margin-right: 2px; }
-
-    .logo {
-      width: 52px; height: 52px; aspect-ratio: 1; flex: 0 0 auto; display: grid; place-items: center;
-      border-radius: 14px; box-shadow: 0 6px 18px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.25);
-      overflow: hidden; transition: transform .25s;
-    }
-    .logo img { width: 28px; height: 28px; object-fit: contain; }
-    .logo.wide img { width: 42px; height: 24px; }
-    .logo.dark img { filter: brightness(0); }
-    .logo:not(.dark) img { filter: brightness(0) invert(1); }
-    .logo.mono { color: #fff; font-weight: 900; font-size: 20px; }
-    .catalog .txt { min-width: 0; flex: 1; }
-    .catalog strong { display: block; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .catalog small { color: var(--muted); font-size: 12px; }
-    .check {
-      width: 22px; height: 22px; border-radius: 50%; border: 2px solid rgba(255,255,255,.22);
-      display: grid; place-items: center; transition: .18s; flex: 0 0 auto;
-    }
-    .check svg { width: 12px; height: 12px; stroke: #fff; stroke-width: 3.5; fill: none; opacity: 0; transform: scale(.4); transition: .18s; }
-    .catalog:has(.catalog-head input:checked) .check { background: var(--brand); border-color: var(--brand); }
-    .catalog:has(.catalog-head input:checked) .check svg { opacity: 1; transform: none; }
-    .catalog:has(.catalog-head input:focus-visible) { outline: 2px solid #fff; outline-offset: 2px; }
-    @keyframes rise { from { opacity: 0; transform: translateY(14px) scale(.985); } }
-    .skeleton { height: 76px; border-radius: 18px; background: linear-gradient(90deg, rgba(255,255,255,.04), rgba(255,255,255,.09), rgba(255,255,255,.04)); background-size: 200% 100%; animation: sh 1.3s linear infinite; }
-    @keyframes sh { to { background-position: -200% 0; } }
-
-    /* TMDB: compatto */
-    .key-row { display: flex; align-items: center; gap: 14px; padding: 12px 14px; border-radius: 16px;
-      background: rgba(1,180,228,.07); border: 1px solid rgba(1,180,228,.22); margin-bottom: 12px; }
-    .tmdb-logo { width: 74px; height: 22px; flex: 0 0 auto; object-fit: contain; }
-    .key-row p { margin: 0; flex: 1; color: #bfdbe5; font-size: 13px; line-height: 1.45; }
-    .key-row a { flex: 0 0 auto; display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 14px; border-radius: 999px;
-      text-decoration: none; font-weight: 700; font-size: 13px; color: #032b36; background: linear-gradient(90deg, var(--tmdb2), var(--tmdb)); transition: transform .2s; }
-    .key-row a:hover { transform: translateY(-1px); }
-    .key-row a svg { width: 13px; height: 13px; }
-    details.how { margin: 12px 0 0; font-size: 13px; color: var(--muted); }
-    details.how summary { cursor: pointer; width: fit-content; list-style: none; }
-    details.how summary::-webkit-details-marker { display: none; }
-    details.how summary::before { content: "+ "; color: var(--tmdb); font-weight: 800; }
-    details.how[open] summary::before { content: "− "; }
-    details.how ol { margin: 10px 0 0; padding-left: 18px; display: grid; gap: 5px; color: #cfe8f0; }
-
-    .field { position: relative; }
-    input[type=password], input[type=text], input[type=search] {
-      width: 100%; border: 1px solid rgba(255,255,255,.11); background: rgba(0,0,0,.32); color: #fff;
-      border-radius: 14px; padding: 14px 15px; outline: none; font: inherit;
-    }
-    .field input { padding-right: 96px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 14px; }
-    .field .tools { position: absolute; right: 7px; top: 50%; transform: translateY(-50%); display: flex; gap: 4px; }
-    .field .tools button { padding: 0 11px; height: 34px; background: rgba(255,255,255,.07); color: #dfe3ea; font-size: 12px; font-weight: 700; border-radius: 10px; }
-    .field .tools button:hover { background: rgba(255,255,255,.14); }
-    .icon-btn { width: 34px; padding: 0 !important; display: grid; place-items: center; }
-    .icon-btn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
-    .icon-btn .i-hide { display: none; }
-    .icon-btn[aria-pressed="true"] { background: rgba(1,180,228,.22) !important; color: #7fdcf6; }
-    .icon-btn[aria-pressed="true"] .i-show { display: none; }
-    .icon-btn[aria-pressed="true"] .i-hide { display: block; }
-    input:focus { border-color: rgba(1,180,228,.7); box-shadow: 0 0 0 4px rgba(1,180,228,.12); }
-    .status { margin-top: 9px; font-size: 13px; min-height: 18px; color: var(--muted); }
-    .status.ok { color: var(--good); } .status.bad { color: var(--bad); }
-    .hint { margin: 9px 0 0; color: var(--muted); font-size: 13px; line-height: 1.55; }
-    .remember { display: flex; align-items: center; gap: 8px; margin-top: 12px; color: var(--muted); font-size: 13px; cursor: pointer; }
-    .remember input { accent-color: var(--tmdb); }
-
-    button { border: 0; border-radius: 13px; padding: 12px 15px; font: inherit; font-weight: 800; cursor: pointer; transition: transform .3s var(--ease), background .2s, opacity .2s; }
-    button:hover { transform: translateY(-1px); }
-    button:disabled { opacity: .55; cursor: wait; transform: none; }
-    .gen { display: flex; align-items: center; justify-content: space-between; gap: 28px; padding: 22px 24px 22px 28px;
-      border-radius: 22px; border: 1px solid rgba(255,255,255,.1);
-      background: linear-gradient(120deg, rgba(255,255,255,.07), rgba(255,255,255,.02)); }
-    .gen-info { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
-    .gen-kicker { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
-    .gen-info strong { font-size: clamp(18px, 2.6vw, 24px); letter-spacing: -.03em; font-weight: 700; }
-    .gen-sub { font-size: 13px; color: var(--muted); }
-    .gen-sub.ready { color: var(--good); }
-    .primary { flex: 0 0 auto; display: inline-flex; align-items: center; gap: 14px; height: 58px; padding: 0 12px 0 28px;
-      border-radius: 999px; background: #f4f5f7; color: #07090c; font-size: 16px; font-weight: 700; letter-spacing: -.01em;
-      transition: transform .35s var(--ease), background .25s, box-shadow .35s var(--ease); box-shadow: 0 0 0 0 rgba(255,255,255,0); }
-    .primary svg { width: 38px; height: 38px; padding: 10px; border-radius: 50%; background: #07090c; stroke: #fff; fill: none;
-      stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; transition: transform .35s var(--ease); }
-    .primary:hover { background: #fff; box-shadow: 0 10px 40px rgba(255,255,255,.16); transform: translateY(-2px); }
-    .primary:hover svg { transform: translateX(3px); }
-    .primary:active { transform: translateY(0) scale(.98); }
-
-    .message { display: none; margin-top: 14px; padding: 12px 13px; border-radius: 13px; font-size: 13px; }
-    .message.ok { display: block; color: #aff0c1; background: rgba(86,219,124,.09); border: 1px solid rgba(86,219,124,.25); }
-    .message.bad { display: block; color: #ffc0c0; background: rgba(255,113,113,.09); border: 1px solid rgba(255,113,113,.24); }
-
-    .result { display: none; margin-top: 22px; padding: clamp(20px, 3vw, 32px); border-radius: 24px; background: rgba(255,255,255,.05); border: 1px solid var(--border); animation: pop .6s var(--ease); }
-    .result.show { display: block; }
-    @keyframes pop { from { opacity: 0; transform: translateY(10px) scale(.98); } }
-    .result label { display: block; font-size: 13px; font-weight: 800; margin-bottom: 9px; }
-    .url-row { display: flex; gap: 8px; }
-    .url-row input { min-width: 0; font-family: ui-monospace, monospace; font-size: 13px; }
-    .url-row button { background: #fff; color: #07090c; }
-    .install { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-top: 14px; }
-    .install a {
-      display: flex; align-items: center; justify-content: center; gap: 9px; padding: 13px; border-radius: 14px;
-      text-decoration: none; font-weight: 800; font-size: 14px; color: #fff; border: 1px solid var(--border); background: rgba(255,255,255,.06); transition: .15s;
-    }
-    .install a:hover { background: rgba(255,255,255,.12); transform: translateY(-1px); }
-    .install a img { width: 18px; height: 18px; }
-    .install a.stremio { background: linear-gradient(135deg, #7b5bf5, #4a35b0); border-color: transparent; }
-    .install a.nuvio { background: linear-gradient(135deg, #ff5d73, #c2185b); border-color: transparent; }
-
-    footer { margin-top: 30px; text-align: center; color: #6c7482; font-size: 12px; line-height: 1.7; }
-    footer a { color: var(--tmdb); text-decoration: none; }
-
-    @media (max-width: 700px) {
-      .page { width: calc(100% - 28px); padding: 28px 0 56px; }
-      .panel { padding: 18px 16px; border-radius: 24px; }
-      .hero { margin-bottom: 22px; }
-      .badge { margin-bottom: 16px; }
-      .cta a { flex: 1 1 100%; }
-      .covers { gap: 40px; padding-right: 30px; margin-bottom: 22px; }
-      .cv { width: 138px; }
-      .cv:nth-child(n+3) { display: none; }
-      .cv .n { font-size: 104px; right: -32px; bottom: -14px; -webkit-text-stroke-width: 2.5px; }
-      .band { margin-bottom: 22px; padding: 12px 0; border-radius: 16px; }
-      .brand { font-size: 17px; }
-      .track { gap: 36px; }
-      .gen { flex-direction: column; align-items: stretch; padding: 18px; gap: 16px; }
-      .primary { justify-content: space-between; width: 100%; }
-      .catalogs { grid-template-columns: 1fr; }
-      .catalog { padding: 12px; }
-      .toolbar { gap: 8px; }
-      .search { flex: 1 1 100%; }
-      .seg { flex: 1 1 100%; }
-      .seg button { flex: 1; }
-      .ghost { flex: 1; }
-      .counter { margin-left: 0; width: 100%; }
-      .url-row { flex-direction: column; }
-      .url-row button { width: 100%; }
-      .key-row { flex-wrap: wrap; }
-      .key-row p { flex: 1 1 100%; order: 3; }
-      .key-row a { margin-left: auto; }
-      .field input { padding-right: 104px; font-size: 16px; }
-      input[type=search] { font-size: 16px; }
-      .step + .step { margin-top: 24px; padding-top: 24px; }
-    }
-
-    h1 { background: linear-gradient(180deg, #fff 30%, #8d96a8); -webkit-background-clip: text; background-clip: text; color: transparent; }
-    h1 span { background: linear-gradient(100deg, #9b7bff, #3b9bff 45%, #01b4e4 70%, #90cea1);
-      background-size: 200% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; }
-
-    /* ===== v3: frosted marquee band (Originkit Frosted Type Band, CSS only) ===== */
-    .band { position: relative; margin: 0 0 30px; padding: 16px 0; border-radius: 22px; overflow: hidden;
-      border: 1px solid rgba(255,255,255,.12);
-      background: linear-gradient(180deg, rgba(255,255,255,.09), rgba(255,255,255,.03));
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.25);
-      -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
-      mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent); }
-    .track { display: flex; gap: 54px; width: max-content; animation: scroll 40s linear infinite; will-change: transform; }
-    .band:hover .track { animation-play-state: paused; }
-    @keyframes scroll { to { transform: translateX(-50%); } }
-    .brand { display: flex; align-items: center; height: 30px; }
-    .brand img { height: 28px; width: 28px; filter: invert(1) brightness(2); opacity: .9; }
-    .brand.custom img { width: auto; max-width: 120px; height: 26px; filter: brightness(0) invert(1); opacity: .88; }
-
-    .panel { box-shadow: 0 30px 80px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.1); }
-    .logo { transition: transform .25s; }
-    .catalog:hover .logo { transform: scale(1.06); }
-    @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
-  </style>
-</head>
-<body>
-  <div class="aurora" aria-hidden="true"></div>
-  <div class="grain" aria-hidden="true"></div>
-
-  <main class="page">
-    <header class="hero">
-      <span class="badge"><b></b> Addon per Nuvio &amp; Stremio</span>
-      <h1>Crea il tuo <span>Top&nbsp;10</span></h1>
-      <p>
-        Le classifiche dei tuoi servizi in streaming, con cover personalizzate:
-        landscape o portrait, sfondo trasparente o nero. Collega la tua chiave TMDB
-        e genera il manifest da installare.
-      </p>
-      <div class="cta">
-        <a class="solid" href="#start">Inizia ora
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M6 13l6 6 6-6"/></svg></a>
-        <a class="line" href="#key">Ho già la chiave TMDB</a>
-      </div>
-      <ol class="flow" aria-label="Come funziona">
-        <li><b>1</b>Scegli le classifiche</li>
-        <li><b>2</b>Collega TMDB</li>
-        <li><b>3</b>Installa l'addon</li>
-      </ol>
-      <div class="targets">
-        <span class="target"><img data-logo="stremio" alt="" />Stremio</span>
-        <span class="target"><img class="wm" data-logo="nuvio" alt="Nuvio" /></span>
-        <span class="target"><img class="tmdb-pill" data-logo="tmdb" alt="TMDB" />Powered by TMDB</span>
-      </div>
-    </header>
-
-    <div class="band" aria-hidden="true"><div class="track" id="track"></div></div>
-
-    <div class="covers" id="covers" aria-hidden="true"></div>
-
-    <section class="panel" id="start">
-      <!-- STEP 1 -->
-      <div class="step">
-        <div class="step-title"><span class="eyebrow">Cataloghi</span><h2>Scegli le classifiche</h2><p class="sub">Seleziona le piattaforme di cui vuoi vedere la Top 10.</p></div>
-
-        <div class="toolbar">
-          <input id="search" class="search" type="search" placeholder="Cerca catalogo…" aria-label="Cerca catalogo" />
-          <div class="seg" role="group" aria-label="Filtro tipo">
-            <button type="button" class="on" data-f="all">Tutti</button>
-            <button type="button" data-f="movie">Film</button>
-            <button type="button" data-f="series">Serie</button>
-          </div>
-          <button class="ghost" id="allBtn" type="button">Tutti</button>
-          <button class="ghost" id="noneBtn" type="button">Nessuno</button>
-          <span class="counter"><b id="count">0</b> selezionati</span>
-        </div>
-
-        <div class="bulk">
-          <span>Formato</span>
-          <button class="ghost" type="button" data-bulk="shape" data-v="landscape">Tutti landscape</button>
-          <button class="ghost" type="button" data-bulk="shape" data-v="poster">Tutti portrait</button>
-          <span style="margin-left:10px">Sfondo</span>
-          <button class="ghost" type="button" data-bulk="bg" data-v="transparent">Tutti trasparenti</button>
-          <button class="ghost" type="button" data-bulk="bg" data-v="black">Tutti neri</button>
-        </div>
-
-        <div id="catalogs" class="catalogs">
-          <div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>
-        </div>
-      </div>
-
-      <!-- STEP 2 -->
-      <div class="step" id="key">
-        <div class="step-title"><span class="eyebrow">Chiave TMDB</span><h2>Collega il tuo account</h2></div>
-
-        <div class="key-row">
-          <img class="tmdb-logo" data-logo="tmdb" alt="TMDB" />
-          <p>Chiave gratuita, usata solo per backdrop e logo dei titoli.</p>
-          <a href="https://www.themoviedb.org/settings/api" target="_blank" rel="noopener noreferrer">Ottieni la chiave
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg></a>
-        </div>
-
-        <div class="field">
-          <input id="tmdbKey" type="password" autocomplete="off" spellcheck="false" placeholder="Incolla la TMDB API Key (v3)" />
-          <div class="tools">
-            <button type="button" id="pasteBtn" title="Incolla dagli appunti">Incolla</button>
-            <button type="button" id="eyeBtn" class="icon-btn" aria-label="Mostra la chiave" aria-pressed="false" title="Mostra / nascondi">
-              <svg class="i-show" viewBox="0 0 24 24"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>
-              <svg class="i-hide" viewBox="0 0 24 24"><path d="M3 3l18 18M10.6 5.1A9.7 9.7 0 0 1 12 5c6.4 0 10 7 10 7a17 17 0 0 1-3.2 4M6.5 6.6C3.8 8.4 2 12 2 12s3.6 7 10 7c1.6 0 3-.4 4.3-1M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg>
-            </button>
-          </div>
-        </div>
-        <div id="keyStatus" class="status"></div>
-        <label class="remember"><input type="checkbox" id="remember" /> Ricorda la chiave su questo browser</label>
-        <details class="how"><summary>Come ottenerla</summary>
-          <ol>
-            <li>Accedi (o registrati) su themoviedb.org e apri <b>Impostazioni → API</b>.</li>
-            <li>Richiedi una chiave <b>Developer</b> (gratuita, uso personale).</li>
-            <li>Copia la <b>API Key (v3 auth)</b> da 32 caratteri e incollala qui.</li>
-          </ol></details>
-        <p class="hint">La chiave non viene salvata su alcun database: finisce solo, cifrata, nel tuo URL personale.</p>
-      </div>
-
-      <!-- STEP 3 -->
-      <div class="step">
-        <div class="step-title"><span class="eyebrow">Installazione</span><h2>Genera il tuo addon</h2></div>
-
-        <div class="gen">
-          <div class="gen-info">
-            <span class="gen-kicker">Riepilogo</span>
-            <strong id="genSummary">Nessun catalogo selezionato</strong>
-            <span class="gen-sub" id="genSub">Aggiungi la tua chiave TMDB per continuare</span>
-          </div>
-          <button id="generateBtn" class="primary" type="button">
-            <span class="label">Genera manifest</span>
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-          </button>
-        </div>
-        <div id="message" class="message"></div>
-
-        <div id="result" class="result">
-          <label for="manifestUrl">Il tuo manifest</label>
-          <div class="url-row">
-            <input id="manifestUrl" type="text" readonly />
-            <button id="copyBtn" type="button">Copia</button>
-          </div>
-          <div class="install">
-            <a id="stremioBtn" class="stremio" href="#"><img data-logo="stremio" alt="" />Installa su Stremio</a>
-            <a id="nuvioBtn" class="nuvio" href="#"><img class="wm" data-logo="nuvio" data-white="1" alt="" />Installa su Nuvio</a>
-          </div>
-          <p class="hint">
-            In Nuvio: <b>Impostazioni → Addon → Aggiungi</b> e incolla l'URL se il pulsante non si apre.
-            Conserva l'URL: contiene la configurazione cifrata.
-          </p>
-        </div>
-      </div>
-    </section>
-
-    <footer>
-      This product uses the TMDB API but is not endorsed or certified by TMDB.<br />
-      Loghi e marchi appartengono ai rispettivi proprietari. Icone via <a href="https://simpleicons.org" target="_blank" rel="noopener">Simple Icons</a> e Wikimedia Commons.
-    </footer>
-  </main>
-
-  <script>
-    const $ = id => document.getElementById(id);
-    const catalogsEl = $("catalogs"), keyEl = $("tmdbKey"), generateBtn = $("generateBtn"),
-          message = $("message"), result = $("result"), manifestUrl = $("manifestUrl"),
-          keyStatus = $("keyStatus"), countEl = $("count");
-
-    /* ---------- loghi reali dei servizi (Simple Icons) ---------- */
-    const ICON_CDN = "https://cdn.jsdelivr.net/npm/simple-icons@11/icons/";
-    const svgUri = (w, h, body) => "data:image/svg+xml;utf8," + encodeURIComponent(
-      `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}"><g fill="#fff" font-family="Arial Black, Arial, Helvetica, sans-serif" font-weight="900">${body}</g></svg>`);
-    const LOGO = {
-      prime:   "https://upload.wikimedia.org/wikipedia/commons/c/ca/Amazon_Prime_Video_logo_%282024%29.svg",
-      infinity:"https://upload.wikimedia.org/wikipedia/commons/2/2f/Mediaset_Infinity_logo.svg",
-      tim:     "https://upload.wikimedia.org/wikipedia/commons/a/a3/TIMvision_logo_%282026-present%29.svg",
-      discovery:"https://static.wikia.nocookie.net/logopedia/images/e/e9/Discovery_plus_ico.svg/revision/latest/scale-to-width-down/250?cb=20210726040631",
-      stremio: "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/stremio.svg",
-      nuvio:   "https://nuvio.tv/assets/nuvio-app-logo-wordmark.webp",
-      hbomax:  "https://upload.wikimedia.org/wikipedia/commons/b/b3/HBO_Max_%282025%29.svg",
-      rakuten: "https://upload.wikimedia.org/wikipedia/commons/e/e5/Rakuten_TV_logo.svg",
-      chili:   svgUri(120, 48, '<text x="60" y="36" font-size="34" text-anchor="middle" letter-spacing="1">CHILI</text>'),
-      tmdb:    "https://upload.wikimedia.org/wikipedia/commons/8/89/Tmdb.new.logo.svg",
-      disney:  "https://upload.wikimedia.org/wikipedia/commons/3/3e/Disney%2B_logo.svg",
-      now:     "https://upload.wikimedia.org/wikipedia/commons/0/0d/Now_logo.svg",
-      raiplay: "https://upload.wikimedia.org/wikipedia/commons/6/6d/RaiPlay_2023_logo.svg"
-    };
-    // [regex, slug Simple Icons | {url}, colore brand]
-    const BRANDS = [
-      [/netflix/i,            "netflix",         "E50914"],
-      [/disney/i,             { url: LOGO.disney },  "113CCF"],
-      [/rai\s?play|\brai\b/i, { url: LOGO.raiplay }, "0094D9"],
-      [/\bnow\b|now ?tv/i,   { url: LOGO.now },     "00D1B2"],
-      [/prime|amazon/i,       { url: LOGO.prime },   "00A8E1"],
-      [/tim\s?vision|\btim\b/i, { url: LOGO.tim },    "1B3FA0"],
-      [/discovery/i,          { url: LOGO.discovery }, "2175D9"],
-      [/hbo|\bmax\b/i,        { url: LOGO.hbomax },  "5822B4"],
-      [/rakuten/i,            { url: LOGO.rakuten }, "BF0000"],
-      [/chili/i,              { url: LOGO.chili },   "E4002B"],
-      [/apple/i,              "appletv",         "9AA0A6"],
-      [/paramount/i,          "paramountplus",   "0064FF"],
-      [/crunchyroll/i,        "crunchyroll",     "F47521"],
-      [/hulu/i,               "hulu",            "1CE783"],
-      [/peacock/i,            "peacock",         "F2C94C"],
-      [/youtube/i,            "youtube",         "FF0000"],
-      [/sky/i,                "sky",             "0072C9"],
-      [/dazn/i,               "dazn",            "F8F8F5"],
-      [/infinity|mediaset|canale ?5/i, { url: LOGO.infinity }, "15171d"],
-      [/plex/i,               "plex",            "E5A00D"],
-      [/tmdb|themoviedb/i,    { url: LOGO.tmdb },    "01B4E4"],
-      [/imdb/i,               "imdb",            "F5C518"],
-      [/trakt/i,              "trakt",           "ED1C24"]
-    ];
-    const hex = h => "#" + h;
-
-    function brandFor(name) {
-      for (const [re, src, color] of BRANDS) if (re.test(name)) {
-        return typeof src === "string"
-          ? { slug: src, url: `${ICON_CDN}${src}.svg`, color: hex(color) }
-          : { url: src.url, wide: true, color: hex(color) };
-      }
-      return null;
-    }
-
-    // luminanza: sceglie glifo scuro su sfondi chiari
-    const isLight = h => { const n = parseInt(h.replace("#", ""), 16);
-      return (0.299 * (n >> 16) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255)) > 170; };
-
-    function makeLogo(name) {
-      const brand = brandFor(name);
-      const box = document.createElement("div");
-      box.className = "logo";
-      const monogram = () => {
-        box.className = "logo mono";
-        box.style.background = brand ? brand.color : "linear-gradient(135deg,#7c5cff,#2f8bff)";
-        if (brand && isLight(brand.color)) box.style.color = "#111";
-        box.textContent = (name.match(/[A-Za-z0-9]/) || ["T"])[0].toUpperCase();
-      };
-      if (!brand) { monogram(); return { box, color: "#7c8cff" }; }
-      box.style.background = brand.color;
-      if (brand.wide) box.classList.add("wide");
-      if (isLight(brand.color)) box.classList.add("dark");
-      const img = new Image();
-      img.alt = "";
-      img.loading = "lazy";
-      img.decoding = "async";
-      img.referrerPolicy = "no-referrer";
-      img.src = brand.url;
-      img.onerror = () => { img.remove(); monogram(); };
-      box.append(img);
-      return { box, color: brand.color };
-    }
-
-    // loghi statici (Stremio / Nuvio / TMDB) nell'header e nei pulsanti
-    document.querySelectorAll("img[data-logo]").forEach(img => {
-      img.src = LOGO[img.dataset.logo];
-      img.referrerPolicy = "no-referrer";
-      if (img.dataset.white) img.style.filter = "brightness(0) invert(1)";
-      img.onerror = () => {
-        const t = img.closest(".target, .install a");
-        img.remove();
-        if (t && !t.textContent.trim()) t.textContent = "Nuvio";
-      };
-    });
-
-    /* ---------- cataloghi ---------- */
-    let allCatalogs = [], typeFilter = "all";
-
-    function setMessage(text, type) { message.textContent = text; message.className = `message ${type}`; }
-
-    function updateCount() {
-      const n = allCatalogs.filter(c => c.checked).length;
-      countEl.textContent = n;
-      updateSummary(n);
-    }
-
-    function updateSummary(n = allCatalogs.filter(c => c.checked).length) {
-      const hasKey = /^[a-f0-9]{32}$/i.test(keyEl.value.trim());
-      $("genSummary").textContent = n ? `${n} ${n === 1 ? "catalogo selezionato" : "cataloghi selezionati"}` : "Nessun catalogo selezionato";
-      const sub = $("genSub");
-      sub.textContent = !n ? "Scegli almeno una classifica" : hasKey ? "Tutto pronto: genera il tuo manifest" : "Aggiungi la tua chiave TMDB per continuare";
-      sub.classList.toggle("ready", !!n && hasKey);
-    }
-
-    function selectedCatalogs() {
-      return allCatalogs.filter(c => c.checked).map(c => ({
-        id: c.id, type: c.type, shape: c.shape, canvasBackground: c.canvasBackground
-      }));
-    }
-
-    function makePick(title, c, prop, options) {
-      const wrap = document.createElement("div");
-      wrap.className = "opt";
-      const span = document.createElement("span");
-      span.textContent = title;
-      const row = document.createElement("div");
-      row.className = "picks";
-      row.setAttribute("role", "group");
-      row.setAttribute("aria-label", title);
-      options.forEach(([value, text, icon]) => {
-        const b = document.createElement("button");
-        b.type = "button";
-        b.title = text;
-        b.setAttribute("aria-label", text);
-        b.innerHTML = `<i class="${icon}"></i>`;
-        b.classList.add("pick");
-        b.classList.toggle("on", c[prop] === value);
-        b.addEventListener("click", () => {
-          c[prop] = value;
-          row.querySelectorAll("button").forEach(x => x.classList.toggle("on", x === b));
-        });
-        row.append(b);
-      });
-      wrap.append(span, row);
-      return wrap;
-    }
-
-    function renderCatalogs() {
-      const q = $("search").value.trim().toLowerCase();
-
-      catalogsEl.innerHTML = "";
-      const list = allCatalogs.filter(c =>
-        (typeFilter === "all" || c.type === typeFilter) && c.name.toLowerCase().includes(q));
-
-      if (!list.length) {
-        catalogsEl.innerHTML = '<span style="color:var(--muted)">Nessun catalogo trovato.</span>';
-        return;
-      }
-
-      list.forEach(c => {
-        const card = document.createElement("div");
-        card.className = "catalog";
-        const label = document.createElement("label");
-        label.className = "catalog-head";
-
-        const input = document.createElement("input");
-        input.type = "checkbox";
-        input.dataset.id = c.id;
-        input.dataset.type = c.type;
-        input.checked = c.checked;
-        input.addEventListener("change", () => { c.checked = input.checked; updateCount(); });
-
-        const { box, color } = makeLogo(c.name);
-        card.style.setProperty("--brand", color);
-
-        const txt = document.createElement("div");
-        txt.className = "txt";
-        const strong = document.createElement("strong");
-        strong.textContent = c.name;
-        const small = document.createElement("small");
-        small.textContent = c.type === "series" ? "Serie TV" : "Film";
-        txt.append(strong, small);
-
-        const check = document.createElement("span");
-        check.className = "check";
-        check.innerHTML = '<svg viewBox="0 0 24 24"><path d="m5 12 5 5 9-10"/></svg>';
-
-        label.append(input, box, txt, check);
-
-        const opts = document.createElement("div");
-        opts.className = "opts";
-        opts.append(
-          makePick("Formato", c, "shape", [["landscape", "Landscape (orizzontale)", "shape-ic land"], ["poster", "Portrait (verticale)", "shape-ic port"]]),
-          makePick("Sfondo", c, "canvasBackground", [["transparent", "Sfondo trasparente", "dot tr"], ["black", "Sfondo nero", "dot bk"]])
-        );
-
-        card.append(label, opts);
-        catalogsEl.append(card);
-      });
-      updateCount();
-    }
-
-    async function loadCatalogs() {
-      try {
-        const res = await fetch("/api/catalogs");
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || "Errore cataloghi");
-        allCatalogs = data.catalogs.map(c => ({ ...c, checked: true, shape: "landscape", canvasBackground: "transparent" }));
-        renderCatalogs();
-      } catch (err) {
-        catalogsEl.innerHTML = "";
-        const s = document.createElement("span");
-        s.style.color = "#ffaaaa";
-        s.textContent = err.message;
-        catalogsEl.append(s);
-      }
-    }
-
-    $("search").addEventListener("input", renderCatalogs);
-    document.querySelectorAll(".seg button").forEach(b => b.addEventListener("click", () => {
-      document.querySelectorAll(".seg button").forEach(x => x.classList.remove("on"));
-      b.classList.add("on");
-      typeFilter = b.dataset.f;
-      renderCatalogs();
-    }));
-    $("allBtn").addEventListener("click", () => {
-      const q = $("search").value.trim().toLowerCase();
-      allCatalogs.forEach(c => { if ((typeFilter === "all" || c.type === typeFilter) && c.name.toLowerCase().includes(q)) c.checked = true; });
-      renderCatalogs();
-    });
-    document.querySelectorAll("[data-bulk]").forEach(b => b.addEventListener("click", () => {
-      const prop = b.dataset.bulk === "shape" ? "shape" : "canvasBackground";
-      allCatalogs.forEach(c => { if (c.checked) c[prop] = b.dataset.v; });
-      renderCatalogs();
-    }));
-    $("noneBtn").addEventListener("click", () => {
-      const q = $("search").value.trim().toLowerCase();
-      allCatalogs.forEach(c => { if ((typeFilter === "all" || c.type === typeFilter) && c.name.toLowerCase().includes(q)) c.checked = false; });
-      renderCatalogs();
-    });
-
-    /* ---------- chiave TMDB ---------- */
-    function checkKeyFormat() {
-      const v = keyEl.value.trim();
-      if (!v) { keyStatus.textContent = ""; keyStatus.className = "status"; return; }
-      if (/^[a-f0-9]{32}$/i.test(v)) { keyStatus.textContent = "✓ Formato valido (v3)"; keyStatus.className = "status ok"; }
-      else if (v.startsWith("eyJ")) { keyStatus.textContent = "Questo sembra il Read Access Token: serve la API Key (v3) da 32 caratteri."; keyStatus.className = "status bad"; }
-      else { keyStatus.textContent = "La chiave v3 è di 32 caratteri esadecimali."; keyStatus.className = "status bad"; }
-    }
-    keyEl.addEventListener("input", () => { checkKeyFormat(); updateSummary(); });
-    $("eyeBtn").addEventListener("click", e => {
-      const show = keyEl.type === "password";
-      keyEl.type = show ? "text" : "password";
-      e.currentTarget.setAttribute("aria-pressed", show);
-      e.currentTarget.setAttribute("aria-label", show ? "Nascondi la chiave" : "Mostra la chiave");
-    });
-    $("pasteBtn").addEventListener("click", async () => {
-      try { keyEl.value = (await navigator.clipboard.readText()).trim(); checkKeyFormat(); }
-      catch { keyEl.focus(); }
-    });
-
-    try {
-      const saved = localStorage.getItem("tmdbKey");
-      if (saved) { keyEl.value = saved; $("remember").checked = true; checkKeyFormat(); }
-    } catch {}
-
-    /* ---------- genera ---------- */
-    generateBtn.addEventListener("click", async () => {
-      const tmdbApiKey = keyEl.value.trim();
-      const catalogs = selectedCatalogs();
-      result.classList.remove("show");
-
-      if (!catalogs.length) return setMessage("Seleziona almeno un catalogo.", "bad");
-      if (!tmdbApiKey) {
-        keyEl.focus();
-        return setMessage("Inserisci la tua TMDB API key (usa il pulsante qui sopra per ottenerla).", "bad");
-      }
-
-      generateBtn.disabled = true;
-      generateBtn.querySelector(".label").textContent = "Generazione…";
-
-      try {
-        const res = await fetch("/api/generate", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ tmdbApiKey, catalogs })
-        });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || "Errore generazione");
-
-        try {
-          if ($("remember").checked) localStorage.setItem("tmdbKey", tmdbApiKey);
-          else localStorage.removeItem("tmdbKey");
-        } catch {}
-
-        manifestUrl.value = data.manifestUrl;
-        const noProto = data.manifestUrl.replace(/^https?:\/\//, "");
-        $("stremioBtn").href = "stremio://" + noProto;
-        $("nuvioBtn").href = "nuvio://addon?url=" + encodeURIComponent(data.manifestUrl);
-        result.classList.add("show");
-        result.scrollIntoView({ behavior: "smooth", block: "center" });
-        setMessage(`Manifest generato con ${data.catalogCount} cataloghi.`, "ok");
-      } catch (err) {
-        setMessage(err.message, "bad");
-      } finally {
-        generateBtn.disabled = false;
-        generateBtn.querySelector(".label").textContent = "Genera manifest";
-      }
-    });
-
-    $("copyBtn").addEventListener("click", async () => {
-      try { await navigator.clipboard.writeText(manifestUrl.value); }
-      catch { manifestUrl.select(); document.execCommand("copy"); }
-      $("copyBtn").textContent = "Copiato ✓";
-      setTimeout(() => $("copyBtn").textContent = "Copia", 1800);
-    });
-
-    /* ---------- v3: marquee loghi + spotlight ---------- */
-    (function () {
-      const items = ["netflix", LOGO.disney, LOGO.prime, LOGO.now, LOGO.hbomax, LOGO.raiplay, "appletv",
-        LOGO.infinity, LOGO.tim, LOGO.discovery, "paramountplus", LOGO.rakuten, LOGO.chili, LOGO.stremio, LOGO.nuvio, LOGO.tmdb];
-      const row = items.map(src => {
-        const custom = src.startsWith("http") || src.startsWith("data:");
-        const url = custom ? src : `${ICON_CDN}${src}.svg`;
-        return `<span class="brand${custom ? " custom" : ""}"><img src="${url}" alt="" referrerpolicy="no-referrer" onerror="this.parentNode.remove()" /></span>`;
-      }).join("");
-      $("track").innerHTML = row + row;
-    })();
-
-    /* ---------- cover Top 4 (immagini reali dell'addon) ---------- */
-    (function () {
-      const base = "https://blvcktop.onrender.com/c/nmoG69qfX6e3tqJVtEaK0sLlrNOFz-tITBc8c_UFds0rhMDfnZ-4y3Voo2jyILN134ZxoR2UJGX-vRgMiRxzjHUXd89UodKEP0DDdxnmMvgKDSz8-zLo7LJDe4N8s3SPRqLqnpSKVUJ7EsFDX-pns5AQ-m87EnZfertRA1iCNCf7WWI8PYUdK2NNhNKJv340KtymzpS7ZIsBqhJ3wzX25TFm1ABaccoq2schhTtYqnHtCkrUbhXQ9UzmzZFB-Ey53JVyhROvBnG1r4rWkFRsUbZR18xymaqjAipZFx5lWWy6rKQd_nAOfwSl12l7arfrHIzvDqtALiliTrSIrsSetFYbqK_F0g8Rf6QkqgU5T2UOX_WbX5cann-Uk-ZdMrXn-RmrxaXLRb2BevMgu_9WX66lThnGFEsRE77gjZ9JGP0MJ4_iE3Nw0b6p2BxN4oSm8pwy5uBfb-YmVPBegWqUCnvzhfMNlxEAs2w5d7iWFnvWMqGQ0_HZPjfeFV0rCUZl_X1pScNTQb_uUkjfz_YsZ9C7kIHp1LNUJ1PAumE3bodIYfg5SSNVJ82tyPjIBJ9lw8YTyLN6CMeQz09UinnLpiBYXwxxhK2Adcd3sW3KMuxbjoYJygrtYCVufR7qGXdr-z4wrzvzV23krFKiv5KzZzPKeHy0DD52Nx0OFkR6TiSNf4XqLgrgQzjX08mgIb7iYE0G8iKdeJFwK144VLwrFXqWy_TvMGfSAgPE4feLv26DK3jZ2A-QL_21xOQ6BI6ZzxSOl0p6aurvM_naUa6wU4NsGqVUSEjqrvkDLZEz8iMaEVo7AuTNY-5XZ8-DglPQ3L2vcWc82Z6bmWZbpUr7enEoGyJko51JIZp9ruM2bRMMBUKstcC6EmkVVTJRs4ckIs5YRbp6tyvW3553lnUSiFMqGdVWfIeb3iPJjI0NWuhEcL7PAgAbrAsEghLgvk3z7Gt3Gd9fVxpPfIjF1qwzjoimmM87a0hhYWCsvid40PTwq3CJZbq-4XA14QrKKZzKnRwZYvnGOYe0teyJCxbSKoxpqpa3I51atLzL_z5RpM2r8nyWczxBX6GV_Jp8olbIy0Zzy45Ij56EddhEqL90YxBkXiJcmSVAtKf7sbGbJWUu72jHn2LGfhrV5Cv0ISXfrrnuAByr8nTuju9yndzcOqBxKQ_9XHFJcVYqMmI_wyvQH4uqMBlLoaMYwzV9hQLv-lbY6YyJs7nlZaXVz4G0pu_WS-uB-7EG65f9Mt9XQMJHx-4JC4Dp3SbgOsHpEiRHwninHX48lwUOzgDQlREkcW-rgH0XhAeAnjFUGYCSTaCpMHApYwXdEU0QRjsdoNNNlVWFjMc5MuPnO6nXSo1DCw46JCx8b1uBj8j4E3CZEfNUfmlhxhbxCMV1cVjgqlYzuZ4XGwpe0w-nG3t-7ROjDBp1btNMmknc6wP7YEoLSX0dcVPUyoxfOf95e1gnCFV_oNn1kD9nf-6MqN7maQk7I7lIDMI2KnZNvOCzmQ2Fbg/top-cover";
-      const ids = [1423191, 1377237, 1283515, 977942];
-      $("covers").innerHTML = ids.map((id, i) =>
-        `<div class="cv"><span class="poster"><img src="${base}?rank=${i + 1}&type=movie&tmdbId=${id}" alt="" decoding="async" referrerpolicy="no-referrer" onerror="this.remove()" /></span></div>`
-      ).join("");
-    })();
-
-    loadCatalogs();
-  </script>
-</body>
-</html>
+    /* controlli condivisi: stessa altezza, stesso stile */
+    .ctl { height: var(--h); border-radius: 999px; border: 1px solid var(--line2); background: transparent; color: #d7dbe2; font-size: 13px; font-weight: 500; transition: background .2s, border-color .2s, color .2s; }
+    button.ctl { display: inline-flex; align-items: center; justify-content: center; padding: 0 18px; }
+    button.ctl:hover { background: rgba(255,255,255,.06); color: #fff; }
+    .toolbar { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 14px; }
+    .search { flex: 1 1 220px; min-width: 0; width: auto; padding: 0 18px; outline: none; font: inherit; font-size: 13px; color: #fff; }
+    .search::placeholder { color: var(--dim); }
+    .search:focus { border-color: rgba(255,255,255,.4); }
+    .seg { display: inline-flex; padding: 3px; gap: 2px; }
+    .seg button { padding: 0 14px; border-radius: 999px; color: var(--muted); font-size: 13px; font-weight: 500; transition: .2s; }
+    .seg button.on { background: rgba(255,255,255,.12); color: #fff; }
+    .counter { margin-left: auto; color: var(--dim); font-size: 13px; padding-left: 6px; }
+    .counter b { color: #fff; font-weight: 600; }
+
+    .bulk { display: flex; flex-wrap: wrap; gap: 6px 22px; align-items: center; margin: 0 0 18px; color: var(--dim); font-size: 12px; }
+    .bulk .grp { display: inline-flex; align-items: center; gap: 4px; }
+    .bulk .grp > em { font-style: normal; margin-right: 6px; letter-spacing: .08em; text-transform: uppercase; font-size: 10.5px; }
+
+    /* opzioni minimal: formato / sfondo */
+    .o { display: inline-flex; align-items: center; gap: 8px; height: 28px; padding: 0 11px; border-radius: 999px; border: 1px solid transparent; color: var(--muted); font-size: 12.5px; transition: .2s; white-space: nowrap; }
+    .o:hover { color: #fff; }
+    .o.on { color: #fff; border-color: var(--line2); background: rgba(255,255,255,.05); }
+    .g-land, .g-port { display: block; border: 1.25px solid currentColor; border-radius: 2px; }
+    .g-land { width: 16px; height: 9px; }
