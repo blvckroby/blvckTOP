@@ -1,130 +1,73 @@
-# blvckTOP v7.2
+# blvckTOP v7.3 (SQLite & ARM Edition)
 
-Addon configurabile per Nuvio/Stremio con Top 10 numerate.
+Addon ad alte prestazioni per Nuvio e Stremio con Top 10 numerate, rendering grafico HD e persistenza su SQLite.
 
-## Novità v7.1
+---
 
-Ogni utente può scegliere **per ogni catalogo**:
+## 🚀 Novità v7.3
 
-- Landscape
-- Portrait
+* **Database SQLite e Storage persistente:** Mappature IMDb $\rightarrow$ TMDB, asset grafici (loghi e backdrop) e cover PNG generate vengono salvati su disco (`/app/data`). Le richieste successive vengono servite all'istante in **0ms** come file statici.
+* **Pre-caching e Aggiornamento Programmato (Cron):** Il server sincronizza automaticamente tutti i cataloghi ed esegue il pre-rendering in background **ogni giorno alle 09:00 e alle 18:00**. Quando apri Stremio, le cover sono già pronte.
+* **Chiave TMDB Globale:** La TMDB API key è gestita a livello di server (configurabile in `.env`), eliminando la richiesta di inserimento per i singoli utenti nel configuratore web.
+* **Supporto Nativo Docker & ARM (carloarm):** Pronto per l'installazione su server ARM64 / Raspberry / VPS tramite `docker compose`.
 
-La scelta viene salvata nel token cifrato del manifest personale.
+---
 
-### Landscape
+## 🎨 Formati e Personalizzazioni
 
-- cover 1280×720
-- backdrop TMDB `w1280`
-- numero a sinistra
-- logo ufficiale dentro la card
-- `posterShape: "landscape"`
+Ogni utente può scegliere per ciascun catalogo:
+* **Landscape:** Cover $1280 \times 720$, backdrop TMDB `w1280`, logo ufficiale e numero a sinistra con glow.
+* **Portrait:** Cover $1000 \times 1500$, poster verticale TMDB `w780`, logo ufficiale e numero a sinistra.
+* **Sfondo Canvas:** Trasparente o Nero (`#000000`).
 
-### Portrait
+---
 
-- cover 1000×1500
-- poster verticale TMDB `w780`
-- numero a sinistra
-- logo ufficiale dentro la card
-- `posterShape: "poster"`
+## 🛠️ Installazione su Server / Docker (carloarm)
 
-## Glow automatico per piattaforma
-
-Il numero riceve un glow diverso in base al nome/id del catalogo.
-
-Colori inclusi:
-
-- Netflix → rosso
-- Prime Video / Amazon → azzurro
-- Disney+ → blu
-- Apple TV+ → bianco/grigio freddo
-- NOW → ciano
-- Paramount+ → blu
-- RaiPlay → blu
-- Rakuten → rosso scuro
-- CHILI → arancio
-- HBO / Max → viola
-- fallback → viola
-
-La funzione è in `server.js`:
-
-```js
-function catalogAccent(catalog) { ... }
+### 1. Clona il repository
+```bash
+git clone https://github.com/qwertyuiop8899/blvckTOP.git
+cd blvckTOP
 ```
 
-quindi puoi cambiare i colori facilmente.
-
-## Cache
-
-La v7 include anche le ottimizzazioni di cache:
-
-- cataloghi/manifest/meta sorgente → 5 minuti
-- dati TMDB images → 6 ore
-- conversione IMDb → TMDB → 24 ore
-- download immagini → 6 ore
-- cover PNG generate → 24 ore
-- richieste simultanee della stessa cover vengono unite
-- backdrop landscape TMDB usa `w1280` invece di `original`
-
-Su Render Free la cache RAM viene persa quando l'istanza viene riavviata/spenta.
-
-## Variabili ambiente Render
-
+### 2. Configura le variabili d'ambiente
+Copia il file di esempio:
+```bash
+cp .env.example .env
+```
+Modifica il file `.env`:
 ```env
+PORT=3000
 SOURCE_MANIFEST_URL=https://IL-TUO-MANIFEST-SORGENTE/manifest.json
-APP_SECRET=UNA_STRINGA_LUNGA_E_STABILE
+APP_SECRET=stringa_lunga_e_casuale_di_almeno_32_caratteri_stabile
+TMDB_API_KEY=ad0f7351455041d8c9c0d4370a4b5fa5
+DATA_DIR=/app/data
 ```
 
-Non cambiare `APP_SECRET`, altrimenti i manifest già generati smettono di funzionare.
+> [!IMPORTANT]
+> Non cambiare `APP_SECRET` dopo aver generato i manifest agli utenti, altrimenti i loro token cifrati smetteranno di essere validi.
 
-## GitHub / Render
-
-Carica i file nel repository GitHub e lascia che Render faccia il redeploy.
-
-Il progetto include:
-
-- `Dockerfile`
-- `render.yaml`
-- `.gitignore`
-
-## Compatibilità vecchi token
-
-La v7 continua a interpretare i vecchi token senza `shape` come `landscape`.
-
-Per usare la nuova modalità portrait, gli utenti devono generare un nuovo manifest
-dalla home.
-
-
-## Ritocchi grafici v7.1
-
-### Portrait più grande
-
-La card portrait passa a:
-
-```js
-width: 680
-height: 1020
+### 3. Avvia con Docker Compose
+```bash
+docker compose up -d --build
 ```
 
-con canvas 1000×1500, così riempie meglio lo spazio.
+Il database SQLite e tutte le locandine generate verranno salvati nella cartella locale `./data`, persistendo a tutti i riavvii del server.
 
-### Numero outline
+---
 
-Il numero ora è:
+## 📊 Monitoraggio Statistiche Cache
 
-- interno trasparente;
-- solo bordo;
-- bordo sfumato bianco → grigio chiaro;
-- glow colorato dietro in base alla piattaforma;
-- stroke leggermente più spesso per mantenere leggibilità su TV.
-
-Il fill del numero è quindi completamente vuoto.
-
-
-## Sfondo cover configurabile
-
-Ogni catalogo può scegliere anche il background del canvas:
-
-- Trasparente
-- Nero #000
-
-La scelta viene salvata nel token insieme a formato e catalogo.
+Puoi verificare in qualunque momento quante copertine e dati sono stati salvati nella cache visitando:
+```
+http://tuo-server:3000/api/stats
+```
+Risposta di esempio:
+```json
+{
+  "covers": 240,
+  "assets": 110,
+  "mappings": 85,
+  "dataDir": "/app/data"
+}
+```

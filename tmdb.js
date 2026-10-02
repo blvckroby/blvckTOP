@@ -1,52 +1,24 @@
+import {
+  getTmdbMapping,
+  setTmdbMapping,
+  getTmdbImagesDb,
+  setTmdbImagesDb
+} from "./db.js";
+
 const TMDB_API = "https://api.themoviedb.org/3";
 const TMDB_IMAGE = "https://image.tmdb.org/t/p";
+export const DEFAULT_TMDB_KEY = process.env.TMDB_API_KEY || "ad0f7351455041d8c9c0d4370a4b5fa5";
 
-const CACHE = {
-  images: new Map(),
-  find: new Map(),
-  validation: new Map()
-};
-
-const TTL = {
-  images: 6 * 60 * 60 * 1000,
-  find: 24 * 60 * 60 * 1000,
-  validation: 60 * 60 * 1000
-};
-
-function getCached(map, key) {
-  const item = map.get(key);
-  if (!item) return null;
-
-  if (item.expiresAt <= Date.now()) {
-    map.delete(key);
-    return null;
-  }
-
-  return item.value;
-}
-
-function setCached(map, key, value, ttl, max = 1000) {
-  map.set(key, {
-    value,
-    expiresAt: Date.now() + ttl
-  });
-
-  while (map.size > max) {
-    const first = map.keys().next().value;
-    if (!first) break;
-    map.delete(first);
-  }
-}
-
-async function tmdbFetch(path, apiKey) {
-  if (!apiKey) throw new Error("TMDB API key mancante.");
+async function tmdbFetch(path, apiKey = DEFAULT_TMDB_KEY) {
+  const key = apiKey || DEFAULT_TMDB_KEY;
+  if (!key) throw new Error("TMDB API key mancante.");
 
   const sep = path.includes("?") ? "&" : "?";
-  const url = `${TMDB_API}${path}${sep}api_key=${encodeURIComponent(apiKey)}`;
+  const url = `${TMDB_API}${path}${sep}api_key=${encodeURIComponent(key)}`;
 
   const response = await fetch(url, {
     headers: {
-      "User-Agent": "blvckTOP/7.0"
+      "User-Agent": "blvckTOP/7.2"
     }
   });
 
@@ -57,33 +29,46 @@ async function tmdbFetch(path, apiKey) {
   return response.json();
 }
 
-export async function validateTmdbKey(apiKey) {
-  const key = apiKey.slice(0, 10);
-  const cached = getCached(CACHE.validation, key);
-  if (cached) return true;
-
+export async function validateTmdbKey(apiKey = DEFAULT_TMDB_KEY) {
   await tmdbFetch("/configuration", apiKey);
-  setCached(CACHE.validation, key, true, TTL.validation, 100);
   return true;
 }
 
-export async function getTmdbImages(type, tmdbId, apiKey) {
+export async function getTmdbImages(type, tmdbId, apiKey = DEFAULT_TMDB_KEY) {
   const mediaType = type === "series" || type === "tv" ? "tv" : "movie";
-  const cacheKey = `${mediaType}:${tmdbId}`;
 
-  const cached = getCached(CACHE.images, cacheKey);
-  if (cached) return cached;
+  // Check persistent DB first
+  const dbData = getTmdbImagesDb(mediaType, tmdbId);
+  if (dbData) return dbData;
 
   const data = await tmdbFetch(
     `/${mediaType}/${encodeURIComponent(tmdbId)}/images?include_image_language=it,en,null`,
     apiKey
   );
 
-  setCached(CACHE.images, cacheKey, data, TTL.images, 600);
+  // Store in DB
+  setTmdbImagesDb(mediaType, tmdbId, data);
   return data;
 }
 
-export async function resolveTmdbId(type, rawId, apiKey) {
+export async function getTmdbDetails(type, tmdbId, apiKey = DEFAULT_TMDB_KEY) {
+  if (!tmdbId) return null;
+  const mediaType = type === "series" || type === "tv" ? "tv" : "movie";
+  try {
+    const data = await tmdbFetch(
+      `/${mediaType}/${encodeURIComponent(tmdbId)}?language=it-IT`,
+      apiKey
+    );
+    const genre = data.genres?.[0]?.name || "";
+    const rating = data.vote_average && data.vote_average > 0 ? String(data.vote_average.toFixed(1)) : "";
+    return { genre, rating, title: data.title || data.name };
+  } catch (err) {
+    console.warn(`TMDB details fallito per ${mediaType} ${tmdbId}:`, err.message);
+    return null;
+  }
+}
+
+export async function resolveTmdbId(type, rawId, apiKey = DEFAULT_TMDB_KEY) {
   if (!rawId) return null;
 
   const id = String(rawId);
@@ -98,21 +83,30 @@ export async function resolveTmdbId(type, rawId, apiKey) {
 
   if (id.startsWith("tt")) {
     const wantsTv = type === "series" || type === "tv";
-    const cacheKey = `${wantsTv ? "tv" : "movie"}:${id}`;
+    const mediaType = wantsTv ? "tv" : "movie";
 
-    const cached = getCached(CACHE.find, cacheKey);
-    if (cached !== null) return cached;
+    // Check persistent DB
+    const cachedId = getTmdbMapping(id, mediaType);
+    if (cachedId !== undefined) {
+      return cachedId;
+    }
 
-    const data = await tmdbFetch(
-      `/find/${encodeURIComponent(id)}?external_source=imdb_id`,
-      apiKey
-    );
+    try {
+      const data = await tmdbFetch(
+        `/find/${encodeURIComponent(id)}?external_source=imdb_id`,
+        apiKey
+      );
 
-    const list = wantsTv ? data.tv_results : data.movie_results;
-    const result = list?.[0]?.id ? String(list[0].id) : null;
+      const list = wantsTv ? data.tv_results : data.movie_results;
+      const result = list?.[0]?.id ? String(list[0].id) : null;
 
-    setCached(CACHE.find, cacheKey, result, TTL.find, 1000);
-    return result;
+      // Store in DB (even if null, to avoid re-querying failed lookups)
+      setTmdbMapping(id, mediaType, result);
+      return result;
+    } catch (err) {
+      console.warn(`TMDB find fallito per ${id}:`, err.message);
+      return null;
+    }
   }
 
   return null;
@@ -136,7 +130,7 @@ function sortImages(items) {
 }
 
 export function chooseBackdrop(images) {
-  const items = sortImages(images.backdrops);
+  const items = sortImages(images?.backdrops);
 
   return items.length
     ? `${TMDB_IMAGE}/w1280${items[0].file_path}`
@@ -144,7 +138,7 @@ export function chooseBackdrop(images) {
 }
 
 export function choosePoster(images) {
-  const items = sortImages(images.posters);
+  const items = sortImages(images?.posters);
 
   return items.length
     ? `${TMDB_IMAGE}/w780${items[0].file_path}`
@@ -152,7 +146,7 @@ export function choosePoster(images) {
 }
 
 export function chooseLogo(images) {
-  const items = sortImages(images.logos);
+  const items = sortImages(images?.logos);
 
   return items.length
     ? `${TMDB_IMAGE}/w500${items[0].file_path}`

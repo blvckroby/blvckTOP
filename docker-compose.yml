@@ -1,0 +1,27 @@
+services:
+  blvcktop:
+    build: .
+    container_name: blvcktop
+    restart: unless-stopped
+    cpus: 1.0
+    mem_limit: 1024m
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1024M
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - SOURCE_MANIFEST_URL=${SOURCE_MANIFEST_URL}
+      - APP_SECRET=${APP_SECRET}
+      - TMDB_API_KEY=${TMDB_API_KEY:-ad0f7351455041d8c9c0d4370a4b5fa5}
+      - HTTP_PROXY=${HTTP_PROXY:-}
+      - HTTPS_PROXY=${HTTPS_PROXY:-}
+      - DATA_DIR=/app/data
+      - NODE_ENV=production
+    volumes:
+      - ./data:/app/data
+      - ./public:/app/public
+
