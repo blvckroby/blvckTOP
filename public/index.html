@@ -625,6 +625,11 @@
     function buildGroups(catalogs) {
       const map = new Map();
       catalogs.forEach(c => {
+        const id = String(c.id || "").toLowerCase();
+        const rawName = String(c.name || "").toLowerCase();
+        if (id.includes("last-video") || id.includes("calendar-video")) return;
+        if (rawName.includes("last video") || rawName.includes("calendar video")) return;
+
         const name = providerOf(c.name);
         const key = name.toLowerCase();
         if (!map.has(key)) map.set(key, { key, name, items: [] });

@@ -208,11 +208,19 @@ app.get("/api/catalogs", async (_req, res) => {
   try {
     const source = await fetchJson(SOURCE_MANIFEST_URL);
 
-    const catalogs = (source.catalogs || []).map(c => ({
-      id: c.id,
-      type: c.type,
-      name: c.name || c.id
-    }));
+    const catalogs = (source.catalogs || [])
+      .filter(c => {
+        const id = String(c.id || "").toLowerCase();
+        const name = String(c.name || "").toLowerCase();
+        if (id.includes("last-video") || id.includes("calendar-video")) return false;
+        if (name.includes("last video") || name.includes("calendar video")) return false;
+        return true;
+      })
+      .map(c => ({
+        id: c.id,
+        type: c.type,
+        name: c.name || c.id
+      }));
 
     res.setHeader("Cache-Control", "public, max-age=300");
     res.json({ catalogs });

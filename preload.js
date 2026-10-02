@@ -79,10 +79,14 @@ export async function preloadAllCatalogs(sourceManifestUrl, options = {}) {
       throw new Error(`Manifest sorgente non raggiungibile (${manifestResponse.status})`);
     }
 
-    const sourceManifest = await manifestResponse.json();
-    setCachedJson(sourceManifestUrl, sourceManifest, 30 * 60 * 1000); // 30 min cache for manifest
-
-    const catalogs = Array.isArray(sourceManifest.catalogs) ? sourceManifest.catalogs : [];
+    const catalogs = (Array.isArray(sourceManifest.catalogs) ? sourceManifest.catalogs : [])
+      .filter(c => {
+        const id = String(c.id || "").toLowerCase();
+        const name = String(c.name || "").toLowerCase();
+        if (id.includes("last-video") || id.includes("calendar-video")) return false;
+        if (name.includes("last video") || name.includes("calendar video")) return false;
+        return true;
+      });
     catalogCount = catalogs.length;
 
     for (const cat of catalogs) {
