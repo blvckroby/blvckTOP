@@ -524,58 +524,41 @@ function numberSvg(rank, layout, accent, genre = "", rating = "", canvasBackgrou
   const ratingVal = formatRating(rating);
   const isLandscape = layout === LAYOUTS.landscape;
 
-  const metaX = isLandscape ? 640 : 500;
-  const metaY = isLandscape ? 668 : 1380;
-
+  // 1. Standalone Large Provider Logo (Left Column, Under Number)
+  let logoXml = "";
   const rawLogo = (showLogo && catalogId) ? getProviderLogoSvg(catalogId) : null;
-  const logoObj = rawLogo ? {
-    width: isLandscape ? rawLogo.width : Math.round(rawLogo.width * 1.35),
-    height: isLandscape ? rawLogo.height : Math.round(rawLogo.height * 1.35),
-    svg: rawLogo.svg
-  } : null;
 
+  if (rawLogo && rawLogo.svg) {
+    const maxLogoW = isLandscape ? 200 : 180;
+    const maxLogoH = isLandscape ? 72 : 85;
+    const scale = Math.min(maxLogoW / rawLogo.width, maxLogoH / rawLogo.height);
+    const logoW = Math.round(rawLogo.width * scale);
+    const logoH = Math.round(rawLogo.height * scale);
+
+    const leftCenterX = isLandscape ? 150 : 105;
+    const leftCenterY = isLandscape ? 620 : 1380;
+    const logoX = Math.round(leftCenterX - logoW / 2);
+    const logoY = Math.round(leftCenterY - logoH / 2);
+
+    const logoHref = `data:image/svg+xml;base64,${Buffer.from(rawLogo.svg).toString("base64")}`;
+    logoXml = `
+      <g filter="url(#logoShadow)">
+        <image href="${logoHref}" x="${logoX}" y="${logoY}" width="${logoW}" height="${logoH}" />
+      </g>
+    `;
+  }
+
+  // 2. Metadata (Genre & Rating Centered Under Artwork Card)
+  const metaX = isLandscape ? 750 : 575;
+  const metaY = isLandscape ? 672 : 1385;
   let metaXml = "";
 
   if (isLandscape) {
-    const gSize = escapedGenre.length > 14 ? 32 : (escapedGenre.length > 10 ? 36 : 40);
-    const starSize = 46;
-    const dotSize = 30;
+    const gSize = escapedGenre.length > 14 ? 36 : (escapedGenre.length > 10 ? 40 : 44);
+    const starSize = 50;
+    const dotSize = 34;
 
-    if (logoObj && (escapedGenre || ratingVal)) {
-      // Symmetrical Layout: GENERE • [Logo Provider] • ★ VOTO
-      const logoHref = `data:image/svg+xml;base64,${Buffer.from(logoObj.svg).toString("base64")}`;
-      const leftPart = escapedGenre ? `
-        <text x="${metaX - logoObj.width / 2 - 14}" y="${metaY}" text-anchor="end" font-family="Inter, -apple-system, sans-serif" filter="url(#metaShadow)">
-          <tspan fill="#F1F5F9" font-size="${gSize}" font-weight="900" letter-spacing="2.5">${escapedGenre}</tspan>
-          <tspan fill="#94A3B8" font-size="${dotSize}" font-weight="800">   •</tspan>
-        </text>
-      ` : "";
-
-      const centerLogo = `
-        <g filter="url(#metaShadow)">
-          <image href="${logoHref}" x="${metaX - logoObj.width / 2}" y="${metaY - logoObj.height + 6}" width="${logoObj.width}" height="${logoObj.height}" />
-        </g>
-      `;
-
-      const rightPart = ratingVal ? `
-        <text x="${metaX + logoObj.width / 2 + 14}" y="${metaY}" text-anchor="start" font-family="Inter, -apple-system, sans-serif" filter="url(#metaShadow)">
-          <tspan fill="#94A3B8" font-size="${dotSize}" font-weight="800">•   </tspan>
-          <tspan fill="#FFB800" font-size="${starSize}" font-weight="900">★ </tspan>
-          <tspan fill="#FFFFFF" font-size="${starSize}" font-weight="900">${ratingVal}</tspan>
-        </text>
-      ` : "";
-
-      metaXml = `${leftPart}${centerLogo}${rightPart}`;
-    } else if (logoObj) {
-      // Only Logo Centered
-      const logoHref = `data:image/svg+xml;base64,${Buffer.from(logoObj.svg).toString("base64")}`;
-      metaXml = `
-        <g filter="url(#metaShadow)">
-          <image href="${logoHref}" x="${metaX - logoObj.width / 2}" y="${metaY - logoObj.height + 6}" width="${logoObj.width}" height="${logoObj.height}" />
-        </g>
-      `;
-    } else if (escapedGenre && ratingVal) {
-      // Standard Centered Meta: GENERE • ★ VOTO
+    if (escapedGenre && ratingVal) {
       metaXml = `
         <text x="${metaX}" y="${metaY}" text-anchor="middle" font-family="Inter, -apple-system, BlinkMacSystemFont, Arial, sans-serif" filter="url(#metaShadow)">
           <tspan fill="#F1F5F9" font-size="${gSize}" font-weight="900" letter-spacing="2.5">${escapedGenre}</tspan>
@@ -585,50 +568,17 @@ function numberSvg(rank, layout, accent, genre = "", rating = "", canvasBackgrou
         </text>
       `;
     } else if (escapedGenre) {
-      metaXml = `<text x="${metaX}" y="${metaY}" text-anchor="middle" font-family="Inter, -apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="40" font-weight="900" letter-spacing="2.5" fill="#F1F5F9" filter="url(#metaShadow)">${escapedGenre}</text>`;
+      metaXml = `<text x="${metaX}" y="${metaY}" text-anchor="middle" font-family="Inter, -apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="44" font-weight="900" letter-spacing="2.5" fill="#F1F5F9" filter="url(#metaShadow)">${escapedGenre}</text>`;
     } else if (ratingVal) {
-      metaXml = `<text x="${metaX}" y="${metaY}" text-anchor="middle" font-family="Inter, -apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="46" font-weight="900" filter="url(#metaShadow)"><tspan fill="#FFB800">★ </tspan><tspan fill="#FFFFFF">${ratingVal}</tspan></text>`;
+      metaXml = `<text x="${metaX}" y="${metaY}" text-anchor="middle" font-family="Inter, -apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="50" font-weight="900" filter="url(#metaShadow)"><tspan fill="#FFB800">★ </tspan><tspan fill="#FFFFFF">${ratingVal}</tspan></text>`;
     }
   } else {
     // Poster / Portrait
-    const gSize = escapedGenre.length > 14 ? 44 : (escapedGenre.length > 10 ? 48 : 52);
-    const starSize = 64;
-    const dotSize = 38;
+    const gSize = escapedGenre.length > 14 ? 48 : (escapedGenre.length > 10 ? 54 : 60);
+    const starSize = 68;
+    const dotSize = 42;
 
-    if (logoObj && (escapedGenre || ratingVal)) {
-      // Symmetrical Layout: GENERE • [Logo Provider] • ★ VOTO
-      const logoHref = `data:image/svg+xml;base64,${Buffer.from(logoObj.svg).toString("base64")}`;
-      const leftPart = escapedGenre ? `
-        <text x="${metaX - logoObj.width / 2 - 18}" y="${metaY}" text-anchor="end" font-family="Inter, -apple-system, sans-serif" filter="url(#metaShadow)">
-          <tspan fill="#F1F5F9" font-size="${gSize}" font-weight="900" letter-spacing="3">${escapedGenre}</tspan>
-          <tspan fill="#94A3B8" font-size="${dotSize}" font-weight="800">   •</tspan>
-        </text>
-      ` : "";
-
-      const centerLogo = `
-        <g filter="url(#metaShadow)">
-          <image href="${logoHref}" x="${metaX - logoObj.width / 2}" y="${metaY - logoObj.height + 8}" width="${logoObj.width}" height="${logoObj.height}" />
-        </g>
-      `;
-
-      const rightPart = ratingVal ? `
-        <text x="${metaX + logoObj.width / 2 + 18}" y="${metaY}" text-anchor="start" font-family="Inter, -apple-system, sans-serif" filter="url(#metaShadow)">
-          <tspan fill="#94A3B8" font-size="${dotSize}" font-weight="800">•   </tspan>
-          <tspan fill="#FFB800" font-size="${starSize}" font-weight="900">★ </tspan>
-          <tspan fill="#FFFFFF" font-size="${starSize}" font-weight="900">${ratingVal}</tspan>
-        </text>
-      ` : "";
-
-      metaXml = `${leftPart}${centerLogo}${rightPart}`;
-    } else if (logoObj) {
-      // Only Logo Centered
-      const logoHref = `data:image/svg+xml;base64,${Buffer.from(logoObj.svg).toString("base64")}`;
-      metaXml = `
-        <g filter="url(#metaShadow)">
-          <image href="${logoHref}" x="${metaX - logoObj.width / 2}" y="${metaY - logoObj.height + 8}" width="${logoObj.width}" height="${logoObj.height}" />
-        </g>
-      `;
-    } else if (escapedGenre && ratingVal) {
+    if (escapedGenre && ratingVal) {
       metaXml = `
         <text x="${metaX}" y="${metaY}" text-anchor="middle" font-family="Inter, -apple-system, BlinkMacSystemFont, Arial, sans-serif" filter="url(#metaShadow)">
           <tspan fill="#F1F5F9" font-size="${gSize}" font-weight="900" letter-spacing="3">${escapedGenre}</tspan>
@@ -638,9 +588,9 @@ function numberSvg(rank, layout, accent, genre = "", rating = "", canvasBackgrou
         </text>
       `;
     } else if (escapedGenre) {
-      metaXml = `<text x="${metaX}" y="${metaY}" text-anchor="middle" font-family="Inter, -apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="52" font-weight="900" letter-spacing="3" fill="#F1F5F9" filter="url(#metaShadow)">${escapedGenre}</text>`;
+      metaXml = `<text x="${metaX}" y="${metaY}" text-anchor="middle" font-family="Inter, -apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="60" font-weight="900" letter-spacing="3" fill="#F1F5F9" filter="url(#metaShadow)">${escapedGenre}</text>`;
     } else if (ratingVal) {
-      metaXml = `<text x="${metaX}" y="${metaY}" text-anchor="middle" font-family="Inter, -apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="64" font-weight="900" filter="url(#metaShadow)"><tspan fill="#FFB800">★ </tspan><tspan fill="#FFFFFF">${ratingVal}</tspan></text>`;
+      metaXml = `<text x="${metaX}" y="${metaY}" text-anchor="middle" font-family="Inter, -apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="68" font-weight="900" filter="url(#metaShadow)"><tspan fill="#FFB800">★ </tspan><tspan fill="#FFFFFF">${ratingVal}</tspan></text>`;
     }
   }
 
@@ -699,8 +649,12 @@ function numberSvg(rank, layout, accent, genre = "", rating = "", canvasBackgrou
       <defs>
         ${defsFilterAndStroke}
 
+        <filter id="logoShadow" x="-30%" y="-30%" width="160%" height="160%">
+          <feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#000000" flood-opacity="0.92"/>
+        </filter>
+
         <filter id="metaShadow" x="-30%" y="-30%" width="160%" height="160%">
-          <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#000000" flood-opacity="0.95"/>
+          <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#000000" flood-opacity="0.95"/>
         </filter>
       </defs>
 
@@ -719,6 +673,7 @@ function numberSvg(rank, layout, accent, genre = "", rating = "", canvasBackgrou
         filter="url(#numFilter)"
       >${rank}</text>
 
+      ${logoXml}
       ${metaXml}
     </svg>
   `);
