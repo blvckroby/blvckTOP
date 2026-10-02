@@ -1,83 +1,170 @@
 import sharp from "sharp";
 
-const CANVAS = { width: 1280, height: 720 };
-
-const CARD = {
-  x: 300,
-  y: 107,
-  width: 900,
-  height: 506,
-  radius: 30
-};
-
-const NUMBER = {
-  centerY: CARD.y + CARD.height / 2,
-  xSingle: 62,
-  xDouble: 24,
-  sizeSingle: 450,
-  sizeDouble: 370
-};
-
-const LOGO = {
-  maxWidth: 380,
-  maxHeight: 155,
-  left: 46,
-  bottom: 40
-};
+const IMAGE_CACHE_TTL = 6 * 60 * 60 * 1000;
+const MAX_IMAGE_CACHE = 100;
 
 const imageCache = new Map();
 const pendingDownloads = new Map();
-const IMAGE_TTL = 6 * 60 * 60 * 1000;
-const MAX_IMAGE_CACHE = 80;
 
-function getImageFromCache(url) {
-  const entry = imageCache.get(url);
-  if (!entry) return null;
-  if (entry.expiresAt <= Date.now()) { imageCache.delete(url); return null; }
-  return entry.buffer;
+const LAYOUTS = {
+  landscape: {
+    canvas: { width: 1280, height: 720 },
+    card: {
+      x: 300,
+      y: 107,
+      width: 900,
+      height: 506,
+      radius: 30
+    },
+    number: {
+      xSingle: 62,
+      xDouble: 24,
+      sizeSingle: 450,
+      sizeDouble: 370,
+      opticalDrop: 8
+    },
+    logo: {
+      maxWidth: 380,
+      maxHeight: 155,
+      left: 46,
+      bottom: 40
+    }
+  },
+
+  poster: {
+    canvas: { width: 1000, height: 1500 },
+    card: {
+      x: 270,
+      y: 235,
+      width: 620,
+      height: 930,
+      radius: 34
+    },
+    number: {
+      xSingle: 34,
+      xDouble: 8,
+      sizeSingle: 350,
+      sizeDouble: 285,
+      opticalDrop: 14
+    },
+    logo: {
+      maxWidth: 320,
+      maxHeight: 130,
+      left: 38,
+      bottom: 40
+    }
+  }
+};
+
+function normalizedShape(shape) {
+  return shape === "poster" || shape === "portrait"
+    ? "poster"
+    : "landscape";
 }
 
-function saveImageToCache(url, buffer) {
-  imageCache.set(url, { buffer, expiresAt: Date.now() + IMAGE_TTL });
+function getImageFromCache(url) {
+  const item = imageCache.get(url);
+  if (!item) return null;
+
+  if (item.expiresAt <= Date.now()) {
+    imageCache.delete(url);
+    return null;
+  }
+
+  return item.buffer;
+}
+
+function setImageCache(url, buffer) {
+  imageCache.set(url, {
+    buffer,
+    expiresAt: Date.now() + IMAGE_CACHE_TTL
+  });
+
   while (imageCache.size > MAX_IMAGE_CACHE) {
-    const firstKey = imageCache.keys().next().value;
-    if (!firstKey) break;
-    imageCache.delete(firstKey);
+    const first = imageCache.keys().next().value;
+    if (!first) break;
+    imageCache.delete(first);
   }
 }
 
 async function fetchBuffer(url) {
   const cached = getImageFromCache(url);
   if (cached) return cached;
-  if (pendingDownloads.has(url)) return pendingDownloads.get(url);
+
+  if (pendingDownloads.has(url)) {
+    return pendingDownloads.get(url);
+  }
 
   const promise = (async () => {
-    const response = await fetch(url, { headers: { "User-Agent": "Nuvio-Top10-Custom-Covers/6.0" } });
-    if (!response.ok) throw new Error(`Download immagine fallito (${response.status})`);
+    const response = await fetch(url, {
+      headers: {
+        "User-Agent": "blvckTOP/7.0"
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error(`Download immagine fallito (${response.status})`);
+    }
+
     const buffer = Buffer.from(await response.arrayBuffer());
-    saveImageToCache(url, buffer);
+    setImageCache(url, buffer);
     return buffer;
   })();
 
   pendingDownloads.set(url, promise);
-  try { return await promise; }
-  finally { pendingDownloads.delete(url); }
+
+  try {
+    return await promise;
+  } finally {
+    pendingDownloads.delete(url);
+  }
 }
 
-function numberSvg(rank) {
+function hexToRgb(hex) {
+  const clean = String(hex || "#ffffff").replace("#", "");
+  const value = clean.length === 3
+    ? clean.split("").map(x => x + x).join("")
+    : clean.padEnd(6, "f").slice(0, 6);
+
+  return {
+    r: parseInt(value.slice(0, 2), 16),
+    g: parseInt(value.slice(2, 4), 16),
+    b: parseInt(value.slice(4, 6), 16)
+  };
+}
+
+function numberSvg(rank, layout, accent) {
+  const { canvas, card, number } = layout;
   const isDouble = String(rank).length > 1;
-  const fontSize = isDouble ? NUMBER.sizeDouble : NUMBER.sizeSingle;
-  const x = isDouble ? NUMBER.xDouble : NUMBER.xSingle;
-  const y = NUMBER.centerY + fontSize * 0.34 + 8;
+  const fontSize = isDouble ? number.sizeDouble : number.sizeSingle;
+  const x = isDouble ? number.xDouble : number.xSingle;
+
+  const centerY = card.y + card.height / 2;
+  const y = centerY + fontSize * 0.34 + number.opticalDrop;
 
   return Buffer.from(`
-    <svg width="${CANVAS.width}" height="${CANVAS.height}" xmlns="http://www.w3.org/2000/svg">
+    <svg width="${canvas.width}" height="${canvas.height}" xmlns="http://www.w3.org/2000/svg">
       <defs>
-        <linearGradient id="numGrad" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.96"/>
-          <stop offset="100%" stop-color="#D9D9D9" stop-opacity="0.82"/>
+        <linearGradient id="numberFill" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#FFFFFF" stop-opacity="1"/>
+          <stop offset="100%" stop-color="#D7D9DE" stop-opacity=".88"/>
         </linearGradient>
+
+        <filter id="brandGlow" x="-100%" y="-100%" width="300%" height="300%">
+          <feGaussianBlur stdDeviation="24" result="blur"/>
+          <feFlood flood-color="${accent}" flood-opacity=".72" result="glowColor"/>
+          <feComposite in="glowColor" in2="blur" operator="in" result="coloredGlow"/>
+          <feGaussianBlur in="SourceAlpha" stdDeviation="6" result="softShadow"/>
+          <feFlood flood-color="${accent}" flood-opacity=".48" result="softColor"/>
+          <feComposite in="softColor" in2="softShadow" operator="in" result="softGlow"/>
+          <feMerge>
+            <feMergeNode in="coloredGlow"/>
+            <feMergeNode in="softGlow"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
       </defs>
+
       <text
         x="${x}"
         y="${y}"
@@ -85,68 +172,98 @@ function numberSvg(rank) {
         font-size="${fontSize}"
         font-weight="800"
         letter-spacing="-16"
-        fill="url(#numGrad)"
+        fill="url(#numberFill)"
+        filter="url(#brandGlow)"
       >${rank}</text>
     </svg>
   `);
 }
 
-async function createRoundedArtwork(buffer) {
+async function roundedArtwork(buffer, layout) {
+  const { card } = layout;
+
   const resized = await sharp(buffer)
-    .resize(CARD.width, CARD.height, { fit: "cover", position: "centre" })
-    .png({ compressionLevel: 8, adaptiveFiltering: true })
+    .resize(card.width, card.height, {
+      fit: "cover",
+      position: "centre"
+    })
+    .png()
     .toBuffer();
 
   const mask = Buffer.from(`
-    <svg width="${CARD.width}" height="${CARD.height}" xmlns="http://www.w3.org/2000/svg">
-      <rect width="100%" height="100%" rx="${CARD.radius}" ry="${CARD.radius}" fill="#fff"/>
+    <svg width="${card.width}" height="${card.height}" xmlns="http://www.w3.org/2000/svg">
+      <rect
+        width="100%"
+        height="100%"
+        rx="${card.radius}"
+        ry="${card.radius}"
+        fill="#fff"
+      />
     </svg>
   `);
 
   return sharp(resized)
     .composite([{ input: mask, blend: "dest-in" }])
-    .png({ compressionLevel: 8, adaptiveFiltering: true })
+    .png()
     .toBuffer();
 }
 
-async function createCardShadow() {
+async function cardShadow(layout) {
+  const { card } = layout;
+
   const svg = Buffer.from(`
-    <svg width="${CARD.width + 100}" height="${CARD.height + 100}" xmlns="http://www.w3.org/2000/svg">
+    <svg width="${card.width + 120}" height="${card.height + 120}" xmlns="http://www.w3.org/2000/svg">
       <rect
-        x="50"
-        y="38"
-        width="${CARD.width}"
-        height="${CARD.height}"
-        rx="${CARD.radius}"
-        ry="${CARD.radius}"
+        x="60"
+        y="46"
+        width="${card.width}"
+        height="${card.height}"
+        rx="${card.radius}"
+        ry="${card.radius}"
         fill="#000"
-        fill-opacity="0.48"
+        fill-opacity=".52"
       />
     </svg>
   `);
 
-  return sharp(svg).blur(22).png().toBuffer();
+  return sharp(svg)
+    .blur(24)
+    .png()
+    .toBuffer();
 }
 
-async function prepareLogo(buffer) {
-  const meta = await sharp(buffer).metadata();
-  let width = meta.width || LOGO.maxWidth;
-  let height = meta.height || LOGO.maxHeight;
+async function prepareLogo(buffer, layout) {
+  const { logo: conf } = layout;
 
-  const scale = Math.min(LOGO.maxWidth / width, LOGO.maxHeight / height, 1);
+  const meta = await sharp(buffer).metadata();
+
+  let width = meta.width || conf.maxWidth;
+  let height = meta.height || conf.maxHeight;
+
+  const scale = Math.min(
+    conf.maxWidth / width,
+    conf.maxHeight / height,
+    1
+  );
+
   width = Math.max(1, Math.round(width * scale));
   height = Math.max(1, Math.round(height * scale));
 
   const logo = await sharp(buffer)
-    .resize({ width, height, fit: "inside", withoutEnlargement: true })
-    .png({ compressionLevel: 8, adaptiveFiltering: true })
+    .resize({
+      width,
+      height,
+      fit: "inside",
+      withoutEnlargement: true
+    })
+    .png()
     .toBuffer();
 
   const pad = 32;
-  const shadowW = width + pad * 2;
-  const shadowH = height + pad * 2;
+  const outWidth = width + pad * 2;
+  const outHeight = height + pad * 2;
 
-  const shadowMask = await sharp(logo)
+  const alpha = await sharp(logo)
     .ensureAlpha()
     .extractChannel("alpha")
     .extend({
@@ -159,63 +276,125 @@ async function prepareLogo(buffer) {
     .blur(10)
     .toBuffer();
 
-  const blackShadow = await sharp({
+  const shadow = await sharp({
     create: {
-      width: shadowW,
-      height: shadowH,
+      width: outWidth,
+      height: outHeight,
       channels: 4,
-      background: { r: 0, g: 0, b: 0, alpha: 0.56 }
+      background: { r: 0, g: 0, b: 0, alpha: 0.58 }
     }
   })
-    .composite([{ input: shadowMask, blend: "dest-in" }])
-    .png({ compressionLevel: 8, adaptiveFiltering: true })
+    .composite([{ input: alpha, blend: "dest-in" }])
+    .png()
+    .toBuffer();
+
+  const composed = await sharp({
+    create: {
+      width: outWidth,
+      height: outHeight,
+      channels: 4,
+      background: { r: 0, g: 0, b: 0, alpha: 0 }
+    }
+  })
+    .composite([
+      { input: shadow, left: 0, top: 6 },
+      { input: logo, left: pad, top: pad }
+    ])
+    .png()
     .toBuffer();
 
   return {
-    buffer: await sharp({
-      create: {
-        width: shadowW,
-        height: shadowH,
-        channels: 4,
-        background: { r: 0, g: 0, b: 0, alpha: 0 }
-      }
-    })
-      .composite([
-        { input: blackShadow, left: 0, top: 6 },
-        { input: logo, left: pad, top: pad }
-      ])
-      .png()
-      .toBuffer(),
+    buffer: composed,
+    visibleWidth: width,
     visibleHeight: height,
     pad
   };
 }
 
-export async function createTopCover({ rank, artworkUrl, logoUrl = null }) {
+async function brandAmbientGlow(layout, accent) {
+  const { canvas, card } = layout;
+  const rgb = hexToRgb(accent);
+
+  const glowWidth = Math.min(canvas.width, card.x + 140);
+  const glowHeight = Math.min(canvas.height, card.height + 260);
+
+  const svg = Buffer.from(`
+    <svg width="${canvas.width}" height="${canvas.height}" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <radialGradient id="ambient" cx="34%" cy="52%" r="45%">
+          <stop offset="0%" stop-color="rgb(${rgb.r},${rgb.g},${rgb.b})" stop-opacity=".20"/>
+          <stop offset="45%" stop-color="rgb(${rgb.r},${rgb.g},${rgb.b})" stop-opacity=".07"/>
+          <stop offset="100%" stop-color="rgb(${rgb.r},${rgb.g},${rgb.b})" stop-opacity="0"/>
+        </radialGradient>
+      </defs>
+      <rect width="${glowWidth}" height="${glowHeight}" fill="url(#ambient)"/>
+    </svg>
+  `);
+
+  return sharp(svg)
+    .blur(10)
+    .png()
+    .toBuffer();
+}
+
+export async function createTopCover({
+  rank,
+  artworkUrl,
+  logoUrl = null,
+  shape = "landscape",
+  accent = "#FFFFFF"
+}) {
   if (!artworkUrl) throw new Error("artworkUrl mancante.");
 
+  const normalized = normalizedShape(shape);
+  const layout = LAYOUTS[normalized];
+
   const artworkBuffer = await fetchBuffer(artworkUrl);
-  const [art, shadow] = await Promise.all([
-    createRoundedArtwork(artworkBuffer),
-    createCardShadow()
+
+  const [art, shadow, ambient] = await Promise.all([
+    roundedArtwork(artworkBuffer, layout),
+    cardShadow(layout),
+    brandAmbientGlow(layout, accent)
   ]);
 
+  const { canvas, card, logo: logoConf } = layout;
+
   const composites = [
-    { input: numberSvg(rank), left: 0, top: 0 },
-    { input: shadow, left: CARD.x - 50, top: CARD.y - 38 + 14 },
-    { input: art, left: CARD.x, top: CARD.y }
+    // Soft brand tint around the number area.
+    { input: ambient, left: 0, top: 0 },
+
+    // Number goes behind the card.
+    { input: numberSvg(rank, layout, accent), left: 0, top: 0 },
+
+    // Card shadow.
+    {
+      input: shadow,
+      left: card.x - 60,
+      top: card.y - 46 + 16
+    },
+
+    // Backdrop/poster.
+    {
+      input: art,
+      left: card.x,
+      top: card.y
+    }
   ];
 
   if (logoUrl) {
     try {
       const logoBuffer = await fetchBuffer(logoUrl);
-      const logo = await prepareLogo(logoBuffer);
+      const logo = await prepareLogo(logoBuffer, layout);
 
       composites.push({
         input: logo.buffer,
-        left: Math.round(CARD.x + LOGO.left - logo.pad),
+        left: Math.round(card.x + logoConf.left - logo.pad),
         top: Math.round(
-          CARD.y + CARD.height - LOGO.bottom - logo.visibleHeight - logo.pad
+          card.y +
+          card.height -
+          logoConf.bottom -
+          logo.visibleHeight -
+          logo.pad
         )
       });
     } catch (err) {
@@ -225,13 +404,16 @@ export async function createTopCover({ rank, artworkUrl, logoUrl = null }) {
 
   return sharp({
     create: {
-      width: CANVAS.width,
-      height: CANVAS.height,
+      width: canvas.width,
+      height: canvas.height,
       channels: 4,
       background: { r: 0, g: 0, b: 0, alpha: 0 }
     }
   })
     .composite(composites)
-    .png({ compressionLevel: 8, adaptiveFiltering: true })
+    .png({
+      compressionLevel: 8,
+      adaptiveFiltering: true
+    })
     .toBuffer();
 }

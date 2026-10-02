@@ -1,161 +1,94 @@
-# Nuvio Top 10 Custom Covers v6
+# blvckTOP v7
 
-Addon configurabile per Nuvio/Stremio.
+Addon configurabile per Nuvio/Stremio con Top 10 numerate.
 
-## Come funziona
+## Novità v7
 
-La home mostra **solo**:
+Ogni utente può scegliere **per ogni catalogo**:
 
-1. i cataloghi Top 10 disponibili;
-2. il campo TMDB API Key;
-3. il pulsante per generare un manifest personale.
+- Landscape
+- Portrait
 
-L'URL del manifest sorgente non viene mostrato nella pagina.
+La scelta viene salvata nel token cifrato del manifest personale.
 
-Ogni utente sceglie i cataloghi che vuole e inserisce la propria TMDB API key.
-Il server genera un URL del tipo:
+### Landscape
 
-```text
-https://tuo-dominio/c/TOKEN_CIFRATO/manifest.json
+- cover 1280×720
+- backdrop TMDB `w1280`
+- numero a sinistra
+- logo ufficiale dentro la card
+- `posterShape: "landscape"`
+
+### Portrait
+
+- cover 1000×1500
+- poster verticale TMDB `w780`
+- numero a sinistra
+- logo ufficiale dentro la card
+- `posterShape: "poster"`
+
+## Glow automatico per piattaforma
+
+Il numero riceve un glow diverso in base al nome/id del catalogo.
+
+Colori inclusi:
+
+- Netflix → rosso
+- Prime Video / Amazon → azzurro
+- Disney+ → blu
+- Apple TV+ → bianco/grigio freddo
+- NOW → ciano
+- Paramount+ → blu
+- RaiPlay → blu
+- Rakuten → rosso scuro
+- CHILI → arancio
+- HBO / Max → viola
+- fallback → viola
+
+La funzione è in `server.js`:
+
+```js
+function catalogAccent(catalog) { ... }
 ```
 
-Il token contiene in forma cifrata:
+quindi puoi cambiare i colori facilmente.
 
-- cataloghi scelti;
-- TMDB API key dell'utente.
+## Cache
 
-Non serve un database e non viene creato un `.env` diverso per ogni utente.
+La v7 include anche le ottimizzazioni di cache:
 
-## Perché non usare `.env` per ogni utente
+- cataloghi/manifest/meta sorgente → 5 minuti
+- dati TMDB images → 6 ore
+- conversione IMDb → TMDB → 24 ore
+- download immagini → 6 ore
+- cover PNG generate → 24 ore
+- richieste simultanee della stessa cover vengono unite
+- backdrop landscape TMDB usa `w1280` invece di `original`
 
-`.env` è una configurazione del server, quindi sarebbe condivisa da tutti.
-Per un configuratore pubblico serve invece una configurazione personale per ogni
-manifest. La v5 usa un token AES-256-GCM cifrato con `APP_SECRET`.
+Su Render Free la cache RAM viene persa quando l'istanza viene riavviata/spenta.
 
-## Variabili d'ambiente richieste
-
-Crea queste variabili sul servizio dove farai girare il backend:
+## Variabili ambiente Render
 
 ```env
 SOURCE_MANIFEST_URL=https://IL-TUO-MANIFEST-SORGENTE/manifest.json
-APP_SECRET=una-stringa-molto-lunga-casuale-e-stabile
-PORT=3000
+APP_SECRET=UNA_STRINGA_LUNGA_E_STABILE
 ```
 
-### IMPORTANTE: APP_SECRET
+Non cambiare `APP_SECRET`, altrimenti i manifest già generati smettono di funzionare.
 
-Non cambiare `APP_SECRET` dopo che gli utenti hanno creato i loro manifest.
-Se cambia, i vecchi URL non saranno più decifrabili.
+## GitHub / Render
 
-## GitHub
+Carica i file nel repository GitHub e lascia che Render faccia il redeploy.
 
-Puoi pubblicare tranquillamente il repository su GitHub.
+Il progetto include:
 
-`.env` è già incluso in `.gitignore`, quindi:
+- `Dockerfile`
+- `render.yaml`
+- `.gitignore`
 
-- non pubblicare `SOURCE_MANIFEST_URL` se vuoi tenerlo fuori dal repository;
-- non pubblicare `APP_SECRET`;
-- imposta entrambi come environment variables sul provider di hosting.
+## Compatibilità vecchi token
 
-## GitHub Pages
+La v7 continua a interpretare i vecchi token senza `shape` come `landscape`.
 
-**GitHub Pages da solo non basta**, perché questo progetto contiene un backend
-Node.js che genera le cover e interroga TMDB.
-
-Puoi comunque tenere il codice su GitHub e collegare il repository a un hosting
-Node/Docker come Render, Railway, Koyeb, Northflank, Fly.io, ecc.
-
-È incluso anche:
-
-```text
-Dockerfile
-render.yaml
-```
-
-per semplificare il deploy.
-
-## Deploy Render da GitHub
-
-1. Carica questa cartella in un repository GitHub.
-2. Crea un nuovo Web Service su Render collegato al repository.
-3. Render rileverà il `Dockerfile`.
-4. Configura:
-   - `SOURCE_MANIFEST_URL`
-   - `APP_SECRET`
-5. Avvia il deploy.
-6. Apri il dominio Render.
-
-Con `render.yaml`, `APP_SECRET` può essere generato automaticamente; devi solo
-inserire `SOURCE_MANIFEST_URL` nel pannello del servizio.
-
-## Endpoint
-
-Configuratore:
-
-```text
-/
-```
-
-Cataloghi disponibili:
-
-```text
-/api/catalogs
-```
-
-Generazione configurazione:
-
-```text
-POST /api/generate
-```
-
-Manifest personale:
-
-```text
-/c/:token/manifest.json
-```
-
-Catalogo:
-
-```text
-/c/:token/catalog/:type/:catalogId.json
-```
-
-Meta:
-
-```text
-/c/:token/meta/:type/:id.json
-```
-
-Cover:
-
-```text
-/c/:token/top-cover
-```
-
-## Cover
-
-Le cover sono:
-
-- landscape;
-- PNG trasparente;
-- numero Top 10 a sinistra;
-- backdrop 16:9;
-- logo ufficiale TMDB nella card;
-- ombra esterna;
-- `posterShape: "landscape"` nel catalogo.
-
-Il generatore usa Inter quando disponibile. Il Dockerfile installa `fonts-inter`.
-
-
-## Cache e velocità (v6)
-
-- Cover PNG in RAM per 24 ore.
-- Richieste contemporanee della stessa cover condividono una sola generazione.
-- Dati TMDB `/images` in cache per 6 ore.
-- Risoluzione IMDb → TMDB in cache per 24 ore.
-- Backdrop TMDB usa `w1280` invece di `original`.
-- Backdrop/logo scaricati restano in RAM per 6 ore.
-- Manifest/cataloghi/meta sorgente in cache per 5 minuti.
-- Le cover restituiscono `Cache-Control: public, max-age=86400, immutable`.
-
-Su Render Free la cache RAM viene persa a ogni cold start/riavvio, quindi il primo caricamento dopo lo sleep può ancora essere più lento.
+Per usare la nuova modalità portrait, gli utenti devono generare un nuovo manifest
+dalla home.
