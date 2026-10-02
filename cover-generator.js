@@ -34,18 +34,18 @@ const LAYOUTS = {
   poster: {
     canvas: { width: 1000, height: 1500 },
     card: {
-      x: 235,
-      y: 190,
-      width: 680,
-      height: 1020,
-      radius: 36
+      x: 210,
+      y: 165,
+      width: 730,
+      height: 1095,
+      radius: 38
     },
     number: {
-      xSingle: 28,
-      xDouble: 4,
-      sizeSingle: 330,
-      sizeDouble: 270,
-      opticalDrop: 14
+      xSingle: 14,
+      xDouble: -10,
+      sizeSingle: 405,
+      sizeDouble: 335,
+      opticalDrop: 22
     },
     logo: {
       maxWidth: 350,
