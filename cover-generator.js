@@ -149,29 +149,43 @@ function numberSvg(rank, layout, accent, genre = "", rating = "") {
   let metaXml = "";
 
   if (layout === LAYOUTS.landscape) {
-    const metaX = isDouble ? 34 : 64;
-    let currentY = isDouble ? 560 : 575;
+    // Center horizontally in the left region (0..300) -> metaX = 150
+    const metaX = 150;
+    let genreY = 580;
+    let ratingY = 640;
+
+    if (escapedGenre && !ratingVal) {
+      genreY = 610;
+    } else if (!escapedGenre && ratingVal) {
+      ratingY = 610;
+    }
 
     if (escapedGenre) {
-      const gSize = escapedGenre.length > 12 ? 18 : (escapedGenre.length > 9 ? 20 : 22);
-      metaXml += `<text x="${metaX}" y="${currentY}" font-family="Inter, -apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="${gSize}" font-weight="700" letter-spacing="2" fill="#CBD5E1" filter="url(#metaShadow)">${escapedGenre}</text>`;
-      currentY += 44;
+      const gSize = escapedGenre.length > 15 ? 22 : (escapedGenre.length > 11 ? 26 : 30);
+      metaXml += `<text x="${metaX}" y="${genreY}" text-anchor="middle" font-family="Inter, -apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="${gSize}" font-weight="900" letter-spacing="2" fill="#F1F5F9" filter="url(#metaShadow)">${escapedGenre}</text>`;
     }
     if (ratingVal) {
-      metaXml += `<text x="${metaX}" y="${currentY}" font-family="Inter, -apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="28" font-weight="800" filter="url(#metaShadow)"><tspan fill="#FFB800">★ </tspan><tspan fill="#FFFFFF">${ratingVal}</tspan></text>`;
+      metaXml += `<text x="${metaX}" y="${ratingY}" text-anchor="middle" font-family="Inter, -apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="42" font-weight="900" filter="url(#metaShadow)"><tspan fill="#FFB800">★ </tspan><tspan fill="#FFFFFF">${ratingVal}</tspan></text>`;
     }
   } else {
     // Poster / Portrait
-    const metaX = 28;
-    let currentY = isDouble ? 945 : 970;
+    // Center horizontally in the left region (0..210) -> metaX = 105
+    const metaX = 105;
+    let genreY = 1000;
+    let ratingY = 1065;
+
+    if (escapedGenre && !ratingVal) {
+      genreY = 1030;
+    } else if (!escapedGenre && ratingVal) {
+      ratingY = 1030;
+    }
 
     if (escapedGenre) {
-      const gSize = escapedGenre.length > 11 ? 17 : (escapedGenre.length > 8 ? 19 : 22);
-      metaXml += `<text x="${metaX}" y="${currentY}" font-family="Inter, -apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="${gSize}" font-weight="700" letter-spacing="1.5" fill="#CBD5E1" filter="url(#metaShadow)">${escapedGenre}</text>`;
-      currentY += 48;
+      const gSize = escapedGenre.length > 15 ? 18 : (escapedGenre.length > 12 ? 22 : 25);
+      metaXml += `<text x="${metaX}" y="${genreY}" text-anchor="middle" font-family="Inter, -apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="${gSize}" font-weight="900" letter-spacing="1.8" fill="#F1F5F9" filter="url(#metaShadow)">${escapedGenre}</text>`;
     }
     if (ratingVal) {
-      metaXml += `<text x="${metaX}" y="${currentY}" font-family="Inter, -apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="30" font-weight="800" filter="url(#metaShadow)"><tspan fill="#FFB800">★ </tspan><tspan fill="#FFFFFF">${ratingVal}</tspan></text>`;
+      metaXml += `<text x="${metaX}" y="${ratingY}" text-anchor="middle" font-family="Inter, -apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="40" font-weight="900" filter="url(#metaShadow)"><tspan fill="#FFB800">★ </tspan><tspan fill="#FFFFFF">${ratingVal}</tspan></text>`;
     }
   }
 
@@ -201,7 +215,7 @@ function numberSvg(rank, layout, accent, genre = "", rating = "") {
         </filter>
 
         <filter id="metaShadow" x="-30%" y="-30%" width="160%" height="160%">
-          <feDropShadow dx="0" dy="2" stdDeviation="2.5" flood-color="#000000" flood-opacity="0.85"/>
+          <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#000000" flood-opacity="0.95"/>
         </filter>
       </defs>
 

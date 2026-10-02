@@ -856,7 +856,7 @@
               const updateImg = () => {
                 const isZoomed = card.classList.contains("zoomed");
                 card.className = `preview-card ${i.shape} ${i.canvasBackground}${isZoomed ? " zoomed" : ""}`;
-                img.src = `/top-cover?catalogId=${encodeURIComponent(i.id)}&type=${encodeURIComponent(i.type)}&shape=${i.shape}&canvasBackground=${i.canvasBackground}&rank=${rank}&v=7.2.2`;
+                img.src = `/top-cover?catalogId=${encodeURIComponent(i.id)}&type=${encodeURIComponent(i.type)}&shape=${i.shape}&canvasBackground=${i.canvasBackground}&rank=${rank}&v=7.2.3`;
               };
 
               card.addEventListener("click", (e) => {
