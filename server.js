@@ -9,15 +9,24 @@ import {
 } from "./config-token.js";
 
 import {
-  validateTmdbKey,
   getTmdbImages,
   chooseBackdrop,
   choosePoster,
   chooseLogo,
-  resolveTmdbId
+  resolveTmdbId,
+  DEFAULT_TMDB_KEY
 } from "./tmdb.js";
 
+import {
+  getCachedJson,
+  setCachedJson,
+  getCoverFilePath,
+  saveCoverBuffer,
+  getDbStats
+} from "./db.js";
+
 import { createTopCover } from "./cover-generator.js";
+import { initScheduler, computeCoverKey } from "./preload.js";
 
 const app = express();
 const PORT = Number(process.env.PORT || 3000);
@@ -28,7 +37,7 @@ if (!SOURCE_MANIFEST_URL) {
 }
 
 if (!process.env.APP_SECRET || process.env.APP_SECRET.length < 24) {
-  throw new Error("APP_SECRET non configurato o troppo corto.");
+  throw new Error("APP_SECRET non configurato o troppo corto (minimo 24 caratteri).");
 }
 
 const __filename = fileURLToPath(import.meta.url);
@@ -38,38 +47,8 @@ app.set("trust proxy", true);
 app.use(express.json({ limit: "32kb" }));
 app.use(express.static(path.join(__dirname, "public")));
 
-const jsonCache = new Map();
-const coverCache = new Map();
 const pendingCovers = new Map();
-
-const JSON_TTL = 5 * 60 * 1000;
-const COVER_TTL = 24 * 60 * 60 * 1000;
-const MAX_COVER_CACHE = 160;
-
-function getMemoryCache(map, key) {
-  const item = map.get(key);
-  if (!item) return null;
-
-  if (item.expiresAt <= Date.now()) {
-    map.delete(key);
-    return null;
-  }
-
-  return item.value;
-}
-
-function setMemoryCache(map, key, value, ttl, maxItems = 500) {
-  map.set(key, {
-    value,
-    expiresAt: Date.now() + ttl
-  });
-
-  while (map.size > maxItems) {
-    const first = map.keys().next().value;
-    if (!first) break;
-    map.delete(first);
-  }
-}
+const JSON_TTL = 15 * 60 * 1000; // 15 minuti cache per i JSON
 
 function sourceBaseUrl() {
   return SOURCE_MANIFEST_URL.replace(/\/manifest\.json(?:\?.*)?$/i, "");
@@ -80,13 +59,13 @@ function publicBase(req) {
   return `${proto}://${req.get("host")}`;
 }
 
-async function fetchJson(url) {
-  const cached = getMemoryCache(jsonCache, url);
+async function fetchJson(url, ttl = JSON_TTL) {
+  const cached = getCachedJson(url);
   if (cached) return cached;
 
   const response = await fetch(url, {
     headers: {
-      "User-Agent": "blvckTOP/7.0"
+      "User-Agent": "blvckTOP/7.2"
     }
   });
 
@@ -95,7 +74,7 @@ async function fetchJson(url) {
   }
 
   const data = await response.json();
-  setMemoryCache(jsonCache, url, data, JSON_TTL, 300);
+  setCachedJson(url, data, ttl);
   return data;
 }
 
@@ -105,7 +84,7 @@ function catalogKey(type, id) {
 
 function selectedCatalogSet(config) {
   return new Set(
-    config.catalogs.map(c => catalogKey(c.type, c.id))
+    (config.catalogs || []).map(c => catalogKey(c.type, c.id))
   );
 }
 
@@ -116,12 +95,12 @@ function normalizeShape(shape) {
 }
 
 function getCatalogConfig(config, type, id) {
-  return config.catalogs.find(
+  return (config.catalogs || []).find(
     c => c.type === type && c.id === id
   ) || null;
 }
 
-function catalogAccent(catalog = {}) {
+export function catalogAccent(catalog = {}) {
   const key = `${catalog.id || ""} ${catalog.name || ""}`.toLowerCase();
 
   if (key.includes("netflix")) return "#E50914";
@@ -145,7 +124,6 @@ async function buildCoverUrl(
   meta,
   rank,
   type,
-  apiKey,
   catalog
 ) {
   const shape = normalizeShape(catalog.shape);
@@ -154,7 +132,7 @@ async function buildCoverUrl(
     const tmdbId = await resolveTmdbId(
       type,
       meta.id || meta.tmdbId,
-      apiKey
+      DEFAULT_TMDB_KEY
     );
 
     if (tmdbId) {
@@ -163,7 +141,7 @@ async function buildCoverUrl(
         type: type === "series" ? "tv" : type,
         tmdbId,
         shape,
-        catalogId: catalog.id,
+        catalogId: catalog.id || "",
         canvasBackground:
           catalog.canvasBackground === "black"
             ? "black"
@@ -186,7 +164,7 @@ async function buildCoverUrl(
     rank: String(rank),
     artwork: fallbackArtwork,
     shape,
-    catalogId: catalog.id,
+    catalogId: catalog.id || "",
     canvasBackground:
       catalog.canvasBackground === "black"
         ? "black"
@@ -220,24 +198,15 @@ app.get("/api/catalogs", async (_req, res) => {
 
 app.post("/api/generate", async (req, res) => {
   try {
-    const tmdbApiKey = String(req.body?.tmdbApiKey || "").trim();
     const requested = Array.isArray(req.body?.catalogs)
       ? req.body.catalogs
       : [];
-
-    if (!tmdbApiKey) {
-      return res.status(400).json({
-        error: "Inserisci la TMDB API key."
-      });
-    }
 
     if (!requested.length) {
       return res.status(400).json({
         error: "Seleziona almeno un catalogo."
       });
     }
-
-    await validateTmdbKey(tmdbApiKey);
 
     const source = await fetchJson(SOURCE_MANIFEST_URL);
 
@@ -276,8 +245,7 @@ app.post("/api/generate", async (req, res) => {
     }
 
     const token = encryptConfig({
-      v: 2,
-      tmdbApiKey,
+      v: 3,
       catalogs
     });
 
@@ -291,17 +259,14 @@ app.post("/api/generate", async (req, res) => {
     });
   } catch (err) {
     console.error(err);
-
-    if (String(err.message || "").includes("TMDB error 401")) {
-      return res.status(400).json({
-        error: "TMDB API key non valida."
-      });
-    }
-
     res.status(500).json({
       error: "Impossibile generare il manifest."
     });
   }
+});
+
+app.get("/api/stats", (_req, res) => {
+  res.json(getDbStats());
 });
 
 /* ---------------- Generated addon ---------------- */
@@ -317,7 +282,6 @@ app.get("/c/:token/manifest.json", async (req, res) => {
       .map(c => {
         const conf = getCatalogConfig(config, c.type, c.id);
 
-        // Keep the source catalog clean: custom shape is used server-side.
         return {
           ...c,
           name: c.name || conf?.name || c.id
@@ -329,9 +293,9 @@ app.get("/c/:token/manifest.json", async (req, res) => {
     const manifest = {
       ...source,
       id: `com.blvcktop.${idSuffix}`,
-      version: "2.0.0",
+      version: "7.2.0",
       name: "blvckTOP",
-      description: "Top 10 personalizzate con cover numerate",
+      description: "Top 10 personalizzate con cover numerate HD",
       catalogs,
       resources: Array.from(
         new Set([...(source.resources || []), "catalog", "meta"])
@@ -378,7 +342,6 @@ app.get("/c/:token/catalog/:type/:catalogId.json", async (req, res) => {
           meta,
           index + 1,
           type,
-          config.tmdbApiKey,
           catalog
         ),
         posterShape:
@@ -421,9 +384,14 @@ app.get("/c/:token/meta/:type/:id.json", async (req, res) => {
   }
 });
 
-app.get("/c/:token/top-cover", async (req, res) => {
+app.get(["/c/:token/top-cover", "/top-cover"], async (req, res) => {
   try {
-    const config = decryptConfig(req.params.token);
+    let config = null;
+    if (req.params.token) {
+      try {
+        config = decryptConfig(req.params.token);
+      } catch {}
+    }
 
     const rank = Math.max(
       1,
@@ -432,76 +400,24 @@ app.get("/c/:token/top-cover", async (req, res) => {
 
     const type = String(req.query.type || "movie");
     const shape = normalizeShape(String(req.query.shape || "landscape"));
-    const tmdbId = req.query.tmdbId
-      ? String(req.query.tmdbId)
-      : null;
-
-    const catalogId = req.query.catalogId
-      ? String(req.query.catalogId)
-      : "";
+    const tmdbId = req.query.tmdbId ? String(req.query.tmdbId) : null;
+    const catalogId = req.query.catalogId ? String(req.query.catalogId) : "";
 
     const canvasBackground =
       req.query.canvasBackground === "black"
         ? "black"
         : "transparent";
 
-    let artworkUrl = req.query.artwork
-      ? String(req.query.artwork)
-      : null;
+    let artworkUrl = req.query.artwork ? String(req.query.artwork) : null;
+    let logoUrl = req.query.logo ? String(req.query.logo) : null;
 
-    let logoUrl = req.query.logo
-      ? String(req.query.logo)
-      : null;
-
-    const catalog =
-      config.catalogs.find(c => c.id === catalogId) || {};
-
+    const catalog = config?.catalogs?.find(c => c.id === catalogId) || { id: catalogId };
     const accent = catalogAccent(catalog);
 
-    const coverKey = [
-      req.params.token,
-      rank,
-      type,
-      shape,
-      tmdbId || "",
-      catalogId,
-      canvasBackground,
-      artworkUrl || "",
-      logoUrl || ""
-    ].join("|");
-
-    const cached = getMemoryCache(coverCache, coverKey);
-
-    if (cached) {
-      res.setHeader("Content-Type", "image/png");
-      res.setHeader(
-        "Cache-Control",
-        "public, max-age=86400, immutable"
-      );
-      res.setHeader("X-Cover-Cache", "HIT");
-      return res.send(cached);
-    }
-
-    if (pendingCovers.has(coverKey)) {
-      const png = await pendingCovers.get(coverKey);
-
-      res.setHeader("Content-Type", "image/png");
-      res.setHeader(
-        "Cache-Control",
-        "public, max-age=86400, immutable"
-      );
-      res.setHeader("X-Cover-Cache", "SHARED");
-      return res.send(png);
-    }
-
-    const generation = (async () => {
-      if (tmdbId && !artworkUrl) {
-        const images = await getTmdbImages(
-          type,
-          tmdbId,
-          config.tmdbApiKey
-        );
-
+    // If artworkUrl is not provided yet, resolve it via TMDB
+    if (tmdbId && !artworkUrl) {
+      try {
+        const images = await getTmdbImages(type, tmdbId, DEFAULT_TMDB_KEY);
         artworkUrl = shape === "poster"
           ? choosePoster(images)
           : chooseBackdrop(images);
@@ -509,20 +425,51 @@ app.get("/c/:token/top-cover", async (req, res) => {
         if (!logoUrl) {
           logoUrl = chooseLogo(images);
         }
-      } else if (tmdbId && !logoUrl) {
-        const images = await getTmdbImages(
-          type,
-          tmdbId,
-          config.tmdbApiKey
-        );
-
+      } catch (tmdbErr) {
+        console.warn(`Errore fetch immagini TMDB ${tmdbId}:`, tmdbErr.message);
+      }
+    } else if (tmdbId && !logoUrl) {
+      try {
+        const images = await getTmdbImages(type, tmdbId, DEFAULT_TMDB_KEY);
         logoUrl = chooseLogo(images);
-      }
+      } catch {}
+    }
 
-      if (!artworkUrl) {
-        throw new Error("Nessuna immagine disponibile.");
-      }
+    if (!artworkUrl) {
+      return res.status(404).send("Nessuna immagine disponibile per questo titolo.");
+    }
 
+    const coverKey = computeCoverKey({
+      rank,
+      type,
+      shape,
+      tmdbId,
+      catalogId,
+      canvasBackground,
+      accent,
+      artworkUrl,
+      logoUrl
+    });
+
+    // 1. Check persistent disk cache (instant response via sendFile)
+    const existingFilePath = getCoverFilePath(coverKey);
+    if (existingFilePath) {
+      res.setHeader("X-Cover-Cache", "HIT-DISK");
+      res.setHeader("Cache-Control", "public, max-age=86400, immutable");
+      return res.sendFile(existingFilePath);
+    }
+
+    // 2. Check pending in-flight generation
+    if (pendingCovers.has(coverKey)) {
+      const png = await pendingCovers.get(coverKey);
+      res.setHeader("Content-Type", "image/png");
+      res.setHeader("Cache-Control", "public, max-age=86400, immutable");
+      res.setHeader("X-Cover-Cache", "SHARED");
+      return res.send(png);
+    }
+
+    // 3. Generate cover with sharp
+    const generationPromise = (async () => {
       const png = await createTopCover({
         rank,
         artworkUrl,
@@ -532,34 +479,24 @@ app.get("/c/:token/top-cover", async (req, res) => {
         canvasBackground
       });
 
-      setMemoryCache(
-        coverCache,
-        coverKey,
-        png,
-        COVER_TTL,
-        MAX_COVER_CACHE
-      );
-
+      // Persist to disk and DB
+      saveCoverBuffer(coverKey, png);
       return png;
     })();
 
-    pendingCovers.set(coverKey, generation);
+    pendingCovers.set(coverKey, generationPromise);
 
     try {
-      const png = await generation;
-
+      const png = await generationPromise;
       res.setHeader("Content-Type", "image/png");
-      res.setHeader(
-        "Cache-Control",
-        "public, max-age=86400, immutable"
-      );
-      res.setHeader("X-Cover-Cache", "MISS");
+      res.setHeader("Cache-Control", "public, max-age=86400, immutable");
+      res.setHeader("X-Cover-Cache", "GENERATED");
       res.send(png);
     } finally {
       pendingCovers.delete(coverKey);
     }
   } catch (err) {
-    console.error(err);
+    console.error(`Errore top-cover:`, err);
     res.status(500).json({
       error: err.message || "Errore generazione cover"
     });
@@ -567,5 +504,9 @@ app.get("/c/:token/top-cover", async (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`blvckTOP configurator: http://localhost:${PORT}`);
+  console.log(`blvckTOP avviato su http://localhost:${PORT}`);
+  console.log(`TMDB Key configurata: ${DEFAULT_TMDB_KEY.slice(0, 6)}...${DEFAULT_TMDB_KEY.slice(-4)}`);
+  
+  // Inizializza il cron job alle 9:00 e alle 18:00
+  initScheduler(SOURCE_MANIFEST_URL);
 });

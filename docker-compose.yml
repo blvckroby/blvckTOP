@@ -1,0 +1,16 @@
+services:
+  blvcktop:
+    build: .
+    container_name: blvcktop
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - SOURCE_MANIFEST_URL=${SOURCE_MANIFEST_URL}
+      - APP_SECRET=${APP_SECRET}
+      - TMDB_API_KEY=${TMDB_API_KEY:-ad0f7351455041d8c9c0d4370a4b5fa5}
+      - DATA_DIR=/app/data
+      - NODE_ENV=production
+    volumes:
+      - ./data:/app/data

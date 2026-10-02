@@ -1,9 +1,6 @@
 import sharp from "sharp";
+import { getAssetBuffer, saveAssetBuffer } from "./db.js";
 
-const IMAGE_CACHE_TTL = 6 * 60 * 60 * 1000;
-const MAX_IMAGE_CACHE = 100;
-
-const imageCache = new Map();
 const pendingDownloads = new Map();
 
 const LAYOUTS = {
@@ -56,41 +53,18 @@ const LAYOUTS = {
   }
 };
 
-function normalizedShape(shape) {
+export function normalizedShape(shape) {
   return shape === "poster" || shape === "portrait"
     ? "poster"
     : "landscape";
 }
 
-function getImageFromCache(url) {
-  const item = imageCache.get(url);
-  if (!item) return null;
-
-  if (item.expiresAt <= Date.now()) {
-    imageCache.delete(url);
-    return null;
-  }
-
-  return item.buffer;
-}
-
-function setImageCache(url, buffer) {
-  imageCache.set(url, {
-    buffer,
-    expiresAt: Date.now() + IMAGE_CACHE_TTL
-  });
-
-  while (imageCache.size > MAX_IMAGE_CACHE) {
-    const first = imageCache.keys().next().value;
-    if (!first) break;
-    imageCache.delete(first);
-  }
-}
-
 async function fetchBuffer(url) {
-  const cached = getImageFromCache(url);
-  if (cached) return cached;
+  // 1. Check persistent disk cache first
+  const diskCached = getAssetBuffer(url);
+  if (diskCached) return diskCached;
 
+  // 2. Check pending parallel downloads
   if (pendingDownloads.has(url)) {
     return pendingDownloads.get(url);
   }
@@ -98,16 +72,16 @@ async function fetchBuffer(url) {
   const promise = (async () => {
     const response = await fetch(url, {
       headers: {
-        "User-Agent": "blvckTOP/7.0"
+        "User-Agent": "blvckTOP/7.2"
       }
     });
 
     if (!response.ok) {
-      throw new Error(`Download immagine fallito (${response.status})`);
+      throw new Error(`Download immagine fallito (${response.status}) da ${url}`);
     }
 
     const buffer = Buffer.from(await response.arrayBuffer());
-    setImageCache(url, buffer);
+    saveAssetBuffer(url, buffer);
     return buffer;
   })();
 

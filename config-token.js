@@ -4,7 +4,7 @@ function getKey() {
   const secret = process.env.APP_SECRET;
   if (!secret || secret.length < 24) {
     throw new Error(
-      "APP_SECRET mancante o troppo corto. Imposta una stringa lunga e stabile nelle variabili d'ambiente."
+      "APP_SECRET mancante o troppo corto. Imposta una stringa lunga e stabile nelle variabili d'ambiente (minimo 24 caratteri)."
     );
   }
   return crypto.createHash("sha256").update(secret, "utf8").digest();
@@ -43,7 +43,7 @@ export function decryptConfig(token) {
 
     const parsed = JSON.parse(plain.toString("utf8"));
 
-    if (!Array.isArray(parsed.catalogs) || !parsed.tmdbApiKey) {
+    if (!Array.isArray(parsed.catalogs)) {
       throw new Error("Configurazione incompleta");
     }
 
