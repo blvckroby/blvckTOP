@@ -146,51 +146,82 @@ function generateGlassBackground(width, height, isStremio = true) {
   const rw = width - pad * 2;
   const rh = height - pad * 2;
   const rx = Math.round(width * 0.032);
+  const strokeW = width > 1100 ? 4.0 : 3.5;
 
   return Buffer.from(`
     <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
       <defs>
-        <!-- Stremio deep atmosphere gradient (darker to lighter to deep purple) -->
-        <radialGradient id="stremioAtmosphere" cx="50%" cy="32%" r="65%">
-          <stop offset="0%" stop-color="#2a235c"/>
-          <stop offset="45%" stop-color="#1d1945"/>
-          <stop offset="100%" stop-color="#120f2e"/>
+        <!-- Canvas Stremio Deep Ambient Atmosphere -->
+        <radialGradient id="stremioAtmosphere" cx="50%" cy="25%" r="75%">
+          <stop offset="0%" stop-color="#2e2569"/>
+          <stop offset="42%" stop-color="#1b1642"/>
+          <stop offset="100%" stop-color="#0a081c"/>
         </radialGradient>
 
-        <!-- Liquid Glass Fill: Translucent frosted depth with light refraction -->
+        <!-- Liquid Glass Card Interior: Strong vibrant top gradient flowing into ultra-deep dark bottom -->
         <linearGradient id="glassBodyGrad" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.10"/>
-          <stop offset="35%" stop-color="#FFFFFF" stop-opacity="0.03"/>
-          <stop offset="70%" stop-color="#1A153E" stop-opacity="0.25"/>
-          <stop offset="100%" stop-color="#0F0C24" stop-opacity="0.55"/>
+          <stop offset="0%" stop-color="#483896" stop-opacity="0.95"/>
+          <stop offset="20%" stop-color="#322673" stop-opacity="0.92"/>
+          <stop offset="50%" stop-color="#1d1647" stop-opacity="0.95"/>
+          <stop offset="80%" stop-color="#0d0a24" stop-opacity="0.98"/>
+          <stop offset="100%" stop-color="#050410" stop-opacity="1.0"/>
         </linearGradient>
 
-        <!-- 3D Liquid Glass Specular Border: Bright light on top/left, soft refractive rim on bottom -->
-        <linearGradient id="glassStrokeGrad" x1="0" y1="0" x2="0.6" y2="1">
-          <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.55"/>
-          <stop offset="25%" stop-color="#A5B4FC" stop-opacity="0.30"/>
-          <stop offset="55%" stop-color="#818CF8" stop-opacity="0.12"/>
-          <stop offset="85%" stop-color="#FFFFFF" stop-opacity="0.22"/>
-          <stop offset="100%" stop-color="#4F46E5" stop-opacity="0.35"/>
+        <!-- Top Internal Glass Light Sheen / Curvature Refraction -->
+        <linearGradient id="innerGlassSheen" x1="0" y1="0" x2="0.8" y2="0.6">
+          <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.28"/>
+          <stop offset="35%" stop-color="#C7D2FE" stop-opacity="0.10"/>
+          <stop offset="100%" stop-color="#6366F1" stop-opacity="0"/>
         </linearGradient>
 
-        <!-- Inner Glass Specular Bevel (Top Light Highlight) -->
-        <linearGradient id="topLightSheen" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.45"/>
+        <!-- High-Contrast 3D Liquid Glass Border: Luminous Specular Rim -->
+        <linearGradient id="glassStrokeGrad" x1="0" y1="0" x2="0.75" y2="1">
+          <stop offset="0%" stop-color="#FFFFFF" stop-opacity="1.0"/>
+          <stop offset="16%" stop-color="#E0E7FF" stop-opacity="0.90"/>
+          <stop offset="40%" stop-color="#A5B4FC" stop-opacity="0.55"/>
+          <stop offset="70%" stop-color="#6366F1" stop-opacity="0.38"/>
+          <stop offset="88%" stop-color="#C7D2FE" stop-opacity="0.70"/>
+          <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0.90"/>
+        </linearGradient>
+
+        <!-- Inner Bevel Stroke (Dual Rim 3D Glass Effect) -->
+        <linearGradient id="innerBevelGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.60"/>
+          <stop offset="25%" stop-color="#FFFFFF" stop-opacity="0.12"/>
+          <stop offset="65%" stop-color="#000000" stop-opacity="0"/>
+          <stop offset="100%" stop-color="#000000" stop-opacity="0.65"/>
+        </linearGradient>
+
+        <!-- Top Edge Specular Flare -->
+        <linearGradient id="topFlare" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0"/>
+          <stop offset="20%" stop-color="#FFFFFF" stop-opacity="0.90"/>
+          <stop offset="50%" stop-color="#FFFFFF" stop-opacity="1.0"/>
+          <stop offset="80%" stop-color="#FFFFFF" stop-opacity="0.90"/>
           <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
         </linearGradient>
 
-        <!-- Outer Glass Drop Shadow -->
-        <filter id="glassShadow" x="-10%" y="-10%" width="120%" height="120%">
-          <feDropShadow dx="0" dy="8" stdDeviation="16" flood-color="#070614" flood-opacity="0.75"/>
+        <!-- Bottom Rim Light Bounce -->
+        <linearGradient id="bottomRimFlare" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#818CF8" stop-opacity="0"/>
+          <stop offset="30%" stop-color="#C7D2FE" stop-opacity="0.60"/>
+          <stop offset="50%" stop-color="#FFFFFF" stop-opacity="0.85"/>
+          <stop offset="70%" stop-color="#C7D2FE" stop-opacity="0.60"/>
+          <stop offset="100%" stop-color="#818CF8" stop-opacity="0"/>
+        </linearGradient>
+
+        <!-- Heavy Outer Drop Shadow -->
+        <filter id="glassShadow" x="-15%" y="-15%" width="130%" height="130%">
+          <feDropShadow dx="0" dy="12" stdDeviation="22" flood-color="#030208" flood-opacity="0.92"/>
         </filter>
       </defs>
 
-      <!-- Base Stremio canvas background -->
+      <!-- Base Canvas Atmosphere -->
       <rect width="${width}" height="${height}" fill="url(#stremioAtmosphere)"/>
 
-      <!-- Liquid Glass Elevated Card Container -->
+      <!-- Liquid Glass Card with Shadow & Border -->
       <g filter="url(#glassShadow)">
+        <!-- Base Body Fill -->
         <rect
           x="${pad}"
           y="${pad}"
@@ -200,15 +231,36 @@ function generateGlassBackground(width, height, isStremio = true) {
           ry="${rx}"
           fill="url(#glassBodyGrad)"
           stroke="url(#glassStrokeGrad)"
-          stroke-width="2.5"
+          stroke-width="${strokeW}"
+        />
+        <!-- Inner Specular Light Wash -->
+        <rect
+          x="${pad + 1.5}"
+          y="${pad + 1.5}"
+          width="${rw - 3}"
+          height="${rh - 3}"
+          rx="${rx - 1.5}"
+          ry="${rx - 1.5}"
+          fill="url(#innerGlassSheen)"
+          stroke="url(#innerBevelGrad)"
+          stroke-width="1.5"
         />
       </g>
 
-      <!-- Glass Top Specular Lip (3D Curved Highlight) -->
+      <!-- Prominent Top Specular Rim Lip -->
       <path
-        d="M ${pad + rx + 10} ${pad + 2} Q ${width / 2} ${pad + 1} ${width - pad - rx - 10} ${pad + 2}"
-        stroke="url(#topLightSheen)"
-        stroke-width="2"
+        d="M ${pad + rx + 8} ${pad + 2} Q ${width / 2} ${pad + 1.2} ${width - pad - rx - 8} ${pad + 2}"
+        stroke="url(#topFlare)"
+        stroke-width="${strokeW}"
+        stroke-linecap="round"
+        fill="none"
+      />
+
+      <!-- Bottom Specular Rim Reflection -->
+      <path
+        d="M ${pad + rx + 14} ${height - pad - 2} Q ${width / 2} ${height - pad - 1.2} ${width - pad - rx - 14} ${height - pad - 2}"
+        stroke="url(#bottomRimFlare)"
+        stroke-width="2.5"
         stroke-linecap="round"
         fill="none"
       />

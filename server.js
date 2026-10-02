@@ -193,7 +193,7 @@ async function buildCoverUrl(
         canvasBackground,
         genre: genre || "",
         rating: rating || "",
-        v: "7.2.6"
+        v: "7.2.7"
       });
 
       return `${publicBase(req)}/c/${token}/top-cover?${qs}`;
@@ -216,7 +216,7 @@ async function buildCoverUrl(
     canvasBackground,
     genre: genre || "",
     rating: rating || "",
-    v: "7.2.6"
+    v: "7.2.7"
   });
 
   return `${publicBase(req)}/c/${token}/top-cover?${qs}`;
