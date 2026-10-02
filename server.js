@@ -173,8 +173,9 @@ async function buildCoverUrl(
 ) {
   const shape = normalizeShape(catalog.shape);
   const canvasBackground = normalizeCanvasBackground(catalog.canvasBackground);
-  const genre = Array.isArray(meta?.genres) && meta.genres.length > 0 ? meta.genres[0] : (meta?.genre || "");
-  const rating = meta?.imdbRating || meta?.rating || "";
+  const showMeta = catalog.showMeta !== false && catalog.showMeta !== "false";
+  const genre = showMeta ? (Array.isArray(meta?.genres) && meta.genres.length > 0 ? meta.genres[0] : (meta?.genre || "")) : "";
+  const rating = showMeta ? (meta?.imdbRating || meta?.rating || "") : "";
 
   try {
     const tmdbId = await resolveTmdbId(
@@ -191,9 +192,10 @@ async function buildCoverUrl(
         shape,
         catalogId: catalog.id || "",
         canvasBackground,
+        showMeta: String(showMeta),
         genre: genre || "",
         rating: rating || "",
-        v: "7.2.7"
+        v: "7.2.8"
       });
 
       return `${publicBase(req)}/c/${token}/top-cover?${qs}`;
@@ -214,9 +216,10 @@ async function buildCoverUrl(
     shape,
     catalogId: catalog.id || "",
     canvasBackground,
+    showMeta: String(showMeta),
     genre: genre || "",
     rating: rating || "",
-    v: "7.2.7"
+    v: "7.2.8"
   });
 
   return `${publicBase(req)}/c/${token}/top-cover?${qs}`;
@@ -286,7 +289,8 @@ app.post("/api/generate", async (req, res) => {
           type: sourceCatalog.type,
           name: sourceCatalog.name || sourceCatalog.id,
           shape: normalizeShape(requestedCatalog.shape),
-          canvasBackground: normalizeCanvasBackground(requestedCatalog.canvasBackground)
+          canvasBackground: normalizeCanvasBackground(requestedCatalog.canvasBackground),
+          showMeta: requestedCatalog.showMeta !== false && requestedCatalog.showMeta !== "false"
         };
       })
       .filter(Boolean);
@@ -515,17 +519,22 @@ app.get(["/c/:token/top-cover", "/top-cover"], async (req, res) => {
 
     const canvasBackground = normalizeCanvasBackground(req.query.canvasBackground);
 
+    const showMetaParam = req.query.showMeta;
+    const catalog = config?.catalogs?.find(c => c.id === catalogId) || { id: catalogId };
+    const showMeta = showMetaParam !== undefined
+      ? (showMetaParam !== "false" && showMetaParam !== "0" && showMetaParam !== false)
+      : (catalog.showMeta !== false && catalog.showMeta !== "false");
+
     let artworkUrl = req.query.artwork ? String(req.query.artwork) : null;
     let resolvedTmdbId = tmdbId;
-    let genre = req.query.genre ? String(req.query.genre) : "";
-    let rating = req.query.rating ? String(req.query.rating) : "";
+    let genre = showMeta && req.query.genre ? String(req.query.genre) : "";
+    let rating = showMeta && req.query.rating ? String(req.query.rating) : "";
 
-    const catalog = config?.catalogs?.find(c => c.id === catalogId) || { id: catalogId };
     const accent = catalogAccent(catalog);
     const effectiveType = type === "series" || type === "tv" ? "tv" : "movie";
 
     // If artworkUrl, tmdbId, genre, or rating are missing, resolve from catalog
-    if ((!artworkUrl && !resolvedTmdbId && catalogId) || (!genre && catalogId) || (!rating && catalogId)) {
+    if ((!artworkUrl && !resolvedTmdbId && catalogId) || (showMeta && !genre && catalogId) || (showMeta && !rating && catalogId)) {
       try {
         const catType = type === "series" || type === "tv" ? "series" : "movie";
         const sourceUrl = `${sourceBaseUrl()}/catalog/${encodeURIComponent(catType)}/${encodeURIComponent(catalogId)}.json`;
@@ -533,8 +542,8 @@ app.get(["/c/:token/top-cover", "/top-cover"], async (req, res) => {
         const metas = Array.isArray(catData?.metas) ? catData.metas : [];
         const item = metas[rank - 1] || metas[0];
         if (item) {
-          if (!genre) genre = Array.isArray(item.genres) && item.genres.length > 0 ? item.genres[0] : (item.genre || "");
-          if (!rating) rating = item.imdbRating || item.rating || "";
+          if (showMeta && !genre) genre = Array.isArray(item.genres) && item.genres.length > 0 ? item.genres[0] : (item.genre || "");
+          if (showMeta && !rating) rating = item.imdbRating || item.rating || "";
           if (!resolvedTmdbId) {
             resolvedTmdbId = await resolveTmdbId(catType, item.id || item.tmdbId, DEFAULT_TMDB_KEY);
             if (!resolvedTmdbId && !artworkUrl) {
@@ -548,7 +557,7 @@ app.get(["/c/:token/top-cover", "/top-cover"], async (req, res) => {
     }
 
     // If genre or rating are still missing, but tmdbId is resolved, fetch TMDB details
-    if (resolvedTmdbId && (!genre || !rating)) {
+    if (showMeta && resolvedTmdbId && (!genre || !rating)) {
       try {
         const details = await getTmdbDetails(effectiveType, resolvedTmdbId, DEFAULT_TMDB_KEY);
         if (details) {

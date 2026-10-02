@@ -126,9 +126,10 @@ export async function preloadAllCatalogs(sourceManifestUrl, options = {}) {
 
             const images = await getTmdbImages(type, tmdbId, DEFAULT_TMDB_KEY);
 
-            // Pre-generate for standard combinations
+            // Pre-generate for standard combinations (both with and without metadata)
             const shapes = ["landscape", "poster"];
-            const backgrounds = ["stremio", "black", "transparent"];
+            const backgrounds = ["transparent", "black", "stremio"];
+            const metaFlags = [true, false];
 
             for (const shape of shapes) {
               const artworkUrl = shape === "poster"
@@ -136,40 +137,45 @@ export async function preloadAllCatalogs(sourceManifestUrl, options = {}) {
                 : chooseBackdrop(images);
 
               for (const canvasBackground of backgrounds) {
-                const coverKey = computeCoverKey({
-                  rank,
-                  type: type === "series" ? "tv" : type,
-                  shape,
-                  tmdbId,
-                  catalogId: catId,
-                  canvasBackground,
-                  accent,
-                  artworkUrl,
-                  genre,
-                  rating
-                });
+                for (const showMeta of metaFlags) {
+                  const effectiveGenre = showMeta ? genre : "";
+                  const effectiveRating = showMeta ? rating : "";
 
-                const existing = getCoverFilePath(coverKey);
-                if (existing) {
-                  skippedCovers++;
-                  continue;
-                }
-
-                try {
-                  const pngBuffer = await createTopCover({
+                  const coverKey = computeCoverKey({
                     rank,
-                    artworkUrl,
+                    type: type === "series" ? "tv" : type,
                     shape,
-                    accent,
+                    tmdbId,
+                    catalogId: catId,
                     canvasBackground,
-                    genre,
-                    rating
+                    accent,
+                    artworkUrl,
+                    genre: effectiveGenre,
+                    rating: effectiveRating
                   });
 
-                  saveCoverBuffer(coverKey, pngBuffer);
-                  newCoversGenerated++;
-                } catch (coverErr) {
-                  console.warn(`[Preload] Errore generazione cover ${meta.name || tmdbId} #${rank}:`, coverErr.message);
+                  const existing = getCoverFilePath(coverKey);
+                  if (existing) {
+                    skippedCovers++;
+                    continue;
+                  }
+
+                  try {
+                    const pngBuffer = await createTopCover({
+                      rank,
+                      artworkUrl,
+                      shape,
+                      accent,
+                      canvasBackground,
+                      genre: effectiveGenre,
+                      rating: effectiveRating
+                    });
+
+                    saveCoverBuffer(coverKey, pngBuffer);
+                    newCoversGenerated++;
+                  } catch (coverErr) {
+                    console.warn(`[Preload] Errore generazione cover ${meta.name || tmdbId} #${rank}:`, coverErr.message);
+                  }
                 }
               }
             }

@@ -214,6 +214,10 @@
     .g-stremio { background: rgb(26, 23, 62); }
     .g-bk { background: #000; }
     .o.on .g-tr, .o.on .g-bk, .o.on .g-stremio { box-shadow: 0 0 0 1.5px var(--accent); }
+    .g-meta-on, .g-meta-off { display: inline-flex; align-items: center; justify-content: center; font-size: 11px; line-height: 1; font-style: normal; }
+    .g-meta-on::before { content: "★"; color: #FFB800; font-size: 11px; }
+    .g-meta-off::before { content: "⊘"; color: var(--dim); font-size: 11px; }
+    .o.on .g-meta-off::before { color: #fff; }
 
     /* elenco cataloghi */
     .list { border-top: 1px solid var(--line); }
@@ -545,13 +549,16 @@
         </div>
 
         <div class="bulk">
-          <span class="grp"><em>FORMATO GLOBALE:</em>
+          <span class="grp"><em>FORMATO:</em>
             <button class="o on" type="button" data-bulk="shape" data-v="landscape"><i class="g-land"></i>Orizzontale 16:9</button>
             <button class="o" type="button" data-bulk="shape" data-v="poster"><i class="g-port"></i>Verticale 2:3</button></span>
           <span class="grp"><em>SFONDO:</em>
-            <button class="o on" type="button" data-bulk="bg" data-v="stremio"><i class="g-stremio"></i>Stremio (rgb 26,23,62)</button>
-            <button class="o" type="button" data-bulk="bg" data-v="black"><i class="g-bk"></i>Nuvio / Nero</button>
-            <button class="o" type="button" data-bulk="bg" data-v="transparent"><i class="g-tr"></i>Trasparente</button></span>
+            <button class="o on" type="button" data-bulk="bg" data-v="transparent"><i class="g-tr"></i>Trasparente</button>
+            <button class="o" type="button" data-bulk="bg" data-v="black"><i class="g-bk"></i>Nuvio</button>
+            <button class="o" type="button" data-bulk="bg" data-v="stremio"><i class="g-stremio"></i>Stremio</button></span>
+          <span class="grp"><em>GENERE &amp; VOTO:</em>
+            <button class="o on" type="button" data-bulk="meta" data-v="true"><i class="g-meta-on"></i>Mostra</button>
+            <button class="o" type="button" data-bulk="meta" data-v="false"><i class="g-meta-off"></i>Nascondi</button></span>
         </div>
 
         <div id="catalogs" class="list">
@@ -725,12 +732,13 @@
         const name = providerOf(c.name);
         const key = name.toLowerCase();
         if (!map.has(key)) map.set(key, { key, name, items: [] });
-        // Default: tutto spento (checked: false)
+        // Default: tutto spento (checked: false), sfondo trasparente
         map.get(key).items.push({ 
           ...c, 
           checked: false, 
           shape: "landscape", 
-          canvasBackground: "stremio" 
+          canvasBackground: "transparent",
+          showMeta: "true"
         });
       });
       map.forEach(g => g.items.sort((a, b) => (a.type === "movie" ? 0 : 1) - (b.type === "movie" ? 0 : 1)));
@@ -757,7 +765,11 @@
 
     function selectedCatalogs() {
       return allItems().filter(c => c.checked).map(c => ({
-        id: c.id, type: c.type, shape: c.shape, canvasBackground: c.canvasBackground
+        id: c.id,
+        type: c.type,
+        shape: c.shape,
+        canvasBackground: c.canvasBackground,
+        showMeta: c.showMeta !== false && c.showMeta !== "false"
       }));
     }
 
@@ -868,7 +880,8 @@
               const updateImg = () => {
                 const isZoomed = card.classList.contains("zoomed");
                 card.className = `preview-card ${i.shape} ${i.canvasBackground}${isZoomed ? " zoomed" : ""}`;
-                img.src = `/top-cover?catalogId=${encodeURIComponent(i.id)}&type=${encodeURIComponent(i.type)}&shape=${i.shape}&canvasBackground=${i.canvasBackground}&rank=${rank}&v=7.2.7`;
+                const showMeta = i.showMeta !== false && i.showMeta !== "false";
+                img.src = `/top-cover?catalogId=${encodeURIComponent(i.id)}&type=${encodeURIComponent(i.type)}&shape=${i.shape}&canvasBackground=${i.canvasBackground}&showMeta=${showMeta}&rank=${rank}&v=7.2.8`;
               };
 
               card.addEventListener("click", (e) => {
@@ -895,9 +908,13 @@
               optBtn(i, "shape", "poster", "Verticale 2:3", "g-port", line, onConfigChange));
             const sep = document.createElement("span"); sep.className = "sep";
             line.append(sep,
-              optBtn(i, "canvasBackground", "stremio", "Stremio", "g-stremio", line, onConfigChange),
+              optBtn(i, "canvasBackground", "transparent", "Trasparente", "g-tr", line, onConfigChange),
               optBtn(i, "canvasBackground", "black", "Nuvio", "g-bk", line, onConfigChange),
-              optBtn(i, "canvasBackground", "transparent", "Trasparente", "g-tr", line, onConfigChange));
+              optBtn(i, "canvasBackground", "stremio", "Stremio", "g-stremio", line, onConfigChange));
+            const sep2 = document.createElement("span"); sep2.className = "sep";
+            line.append(sep2,
+              optBtn(i, "showMeta", "true", "Info ON", "g-meta-on", line, onConfigChange),
+              optBtn(i, "showMeta", "false", "Info OFF", "g-meta-off", line, onConfigChange));
 
             previewRow.append(...cards);
             previewsWrap.append(previewHeader, previewRow);
@@ -968,7 +985,7 @@
     $("allBtn").addEventListener("click", () => { visibleItems().forEach(c => c.checked = true); renderCatalogs(); });
     $("noneBtn").addEventListener("click", () => { visibleItems().forEach(c => c.checked = false); renderCatalogs(); });
     document.querySelectorAll("[data-bulk]").forEach(b => b.addEventListener("click", () => {
-      const prop = b.dataset.bulk === "shape" ? "shape" : "canvasBackground";
+      const prop = b.dataset.bulk === "shape" ? "shape" : (b.dataset.bulk === "meta" ? "showMeta" : "canvasBackground");
       allItems().forEach(c => { c[prop] = b.dataset.v; });
       document.querySelectorAll(`[data-bulk="${b.dataset.bulk}"]`).forEach(x => x.classList.toggle("on", x === b));
       renderCatalogs();
@@ -1058,7 +1075,7 @@
       const base = "/top-cover";
       const ids = [1423191, 1377237, 1283515, 977942];
       $("covers").innerHTML = ids.map((id, i) =>
-        `<div class="cv"><span class="poster"><img src="${base}?rank=${i + 1}&type=movie&tmdbId=${id}&v=7.2.7" alt="" decoding="async" referrerpolicy="no-referrer" onerror="this.remove()" /></span></div>`
+        `<div class="cv"><span class="poster"><img src="${base}?rank=${i + 1}&type=movie&tmdbId=${id}&v=7.2.8" alt="" decoding="async" referrerpolicy="no-referrer" onerror="this.remove()" /></span></div>`
       ).join("");
     })();
 
